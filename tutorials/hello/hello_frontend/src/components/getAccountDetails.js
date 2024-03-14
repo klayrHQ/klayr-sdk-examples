@@ -109,7 +109,7 @@ function GetAccountDetails() {
             <FixedMenuLayout />
             <Container>
                 <h2>Account details</h2>
-                <p>Get account details by submitting a Lisk32 address.</p>
+                <p>Get account details by submitting a Klayr32 address.</p>
                 <Divider></Divider>
                 <div className="ui two column doubling stackable grid container">
                     <div className="column">
@@ -119,7 +119,7 @@ function GetAccountDetails() {
                                 <label>Lisk32 address:</label>
                                 <input placeholder="Lisk32 address" id="address" name="address" onChange={handleChange} value={state.address} />
                             </Form.Field>
-                            <Button type='submit' fluid size='large' style={{ backgroundColor: '#2BD67B', color: 'white' }}>Submit</Button>
+                            <Button type='submit' fluid size='large' style={{ backgroundColor: '#0D75FD', color: 'white' }}>Submit</Button>
                         </Form>
                     </div>
 

@@ -11,7 +11,7 @@ function Home() {
             <FixedMenuLayout />
             <Container >
                 <span>
-                    <h1><img src={logo} alt="Lisk Logo" width="35" style={{ display: 'inline', verticalAlign: 'middle' }} /> Welcome to the Hello Lisk application!</h1>
+                    <h1><img src={logo} alt="Klayr Logo" width="35" style={{ display: 'inline', verticalAlign: 'middle' }} /> Welcome to the Hello Klayr application!</h1>
                 </span>
                 <Divider>
                 </Divider>

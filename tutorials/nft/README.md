@@ -1,8 +1,8 @@
 # NFT Demo
 
-This is a NFT Blockchain application created using `Version 5` of `lisk-sdk`.
+This is a NFT Blockchain application created using `Version 5` of `klayr-sdk`.
 
-This demonstrates On-Chain and Off-Chain architecture of `lisk-sdk`. We will be building an NFT Token to cover up following requirements.
+This demonstrates On-Chain and Off-Chain architecture of `klayr-sdk`. We will be building an NFT Token to cover up following requirements.
 
 - A blockchain app which have support for.
   - NFT Token
@@ -18,8 +18,8 @@ This demonstrates On-Chain and Off-Chain architecture of `lisk-sdk`. We will be 
 ## Install dependencies
 
 ```bash
-cd blockchain_app && npm i --registry https://npm.lisk.io
-cd frontend_app && npm i --registry https://npm.lisk.io
+cd blockchain_app && npm i --registry https://npm.klayr.io
+cd frontend_app && npm i --registry https://npm.klayr.io
 ```
 
 ## Start node

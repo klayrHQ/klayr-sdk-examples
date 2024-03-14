@@ -105,10 +105,10 @@ function Faucet() {
                         <div className="column">
                             <Form onSubmit={handleSubmit}>
                                 <Form.Field>
-                                    <label>Recipient's Lisk32 Address:</label>
-                                    <input placeholder="Recipient's Lisk32 Address" id="address" name="address" onChange={handleChange} value={state.address} />
+                                    <label>Recipient's Klayr32 Address:</label>
+                                    <input placeholder="Recipient's Klayr32 Address" id="address" name="address" onChange={handleChange} value={state.address} />
                                 </Form.Field>
-                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#2BD67B', color: 'white' }}>Submit</Button>
+                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#0D75FD', color: 'white' }}>Submit</Button>
                             </Form>
                         </div>
 

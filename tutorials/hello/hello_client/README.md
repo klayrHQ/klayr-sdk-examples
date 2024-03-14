@@ -1,6 +1,6 @@
-# Getting Started with Lisk Blockchain Client
+# Getting Started with Klayr Blockchain Client
 
-This project was bootstrapped with [Lisk SDK](https://github.com/LiskHQ/lisk-sdk)
+This project was bootstrapped with [Klayr SDK](https://github.com/KlayrHQ/klayr-sdk)
 
 ### Install packages
 
@@ -23,19 +23,19 @@ npm run build
 ### Add a new module
 
 ```
-lisk generate:module ModuleName
+klayr generate:module ModuleName
 // Example
-lisk generate:module hello
+klayr generate:module hello
 ```
 
 ### Add a new plugin
 
 ```
-lisk generate:plugin PluginName
+klayr generate:plugin PluginName
 // Example
-lisk generate:plugin helloInfo
+klayr generate:plugin helloInfo
 ```
 
 ## Learn More
 
-You can learn more in the [documentation](https://lisk.com/documentation/lisk-sdk/).
+You can learn more in the [documentation](https://klayr.com/documentation/klayr-sdk/).
