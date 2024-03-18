@@ -14,8 +14,8 @@ function Transfer() {
                         <div class="column">
                             <Form class="ui form">
                                 <Form.Field class="field">
-                                    <label>Recipient's Lisk32 Address:</label>
-                                    <input placeholder="Recipient's Lisk32 Address" id="address" name="address" />
+                                    <label>Recipient's Klayr32 Address:</label>
+                                    <input placeholder="Recipient's Klayr32 Address" id="address" name="address" />
                                 </Form.Field>
                                 <Form.Field class="field">
                                     <label>Amount:</label>
@@ -44,7 +44,7 @@ function Transfer() {
                                         </div>
                                     </div>
                                 </Form.Field>
-                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#2BD67B', color: 'white' }}>Submit</Button>
+                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#0D75FD', color: 'white' }}>Submit</Button>
                             </Form>
                         </div>
 

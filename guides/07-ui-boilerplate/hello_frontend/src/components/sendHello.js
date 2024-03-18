@@ -40,7 +40,7 @@ function SendHello() {
                                         </div>
                                     </div>
                                 </Form.Field>
-                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#2BD67B', color: 'white' }}>Submit</Button>
+                                <Button type='submit' fluid size='large' style={{ backgroundColor: '#0D75FD', color: 'white' }}>Submit</Button>
                             </Form>
                         </div>
                         <div className='column'>

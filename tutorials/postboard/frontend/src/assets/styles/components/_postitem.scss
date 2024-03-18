@@ -17,7 +17,7 @@
     button.outline {
       border: none;
       background-color: transparent;
-      color: $ultramarine_blue;
+      color: $azule;
       margin-left: 10px;
     }
     .sub {
@@ -39,7 +39,7 @@
         }
         &:hover {
           svg, path {
-            fill: $ultramarine_blue;
+            fill: $azule;
             stroke-width: 2;
             fill-rule: unset;
           }

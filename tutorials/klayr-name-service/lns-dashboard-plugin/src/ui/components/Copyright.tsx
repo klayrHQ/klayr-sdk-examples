@@ -5,7 +5,7 @@ const Copyright: React.FC = () => (
 	<Typography variant="body2" color="textSecondary" align="center">
 		{'Copyright © '}
 		<Link color="inherit" href="https://lisk.io/">
-			Lisk Foundation
+			Klayr
 		</Link>{' '}
 		{new Date().getFullYear()}
 		{'.'}

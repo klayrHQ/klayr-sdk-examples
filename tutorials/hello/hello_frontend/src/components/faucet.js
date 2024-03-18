@@ -38,7 +38,7 @@ function Faucet() {
                 tokenID: Buffer.from('0000000100000000', 'hex'),
                 amount: BigInt(transactions.convertLSKToBeddows('10')),
                 recipientAddress: state.address,
-                data: 'Please accept this grant from Lisk faucet.'
+                data: 'Please accept this grant from Klayr faucet.'
             }
         }, privateKey).catch(err => {
             responseError = err.message;

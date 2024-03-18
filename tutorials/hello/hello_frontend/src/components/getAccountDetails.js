@@ -116,8 +116,8 @@ function GetAccountDetails() {
 
                         <Form onSubmit={handleSubmit}>
                             <Form.Field>
-                                <label>Lisk32 address:</label>
-                                <input placeholder="Lisk32 address" id="address" name="address" onChange={handleChange} value={state.address} />
+                                <label>Klayr32 address:</label>
+                                <input placeholder="Klayr32 address" id="address" name="address" onChange={handleChange} value={state.address} />
                             </Form.Field>
                             <Button type='submit' fluid size='large' style={{ backgroundColor: '#0D75FD', color: 'white' }}>Submit</Button>
                         </Form>

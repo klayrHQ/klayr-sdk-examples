@@ -110,8 +110,8 @@ function Transfer() {
 
                             <Form onSubmit={handleSubmit} class="ui form">
                                 <Form.Field class="field">
-                                    <label>Recipient's Lisk32 Address:</label>
-                                    <input placeholder="Recipient's Lisk32 Address" id="address" name="address" onChange={handleChange} value={state.address} />
+                                    <label>Recipient's Klayr32 Address:</label>
+                                    <input placeholder="Recipient's Klayr32 Address" id="address" name="address" onChange={handleChange} value={state.address} />
                                 </Form.Field>
                                 <Form.Field class="field">
                                     <label>Amount:</label>
