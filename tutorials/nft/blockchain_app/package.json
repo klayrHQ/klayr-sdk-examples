@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Klayr Foundation <admin@klayr.xyz>, lightcurve GmbH <admin@lightcurve.io>",
+  "author": "Klayr <admin@klayr.xyz>, lightcurve GmbH <admin@lightcurve.io>",
   "keywords": [
     "klayr",
     "blockchain"

@@ -4,7 +4,7 @@ import * as React from 'react';
 const Copyright: React.FC = () => (
 	<Typography variant="body2" color="textSecondary" align="center">
 		{'Copyright © '}
-		<Link color="inherit" href="https://lisk.io/">
+		<Link color="inherit" href="https://klayr.xyz/">
 			Klayr
 		</Link>{' '}
 		{new Date().getFullYear()}
