@@ -1,16 +1,25 @@
 import React from 'react';
 import './App.css';
-import { ThemeProvider } from '@mui/material';
-import { muiLightTheme } from './config/theme';
-import { Header } from './layout/Header';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { WalletConnect } from './pages/WalletConnect';
+import { Home } from './pages/Home';
+import { Layout } from './layout/Layout';
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout><Home /></Layout>,
+    errorElement: <div>404 not found</div>
+  },
+  {
+    path: "/wallet-connect",
+    element: <Layout><WalletConnect /></Layout>
+  }
+])
 
 function App() {
   return (
-    <ThemeProvider theme={muiLightTheme}>
-      <div className="App">
-        <Header/>
-      </div>
-    </ThemeProvider>
+    <RouterProvider router={router} />
   );
 }
 

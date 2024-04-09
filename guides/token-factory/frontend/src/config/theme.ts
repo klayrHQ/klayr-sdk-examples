@@ -1,6 +1,7 @@
 import { createTheme} from '@mui/material/styles';
 import type { ThemeOptions } from '@mui/material/styles';
 import Inter from '../assets/fonts/Inter-Regular.ttf';
+import Utendo from '../assets/fonts/Utendo-Regular.ttf';
 
 declare module '@mui/material/styles' {
 	interface Palette {
@@ -42,7 +43,7 @@ const darkBlue = {
 }
 
 const typography: ThemeOptions['typography'] = {
-	fontFamily: 'Inter, sans-serif',
+	fontFamily: 'inter, sans-serif',
 	fontSize: 20,
 	body1: {
 		fontSize: '1.2rem',
@@ -51,29 +52,23 @@ const typography: ThemeOptions['typography'] = {
 		fontSize: '1.5rem',
 	},
 	button: {
-		fontFamily: 'Utendo, Inter, sans-serif',
+		fontFamily: 'utendo, inter, sans-serif',
 		fontSize: '1.3rem',
 	},
 	h1: {
 		fontSize: '3rem',
+		fontFamily: 'utendo, inter, sans-serif',
 	},
 	h2: {
 		fontSize: '4rem',
+		fontFamily: 'utendo, inter, sans-serif',
 	},
+	h3: {
+		fontFamily: 'utendo, inter, sans-serif',
+	}
 };
 
 const components: ThemeOptions['components'] = {
-	MuiCssBaseline: {
-		styleOverrides: `
-        @font-face {
-          font-family: 'Inter';
-          font-style: normal;
-          font-display: swap;
-          font-weight: 400;
-          src: local('Inter'), local('Inter-Regular'), url(${Inter}) format('ttf');
-        }
-      `,
-	},
 	MuiButton: {
 		defaultProps: {
 			variant: 'contained',
