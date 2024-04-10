@@ -6,6 +6,13 @@ This project was bootstrapped with [Lisk SDK](https://github.com/LiskHQ/lisk-sdk
 
 ```
 ./bin/run start
+npm run build && ./bin/run start --config config/custom_config.json --overwrite-config
+```
+
+### Commands
+
+```
+./bin/run transaction:create tokenFactory createToken 10000000 --params='{"name":"The real pepe", "symbol": "TESTTT", "totalSupply": 10000}' --json --pretty
 ```
 
 ### Add a new module

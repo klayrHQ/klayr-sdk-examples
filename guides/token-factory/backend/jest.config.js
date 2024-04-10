@@ -1,6 +1,10 @@
 module.exports = {
 	testMatch: ['<rootDir>/test/**/?(*.)+(spec|test).+(ts|tsx|js)'],
 	setupFilesAfterEnv: ['<rootDir>/test/_setup.js'],
+	moduleNameMapper: {
+		'^@app/(.*)$': '<rootDir>/src/app/$1',
+		'^@test/(.*)$': '<rootDir>/test/$1',
+	},
 	transform: {
 		'^.+\\.(ts|tsx)$': [
 			'ts-jest',

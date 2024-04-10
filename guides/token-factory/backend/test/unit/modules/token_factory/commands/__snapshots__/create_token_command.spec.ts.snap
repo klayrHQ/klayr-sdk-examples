@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CreateTokenCommand constructor should have valid schema 1`] = `
+{
+  "$id": "token_factory/createToken-params",
+  "properties": {
+    "name": {
+      "dataType": "string",
+      "fieldNumber": 1,
+      "maxLength": 30,
+      "minLength": 1,
+    },
+    "symbol": {
+      "dataType": "string",
+      "fieldNumber": 2,
+      "maxLength": 6,
+      "minLength": 1,
+    },
+    "totalSupply": {
+      "dataType": "uint64",
+      "fieldNumber": 3,
+    },
+  },
+  "required": [
+    "name",
+  ],
+  "title": "CreateTokenCommand transaction parameter for the Token Factory module",
+  "type": "object",
+}
+`;
