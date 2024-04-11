@@ -12,7 +12,7 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 ### Commands
 
 ```
-./bin/run transaction:create tokenFactory createToken 10000000 --params='{"name":"The real pepe", "symbol": "TESTTT", "totalSupply": 10000}' --json --pretty
+./bin/run transaction:create tokenFactory createToken 10000000 --params='{"name":"The real pepe", "symbol": "PEPE", "totalSupply": 100000}' --json --pretty
 ```
 
 ### Add a new module

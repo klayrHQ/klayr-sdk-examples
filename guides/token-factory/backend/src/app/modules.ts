@@ -7,6 +7,5 @@ export const registerModules = (app: Application): void => {
 	const tokenFactoryModule = new TokenFactoryModule();
 	tokenFactoryModule.addDependencies(tokenModule.method);
 
-	app.registerModule(tokenModule);
 	app.registerModule(tokenFactoryModule);
 };
