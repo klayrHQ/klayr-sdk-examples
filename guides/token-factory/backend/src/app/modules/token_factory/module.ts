@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { validator } from '@liskhq/lisk-validator';
-import { BaseModule, ModuleInitArgs, ModuleMetadata, utils } from 'lisk-sdk';
-import { ModuleConfigJSON } from '../types';
+import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'lisk-sdk';
+import { ModuleConfig, ModuleConfigJSON } from '../types';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { TokenFactoryEndpoint } from './endpoint';
 import { TokenFactoryMethod } from './method';
@@ -13,18 +13,27 @@ import { TokenStore } from './stores/token';
 export const defaultConfig = {
 	maxNameLength: 30,
 	maxSymbolLength: 5,
-	maxTotalSupply: 1e18, // Not sure whats normal for this chain yet
+	maxTotalSupply: 1e18, // Not sure if neccesary and whats normal for this chain yet
 };
 
 export class TokenFactoryModule extends BaseModule {
+	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
+	private _moduleConfig!: ModuleConfig;
+	private _tokenMethod!: TokenMethod;
+
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public method = new TokenFactoryMethod(this.stores, this.events);
-	public commands = [new CreateTokenCommand(this.stores, this.events)];
+	public commands = [this._createTokenCommand];
 
 	public constructor() {
 		super();
 		// registeration of stores and events
 		this.stores.register(TokenStore, new TokenStore(this.name, 0));
+	}
+
+	public addDependencies(tokenMethod: TokenMethod) {
+		this._tokenMethod = tokenMethod;
+		this._createTokenCommand.addDependencies({ tokenMethod: this._tokenMethod });
 	}
 
 	public metadata(): ModuleMetadata {
@@ -44,7 +53,8 @@ export class TokenFactoryModule extends BaseModule {
 		// Validate the config with the config schema
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
-		this.commands[0].init(config).catch(err => {
+		this._moduleConfig = config;
+		this.commands[0].init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});
 	}

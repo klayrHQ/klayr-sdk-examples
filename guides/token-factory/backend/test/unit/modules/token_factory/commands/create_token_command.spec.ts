@@ -9,28 +9,27 @@ import { Transaction, VerifyStatus, chain, codec, db, testing } from 'lisk-sdk';
 import { createSampleTransaction } from '@test/helpers';
 
 describe('CreateTokenCommand', () => {
+	const initConfig = {
+		maxNameLength: 30,
+		maxSymbolLength: 6,
+		maxTotalSupply: 1e18,
+	};
+	const defaultValidParams = codec.encode(createTokenSchema, {
+		name: 'The real pepe coin',
+		symbol: 'PEPE',
+		totalSupply: BigInt(initConfig.maxTotalSupply - 1e6),
+	});
+
 	let command: CreateTokenCommand;
-	let config: ModuleConfig;
 	let stateStore: any;
-	let defaultValidParams: Buffer;
-	// let tokenStore: TokenStore;
 
 	beforeEach(async () => {
 		const tokenFactory = new TokenFactoryModule();
+
 		command = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
-		config = {
-			maxNameLength: 30,
-			maxSymbolLength: 6,
-			maxTotalSupply: 1e18,
-		};
+		command.addDependencies({ tokenMethod: { mint: jest.fn() } } as any);
+		await command.init(initConfig as ModuleConfig);
 
-		defaultValidParams = codec.encode(createTokenSchema, {
-			name: 'The real pepe coin',
-			symbol: 'PEPE',
-			totalSupply: BigInt(config.maxTotalSupply - 1e6),
-		});
-
-		await command.init(config as ModuleConfig);
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
 		// tokenStore = tokenFactory.stores.get(TokenStore);
 	});
@@ -51,7 +50,7 @@ describe('CreateTokenCommand', () => {
 				const invalidParam = codec.encode(createTokenSchema, {
 					name: 'The real pepe coin',
 					symbol: 'PEPE',
-					totalSupply: BigInt(config.maxTotalSupply + 1e6), // invalid totalSupply
+					totalSupply: BigInt(initConfig.maxTotalSupply + 1e6), // invalid totalSupply
 				});
 				const transaction = new Transaction(createSampleTransaction(invalidParam));
 				const context = testing

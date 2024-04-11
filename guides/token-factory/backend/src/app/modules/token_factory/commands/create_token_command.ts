@@ -6,6 +6,7 @@ import {
 	CommandExecuteContext,
 	VerificationResult,
 	VerifyStatus,
+	TokenMethod,
 } from 'lisk-sdk';
 import { createTokenSchema } from '../schema';
 import { ModuleConfig } from '../../types';
@@ -17,11 +18,17 @@ export interface CreateTokenParams {
 }
 
 export class CreateTokenCommand extends BaseCommand {
+	private _maxTotalSupply!: number;
+	private _tokenMethod!: TokenMethod;
+
 	public schema = createTokenSchema;
-	private maxTotalSupply!: number;
+
+	public addDependencies(args: { tokenMethod: TokenMethod }) {
+		this._tokenMethod = args.tokenMethod;
+	}
 
 	public async init(config: ModuleConfig): Promise<void> {
-		this.maxTotalSupply = config.maxTotalSupply;
+		this._maxTotalSupply = config.maxTotalSupply;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;
 	}
@@ -32,8 +39,8 @@ export class CreateTokenCommand extends BaseCommand {
 	): Promise<VerificationResult> {
 		context.logger.info('TX VERIFICATION');
 
-		if (context.params.totalSupply > this.maxTotalSupply) {
-			const error = Error(`Total supply cannot be greater than ${this.maxTotalSupply}`);
+		if (context.params.totalSupply > this._maxTotalSupply) {
+			const error = Error(`Total supply cannot be greater than ${this._maxTotalSupply}`);
 			context.logger.info(error);
 			return {
 				status: VerifyStatus.FAIL,
@@ -48,5 +55,14 @@ export class CreateTokenCommand extends BaseCommand {
 
 	public async execute(context: CommandExecuteContext<CreateTokenParams>): Promise<void> {
 		context.logger.info('EXECUTE');
+		const {
+			transaction: { senderAddress },
+		} = context;
+		await this._tokenMethod.mint(
+			context.getMethodContext(),
+			senderAddress,
+			Buffer.from('0001', 'hex'),
+			BigInt(1),
+		);
 	}
 }
