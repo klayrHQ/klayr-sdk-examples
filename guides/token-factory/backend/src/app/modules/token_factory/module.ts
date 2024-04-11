@@ -9,6 +9,8 @@ import { TokenFactoryEndpoint } from './endpoint';
 import { TokenFactoryMethod } from './method';
 import { configSchema } from './schema';
 import { TokenStore } from './stores/token';
+import { CounterStore } from './stores/counter';
+import { OwnerStore } from './stores/owner';
 
 export const defaultConfig = {
 	maxNameLength: 30,
@@ -29,6 +31,8 @@ export class TokenFactoryModule extends BaseModule {
 		super();
 		// registeration of stores and events
 		this.stores.register(TokenStore, new TokenStore(this.name, 0));
+		this.stores.register(CounterStore, new CounterStore(this.name, 1));
+		this.stores.register(OwnerStore, new OwnerStore(this.name, 2));
 	}
 
 	public addDependencies(tokenMethod: TokenMethod) {
@@ -54,7 +58,7 @@ export class TokenFactoryModule extends BaseModule {
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
 		this._moduleConfig = config;
-		this.commands[0].init(this._moduleConfig).catch(err => {
+		this._createTokenCommand.init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});
 	}

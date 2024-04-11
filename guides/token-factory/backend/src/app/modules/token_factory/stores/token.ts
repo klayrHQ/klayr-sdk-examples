@@ -1,6 +1,7 @@
 import { BaseStore } from 'lisk-sdk';
 
 export interface TokenStoreData {
+	tokenID: number;
 	name: string;
 	symbol: string;
 	totalSupply: number;
@@ -9,19 +10,23 @@ export interface TokenStoreData {
 export const tokenStoreSchema = {
 	$id: '/token_factory/token',
 	type: 'object',
-	required: ['name', 'symbol', 'totalSupply'],
+	required: ['tokenID', 'name', 'symbol', 'totalSupply'],
 	properties: {
-		name: {
-			dataType: 'string',
+		tokenID: {
+			dataType: 'uint32',
 			fieldNumber: 1,
 		},
-		symbol: {
+		name: {
 			dataType: 'string',
 			fieldNumber: 2,
 		},
-		totalSupply: {
-			dataType: 'uint256',
+		symbol: {
+			dataType: 'string',
 			fieldNumber: 3,
+		},
+		totalSupply: {
+			dataType: 'uint64',
+			fieldNumber: 4,
 		},
 	},
 };

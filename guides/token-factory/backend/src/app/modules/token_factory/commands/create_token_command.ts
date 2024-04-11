@@ -10,6 +10,9 @@ import {
 } from 'lisk-sdk';
 import { createTokenSchema } from '../schema';
 import { ModuleConfig } from '../../types';
+import { TokenStore } from '../stores/token';
+import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';
+import { OwnerStore } from '../stores/owner';
 
 export interface CreateTokenParams {
 	name: string;
@@ -58,11 +61,37 @@ export class CreateTokenCommand extends BaseCommand {
 		const {
 			transaction: { senderAddress },
 		} = context;
+		const tokenStore = this.stores.get(TokenStore);
+		const counterStore = this.stores.get(CounterStore);
+		const ownerStore = this.stores.get(OwnerStore);
+
+		let tokenIdCounter: CounterStoreData = await counterStore
+			.get(context, counterKey)
+			.catch(() => ({ counter: 0 }));
+		tokenIdCounter.counter += 1;
+
+		const currentTokenID = tokenIdCounter.counter;
+		const currentTokenIDBuff = Buffer.from(currentTokenID.toString());
+
+		await Promise.all([
+			counterStore.set(context, counterKey, tokenIdCounter),
+			ownerStore.set(context, currentTokenIDBuff, { address: senderAddress }),
+			tokenStore.set(context, currentTokenIDBuff, {
+				tokenID: currentTokenID,
+				name: context.params.name,
+				symbol: context.params.symbol,
+				totalSupply: context.params.totalSupply,
+			}),
+		]);
+
+		// IMPLEMENT
 		await this._tokenMethod.mint(
 			context.getMethodContext(),
 			senderAddress,
-			Buffer.from('0001', 'hex'),
-			BigInt(1),
+			currentTokenIDBuff,
+			BigInt(context.params.totalSupply),
 		);
+
+		// EVENT
 	}
 }
