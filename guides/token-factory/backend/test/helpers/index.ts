@@ -1,8 +1,6 @@
-import {
-	CreateTokenCommand,
-	CreateTokenParams,
-} from '@app/modules/token_factory/commands/create_token_command';
-import { createTokenSchema } from '@app/modules/token_factory/schema';
+import { CreateTokenParams } from '@app/modules/token_factory/commands/create_token_command';
+import { MintParams } from '@app/modules/token_factory/commands/mint_command';
+import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
 import {
 	CommandExecuteContext,
 	CommandVerifyContext,
@@ -13,10 +11,10 @@ import {
 
 export type contextType = 'verify' | 'execute';
 
-export function createSampleTransaction(params: Buffer) {
+export function createSampleTransaction(params: Buffer, command: string) {
 	return {
 		module: 'token_factory',
-		command: CreateTokenCommand.name,
+		command,
 		senderPublicKey: Buffer.from(
 			'3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a',
 			'hex',
@@ -28,7 +26,7 @@ export function createSampleTransaction(params: Buffer) {
 	};
 }
 
-export function createContext(
+export function createCreateTokenCtx(
 	stateStore: any,
 	transaction: Transaction,
 	contextType: contextType,
@@ -42,4 +40,20 @@ export function createContext(
 	return contextType === 'verify'
 		? context.createCommandVerifyContext<CreateTokenParams>(createTokenSchema)
 		: context.createCommandExecuteContext<CreateTokenParams>(createTokenSchema);
+}
+
+export function createMintCtx(
+	stateStore: any,
+	transaction: Transaction,
+	contextType: contextType,
+): CommandVerifyContext<MintParams> | CommandExecuteContext<MintParams> {
+	const context = testing.createTransactionContext({
+		stateStore,
+		transaction,
+		header: testing.createFakeBlockHeader({}),
+	});
+
+	return contextType === 'verify'
+		? context.createCommandVerifyContext<MintParams>(mintSchema)
+		: context.createCommandExecuteContext<MintParams>(mintSchema);
 }

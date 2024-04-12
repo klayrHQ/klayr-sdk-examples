@@ -8,7 +8,7 @@ import {
 	VerifyStatus,
 	TokenMethod,
 } from 'lisk-sdk';
-import { createTokenSchema } from '../schema';
+import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../../types';
 import { TokenStore } from '../stores/token';
 import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';

@@ -8,6 +8,8 @@ describe('TokenFactoryModule', () => {
 		maxNameLength: 30,
 		maxSymbolLength: 5,
 		maxTotalSupply: 1e18,
+		minAmountToMint: BigInt(1000),
+		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 	};
 	let tokenFactory: TokenFactoryModule;
 
@@ -21,13 +23,13 @@ describe('TokenFactoryModule', () => {
 			expect(tokenFactory['_moduleConfig'].maxNameLength).toBe(defaultConfig.maxNameLength);
 			expect(tokenFactory['_moduleConfig'].maxSymbolLength).toBe(defaultConfig.maxSymbolLength);
 			expect(tokenFactory['_moduleConfig'].maxTotalSupply).toBe(defaultConfig.maxTotalSupply);
+			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(defaultConfig.maxAmountToMint);
 		});
 
 		it('should initialize config with custom values when module config is set', async () => {
 			const moduleConfig = {
 				maxNameLength: 66,
 				maxSymbolLength: 8,
-				maxTotalSupply: 1e10,
 			};
 			tokenFactory = new TokenFactoryModule();
 
@@ -40,14 +42,14 @@ describe('TokenFactoryModule', () => {
 
 			expect(tokenFactory['_moduleConfig'].maxNameLength).toBe(moduleConfig.maxNameLength);
 			expect(tokenFactory['_moduleConfig'].maxSymbolLength).toBe(moduleConfig.maxSymbolLength);
-			expect(tokenFactory['_moduleConfig'].maxTotalSupply).toBe(moduleConfig.maxTotalSupply);
+			expect(tokenFactory['_moduleConfig'].maxTotalSupply).toBe(defaultConfig.maxTotalSupply);
+			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(defaultConfig.maxAmountToMint);
 		});
 
 		it('should not initialize config with invalid value for `maxSymbolLength`', async () => {
 			const moduleConfig = {
 				maxNameLength: 30,
 				maxSymbolLength: -1,
-				maxTotalSupply: 1e10,
 			};
 			tokenFactory = new TokenFactoryModule();
 

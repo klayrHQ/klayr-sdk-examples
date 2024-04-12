@@ -3,10 +3,10 @@ import {
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema } from '@app/modules/token_factory/schema';
+import { createTokenSchema } from '@app/modules/token_factory/schemas';
 import { ModuleConfig } from '@app/modules/types';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
-import { createContext, createSampleTransaction } from '@test/helpers';
+import { createCreateTokenCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { CounterStore, counterKey } from '@app/modules/token_factory/stores/counter';
 import { OwnerStore } from '@app/modules/token_factory/stores/owner';
@@ -62,16 +62,20 @@ describe('CreateTokenCommand', () => {
 					symbol: 'PEPE',
 					totalSupply: BigInt(initConfig.maxTotalSupply + 10), // invalid totalSupply
 				});
-				const transaction = new Transaction(createSampleTransaction(paramWithInvalidTotalSupply));
-				const context = createContext(stateStore, transaction, 'verify');
+				const transaction = new Transaction(
+					createSampleTransaction(paramWithInvalidTotalSupply, CreateTokenCommand.name),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'verify');
 
 				const result = await command.verify(context);
 				expect(result.status).toBe(VerifyStatus.FAIL);
 			});
 
 			it('should be ok when valid params', async () => {
-				const transaction = new Transaction(createSampleTransaction(defaultValidParams));
-				const context = createContext(stateStore, transaction, 'verify');
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'verify');
 
 				const result = await command.verify(context);
 				expect(result.status).toBe(VerifyStatus.OK);
@@ -82,8 +86,10 @@ describe('CreateTokenCommand', () => {
 	describe('execute', () => {
 		describe('valid cases', () => {
 			it('mint function should have been called', async () => {
-				const transaction = new Transaction(createSampleTransaction(defaultValidParams));
-				const context = createContext(stateStore, transaction, 'execute');
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
 
 				await expect(
 					command.execute(context as CommandExecuteContext<CreateTokenParams>),
@@ -92,8 +98,10 @@ describe('CreateTokenCommand', () => {
 			});
 
 			it('should update the `token`, `counter` and `owner` store', async () => {
-				const transaction = new Transaction(createSampleTransaction(defaultValidParams));
-				const context = createContext(stateStore, transaction, 'execute');
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
 
 				await expect(
 					command.execute(context as CommandExecuteContext<CreateTokenParams>),

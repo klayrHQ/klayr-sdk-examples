@@ -5,27 +5,32 @@ import { validator } from '@liskhq/lisk-validator';
 import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'lisk-sdk';
 import { ModuleConfig, ModuleConfigJSON } from '../types';
 import { CreateTokenCommand } from './commands/create_token_command';
+import { MintCommand } from './commands/mint_command';
 import { TokenFactoryEndpoint } from './endpoint';
 import { TokenFactoryMethod } from './method';
-import { configSchema } from './schema';
-import { TokenStore } from './stores/token';
+import { configSchema } from './schemas';
 import { CounterStore } from './stores/counter';
 import { OwnerStore } from './stores/owner';
+import { TokenStore } from './stores/token';
+import { getModuleConfig } from './utils';
 
 export const defaultConfig = {
 	maxNameLength: 30,
 	maxSymbolLength: 5,
 	maxTotalSupply: 1e18, // Not sure if neccesary and whats normal for this chain yet
+	minAmountToMint: BigInt(1000),
+	maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 };
 
 export class TokenFactoryModule extends BaseModule {
 	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
+	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public method = new TokenFactoryMethod(this.stores, this.events);
-	public commands = [this._createTokenCommand];
+	public commands = [this._createTokenCommand, this._mintCommand];
 
 	public constructor() {
 		super();
@@ -38,6 +43,7 @@ export class TokenFactoryModule extends BaseModule {
 	public addDependencies(tokenMethod: TokenMethod) {
 		this._tokenMethod = tokenMethod;
 		this._createTokenCommand.addDependencies({ tokenMethod: this._tokenMethod });
+		this._mintCommand.addDependencies({ tokenMethod: this._tokenMethod });
 	}
 
 	public metadata(): ModuleMetadata {
@@ -57,10 +63,18 @@ export class TokenFactoryModule extends BaseModule {
 		// Validate the config with the config schema
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
-		this._moduleConfig = config;
+		this._moduleConfig = getModuleConfig(config);
 		this._createTokenCommand.init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});
+		this._mintCommand
+			.init({
+				minAmountToMint: this._moduleConfig.minAmountToMint,
+				maxAmountToMint: this._moduleConfig.maxAmountToMint,
+			})
+			.catch(err => {
+				console.log('Error: ', err);
+			});
 	}
 
 	// public async insertAssets(_context: InsertAssetContext) {
