@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Application } from 'lisk-sdk';
+import { Application, TokenModule } from 'lisk-sdk';
+import { TokenFactoryModule } from './modules/token_factory/module';
 
-// @ts-expect-error app will have typescript error for unsued variable
-export const registerModules = (app: Application): void => {};
+export const registerModules = (app: Application): void => {
+	const tokenModule = new TokenModule();
+	const tokenFactoryModule = new TokenFactoryModule();
+	tokenFactoryModule.addDependencies(tokenModule.method);
+
+	app.registerModule(tokenFactoryModule);
+};
