@@ -4,10 +4,7 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: ['token-factory']
   pull_request:
-    branches: ['token-factory']
 
 jobs:
   build:
