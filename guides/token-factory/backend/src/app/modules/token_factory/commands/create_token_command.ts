@@ -67,8 +67,8 @@ export class CreateTokenCommand extends BaseCommand {
 
 		let tokenIdCounter: CounterStoreData = await counterStore
 			.get(context, counterKey)
-			.catch(() => ({ counter: 0 }));
-		tokenIdCounter.counter += 1;
+			.catch(() => ({ counter: BigInt(0) }));
+		tokenIdCounter.counter += BigInt(1);
 
 		const currentTokenID = tokenIdCounter.counter;
 		const currentTokenIDBuff = Buffer.alloc(8);

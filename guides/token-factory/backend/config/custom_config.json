@@ -1,6 +1,6 @@
 {
 	"system": {
-		"dataPath": "/home/nick/.lisk/token-factory",
+		"dataPath": "~/.lisk/token-factory",
 		"keepEventsForHeights": 300,
 		"logLevel": "info"
 	},

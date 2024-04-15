@@ -1,7 +1,7 @@
 import { BaseStore } from 'lisk-sdk';
 
 export interface CounterStoreData {
-	counter: number;
+	counter: bigint;
 }
 
 export const counterKey = Buffer.alloc(0);
@@ -12,7 +12,7 @@ export const counterStoreSchema = {
 	required: ['counter'],
 	properties: {
 		counter: {
-			dataType: 'uint32',
+			dataType: 'uint64',
 			fieldNumber: 1,
 		},
 	},
