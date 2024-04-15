@@ -106,12 +106,12 @@ describe('CreateTokenCommand', () => {
 				const tokenIdCounter = await counterStore.get(context, counterKey);
 				const owner = await ownerStore.get(context, currentTokenIDBuff);
 
-				expect(token.tokenID).toBe(1);
+				expect(token.tokenID).toBe(BigInt(1));
 				expect(token.name).toBe(defaultToken.name);
 				expect(token.symbol).toBe(defaultToken.symbol);
 				expect(token.totalSupply).toBe(defaultToken.totalSupply);
 
-				expect(tokenIdCounter.counter).toBe(1);
+				expect(tokenIdCounter.counter).toBe(BigInt(1));
 
 				expect(owner.address.equals(transaction.senderAddress)).toBe(true);
 			});
