@@ -5,7 +5,7 @@ export type TokenID = Buffer;
 export interface ModuleConfig {
 	maxNameLength: number;
 	maxSymbolLength: number;
-	maxTotalSupply: number;
+	maxTotalSupply: bigint;
 	minAmountToMint: bigint;
 	maxAmountToMint: bigint;
 }

@@ -8,8 +8,8 @@ import {
 	VerifyStatus,
 	TokenMethod,
 } from 'lisk-sdk';
-import { createTokenSchema } from '../schemas';
-import { ModuleConfig } from '../../types';
+import { createTokenSchema } from '../schema';
+import { ModuleConfig } from '../types';
 import { TokenStore } from '../stores/token';
 import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';
 import { OwnerStore } from '../stores/owner';
@@ -17,11 +17,11 @@ import { OwnerStore } from '../stores/owner';
 export interface CreateTokenParams {
 	name: string;
 	symbol: string;
-	totalSupply: number;
+	totalSupply: bigint;
 }
 
 export class CreateTokenCommand extends BaseCommand {
-	private _maxTotalSupply!: number;
+	private _maxTotalSupply!: bigint;
 	private _tokenMethod!: TokenMethod;
 
 	public schema = createTokenSchema;
@@ -71,7 +71,8 @@ export class CreateTokenCommand extends BaseCommand {
 		tokenIdCounter.counter += 1;
 
 		const currentTokenID = tokenIdCounter.counter;
-		const currentTokenIDBuff = Buffer.from(currentTokenID.toString());
+		const currentTokenIDBuff = Buffer.alloc(8);
+		currentTokenIDBuff.writeBigUInt64BE(BigInt(currentTokenID));
 
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
@@ -80,7 +81,7 @@ export class CreateTokenCommand extends BaseCommand {
 				tokenID: currentTokenID,
 				name: context.params.name,
 				symbol: context.params.symbol,
-				totalSupply: context.params.totalSupply,
+				totalSupply: BigInt(context.params.totalSupply),
 			}),
 		]);
 

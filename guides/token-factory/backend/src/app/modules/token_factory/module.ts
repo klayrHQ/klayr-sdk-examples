@@ -3,7 +3,7 @@
 
 import { validator } from '@liskhq/lisk-validator';
 import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'lisk-sdk';
-import { ModuleConfig, ModuleConfigJSON } from '../types';
+import { ModuleConfig, ModuleConfigJSON } from './types';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
 import { TokenFactoryEndpoint } from './endpoint';
@@ -11,13 +11,13 @@ import { TokenFactoryMethod } from './method';
 import { configSchema } from './schemas';
 import { CounterStore } from './stores/counter';
 import { OwnerStore } from './stores/owner';
-import { TokenStore } from './stores/token';
 import { getModuleConfig } from './utils';
+import { TokenStore } from './stores/token';
 
 export const defaultConfig = {
 	maxNameLength: 30,
 	maxSymbolLength: 5,
-	maxTotalSupply: 1e18, // Not sure if neccesary and whats normal for this chain yet
+	maxTotalSupply: BigInt(1e18), // max: 9223372036854775807 = 9e18
 	minAmountToMint: BigInt(1000),
 	maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 };

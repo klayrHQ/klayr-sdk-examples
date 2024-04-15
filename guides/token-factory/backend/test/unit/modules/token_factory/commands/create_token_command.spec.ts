@@ -3,8 +3,8 @@ import {
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema } from '@app/modules/token_factory/schemas';
-import { ModuleConfig } from '@app/modules/types';
+import { createTokenSchema } from '@app/modules/token_factory/schema';
+import { ModuleConfig } from '@app/modules/token_factory/types';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
 import { createCreateTokenCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
@@ -15,7 +15,7 @@ describe('CreateTokenCommand', () => {
 	const initConfig = {
 		maxNameLength: 30,
 		maxSymbolLength: 6,
-		maxTotalSupply: 1e6,
+		maxTotalSupply: BigInt(1e6),
 	};
 	const defaultToken = {
 		name: 'The real pepe coin',
@@ -60,7 +60,7 @@ describe('CreateTokenCommand', () => {
 				const paramWithInvalidTotalSupply = codec.encode(createTokenSchema, {
 					name: 'The real pepe coin',
 					symbol: 'PEPE',
-					totalSupply: BigInt(initConfig.maxTotalSupply + 10), // invalid totalSupply
+					totalSupply: initConfig.maxTotalSupply + BigInt(1), // invalid totalSupply
 				});
 				const transaction = new Transaction(
 					createSampleTransaction(paramWithInvalidTotalSupply, CreateTokenCommand.name),
@@ -101,15 +101,18 @@ describe('CreateTokenCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
+				const currentTokenIDBuff = Buffer.alloc(8);
+				currentTokenIDBuff.writeBigUInt64BE(BigInt(1));
+
 				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
 
 				await expect(
 					command.execute(context as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 
-				const token = await tokenStore.get(context, Buffer.from('1'));
+				const token = await tokenStore.get(context, currentTokenIDBuff);
 				const tokenIdCounter = await counterStore.get(context, counterKey);
-				const owner = await ownerStore.get(context, Buffer.from('1'));
+				const owner = await ownerStore.get(context, currentTokenIDBuff);
 
 				expect(token.tokenID).toBe(1);
 				expect(token.name).toBe(defaultToken.name);
@@ -123,6 +126,7 @@ describe('CreateTokenCommand', () => {
 		});
 
 		describe('invalid cases', () => {
+			// will add when mint function is implemented
 			it.todo('should throw error');
 		});
 	});

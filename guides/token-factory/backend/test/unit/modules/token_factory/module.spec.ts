@@ -7,7 +7,7 @@ describe('TokenFactoryModule', () => {
 	const defaultConfig = {
 		maxNameLength: 30,
 		maxSymbolLength: 5,
-		maxTotalSupply: 1e18,
+		maxTotalSupply: BigInt(1e18),
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 	};
@@ -30,6 +30,7 @@ describe('TokenFactoryModule', () => {
 			const moduleConfig = {
 				maxNameLength: 66,
 				maxSymbolLength: 8,
+				maxTotalSupply: BigInt(1e10),
 			};
 			tokenFactory = new TokenFactoryModule();
 
@@ -50,6 +51,7 @@ describe('TokenFactoryModule', () => {
 			const moduleConfig = {
 				maxNameLength: 30,
 				maxSymbolLength: -1,
+				maxTotalSupply: BigInt(1e10),
 			};
 			tokenFactory = new TokenFactoryModule();
 
