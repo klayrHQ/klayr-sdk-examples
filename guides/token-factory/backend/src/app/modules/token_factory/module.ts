@@ -3,7 +3,7 @@
 
 import { validator } from '@liskhq/lisk-validator';
 import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'lisk-sdk';
-import { ModuleConfig, ModuleConfigJSON } from '../types';
+import { ModuleConfig, ModuleConfigJSON } from './types';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { TokenFactoryEndpoint } from './endpoint';
 import { TokenFactoryMethod } from './method';
@@ -11,11 +11,12 @@ import { configSchema } from './schema';
 import { TokenStore } from './stores/token';
 import { CounterStore } from './stores/counter';
 import { OwnerStore } from './stores/owner';
+import { getModuleConfig } from './utils';
 
 export const defaultConfig = {
 	maxNameLength: 30,
 	maxSymbolLength: 5,
-	maxTotalSupply: 1e18, // Not sure if neccesary and whats normal for this chain yet
+	maxTotalSupply: BigInt(1e18), // max: 9223372036854775807 = 9e18
 };
 
 export class TokenFactoryModule extends BaseModule {
@@ -57,7 +58,7 @@ export class TokenFactoryModule extends BaseModule {
 		// Validate the config with the config schema
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
-		this._moduleConfig = config;
+		this._moduleConfig = getModuleConfig(config);
 		this._createTokenCommand.init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});

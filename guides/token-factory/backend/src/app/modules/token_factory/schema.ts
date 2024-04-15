@@ -2,7 +2,7 @@ export const createTokenSchema = {
 	$id: 'token_factory/createToken-params',
 	title: 'CreateTokenCommand transaction parameter for the Token Factory module',
 	type: 'object',
-	required: ['name'],
+	required: ['name', 'symbol', 'totalSupply'],
 	properties: {
 		name: {
 			dataType: 'string',
@@ -28,16 +28,16 @@ export const configSchema = {
 	type: 'object',
 	properties: {
 		maxNameLength: {
-			type: 'integer',
-			format: 'uint32',
+			dataType: 'uint32',
+			fieldNumber: 1,
 		},
 		maxSymbolLength: {
-			type: 'integer',
-			format: 'uint32',
+			dataType: 'uint32',
+			fieldNumber: 2,
 		},
 		maxTotalSupply: {
-			type: 'integer',
-			format: 'uint64',
+			dataType: 'uint64',
+			fieldNumber: 3,
 		},
 	},
 	required: ['maxNameLength', 'maxSymbolLength', 'maxTotalSupply'],

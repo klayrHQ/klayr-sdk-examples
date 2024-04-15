@@ -3,7 +3,7 @@ import { JSONObject } from 'lisk-sdk';
 export interface ModuleConfig {
 	maxNameLength: number;
 	maxSymbolLength: number;
-	maxTotalSupply: number;
+	maxTotalSupply: bigint;
 }
 
 export type ModuleConfigJSON = JSONObject<ModuleConfig>;

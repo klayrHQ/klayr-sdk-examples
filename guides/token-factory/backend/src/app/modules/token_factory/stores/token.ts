@@ -4,7 +4,7 @@ export interface TokenStoreData {
 	tokenID: number;
 	name: string;
 	symbol: string;
-	totalSupply: number;
+	totalSupply: bigint;
 }
 
 export const tokenStoreSchema = {

@@ -23,6 +23,8 @@ exports[`CreateTokenCommand constructor should have valid schema 1`] = `
   },
   "required": [
     "name",
+    "symbol",
+    "totalSupply",
   ],
   "title": "CreateTokenCommand transaction parameter for the Token Factory module",
   "type": "object",
