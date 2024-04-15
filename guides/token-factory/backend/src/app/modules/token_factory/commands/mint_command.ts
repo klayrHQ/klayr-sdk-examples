@@ -9,7 +9,8 @@ import {
 	TokenMethod,
 } from 'lisk-sdk';
 import { mintSchema } from '../schemas';
-import { TokenID } from '@app/modules/types';
+import { OwnerStore } from '../stores/owner';
+import { TokenID } from '../types';
 
 export interface MintParams {
 	tokenID: TokenID;
@@ -39,6 +40,11 @@ export class MintCommand extends BaseCommand {
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
 		const amount = context.params.amount;
+		const ownerStore = this.stores.get(OwnerStore);
+
+		const owner = await ownerStore.get(context, context.params.tokenID);
+		console.log(owner);
+
 		if (amount > this._maxAmountToMint || amount < this._minAmountToMint) {
 			const error = Error(
 				`Amount can not be lower than ${this._minAmountToMint} or greater than ${this._maxAmountToMint}`,
@@ -55,3 +61,7 @@ export class MintCommand extends BaseCommand {
 
 	public async execute(_context: CommandExecuteContext<MintParams>): Promise<void> {}
 }
+
+// verifcation of the user in verify function
+// Mint function itself in the execute
+//

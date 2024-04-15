@@ -3,7 +3,7 @@ import {
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema } from '@app/modules/token_factory/schema';
+import { createTokenSchema } from '@app/modules/token_factory/schemas';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
 import { createCreateTokenCtx, createSampleTransaction } from '@test/helpers';
