@@ -1,17 +1,8 @@
-import { MintCommand } from '@app/modules/token_factory/commands/mint_command';
+import { MintCommand, MintParams } from '@app/modules/token_factory/commands/mint_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
 import { createCreateTokenCtx, createMintCtx, createSampleTransaction } from '@test/helpers';
-import {
-	CommandExecuteContext,
-	TokenMethod,
-	TokenModule,
-	Transaction,
-	VerifyStatus,
-	chain,
-	codec,
-	db,
-} from 'lisk-sdk';
+import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
 import { utils } from '@liskhq/lisk-cryptography';
 import {
 	CreateTokenCommand,
@@ -24,13 +15,17 @@ describe('MintCommand', () => {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 	};
-	const defaultToken = {
-		name: 'The real pepe coin',
-		symbol: 'PEPE',
-		totalSupply: BigInt(1e4),
-	};
 	const tokenID = Buffer.alloc(8);
 	tokenID.writeBigUInt64BE(BigInt(1));
+	const recipient = utils.getRandomBytes(20);
+
+	const defaultValidParams = codec.encode(mintSchema, {
+		tokenID,
+		amount: BigInt(1000) + BigInt(1),
+		recipient,
+	});
+
+	const mockMint = jest.fn();
 
 	let mintCommand: MintCommand;
 	let createCommand: CreateTokenCommand;
@@ -39,15 +34,13 @@ describe('MintCommand', () => {
 	beforeEach(async () => {
 		const { minAmountToMint, maxAmountToMint } = initConfig;
 		const tokenFactory = new TokenFactoryModule();
-		const tokenModule = new TokenModule();
-		const tokenMethod = new TokenMethod(tokenModule.stores, tokenModule.events, tokenModule.name);
 
 		mintCommand = new MintCommand(tokenFactory.stores, tokenFactory.events);
-		mintCommand.addDependencies({ tokenMethod });
+		mintCommand.addDependencies({ tokenMethod: { mint: mockMint } as any });
 		await mintCommand.init({ minAmountToMint, maxAmountToMint });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
-		createCommand.addDependencies({ tokenMethod });
+		createCommand.addDependencies({ tokenMethod: { mint: mockMint } as any });
 		await createCommand.init(initConfig as ModuleConfig);
 
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
@@ -66,6 +59,11 @@ describe('MintCommand', () => {
 	describe('verify', () => {
 		describe('schema validation', () => {
 			beforeEach(async () => {
+				const defaultToken = {
+					name: 'The real pepe coin',
+					symbol: 'PEPE',
+					totalSupply: BigInt(1e4),
+				};
 				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
@@ -129,13 +127,9 @@ describe('MintCommand', () => {
 			});
 
 			it('should be OK when params are correct', async () => {
-				const recipient = utils.getRandomBytes(20);
-				const validParams = codec.encode(mintSchema, {
-					tokenID,
-					amount: BigInt(1000) + BigInt(1),
-					recipient,
-				});
-				const transaction = new Transaction(createSampleTransaction(validParams, MintCommand.name));
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, MintCommand.name),
+				);
 				const context = createMintCtx(stateStore, transaction, 'verify');
 
 				const result = await mintCommand.verify(context);
@@ -146,7 +140,17 @@ describe('MintCommand', () => {
 
 	describe('execute', () => {
 		describe('valid cases', () => {
-			it('should send tokens to the recipient', async () => {});
+			it('mint function should have been called', async () => {
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, MintCommand.name),
+				);
+				const context = createMintCtx(stateStore, transaction, 'execute');
+
+				await expect(
+					mintCommand.execute(context as CommandExecuteContext<MintParams>),
+				).resolves.toBeUndefined();
+				expect(mockMint).toHaveBeenCalledTimes(1);
+			});
 		});
 
 		describe('invalid cases', () => {
