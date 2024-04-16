@@ -2,7 +2,16 @@ import { MintCommand } from '@app/modules/token_factory/commands/mint_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
 import { createCreateTokenCtx, createMintCtx, createSampleTransaction } from '@test/helpers';
-import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
+import {
+	CommandExecuteContext,
+	TokenMethod,
+	TokenModule,
+	Transaction,
+	VerifyStatus,
+	chain,
+	codec,
+	db,
+} from 'lisk-sdk';
 import { utils } from '@liskhq/lisk-cryptography';
 import {
 	CreateTokenCommand,
@@ -10,7 +19,7 @@ import {
 } from '@app/modules/token_factory/commands/create_token_command';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 
-describe.only('MintCommand', () => {
+describe('MintCommand', () => {
 	const initConfig = {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
@@ -22,7 +31,6 @@ describe.only('MintCommand', () => {
 	};
 	const tokenID = Buffer.alloc(8);
 	tokenID.writeBigUInt64BE(BigInt(1));
-	const mockMint = jest.fn();
 
 	let mintCommand: MintCommand;
 	let createCommand: CreateTokenCommand;
@@ -31,13 +39,15 @@ describe.only('MintCommand', () => {
 	beforeEach(async () => {
 		const { minAmountToMint, maxAmountToMint } = initConfig;
 		const tokenFactory = new TokenFactoryModule();
+		const tokenModule = new TokenModule();
+		const tokenMethod = new TokenMethod(tokenModule.stores, tokenModule.events, tokenModule.name);
 
 		mintCommand = new MintCommand(tokenFactory.stores, tokenFactory.events);
-		mintCommand.addDependencies({ tokenMethod: { mint: mockMint } } as any);
+		mintCommand.addDependencies({ tokenMethod });
 		await mintCommand.init({ minAmountToMint, maxAmountToMint });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
-		createCommand.addDependencies({ tokenMethod: { mint: mockMint } } as any);
+		createCommand.addDependencies({ tokenMethod });
 		await createCommand.init(initConfig as ModuleConfig);
 
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
@@ -99,6 +109,25 @@ describe.only('MintCommand', () => {
 				expect(result.status).toBe(VerifyStatus.FAIL);
 			});
 
+			it('should throw when sender is not the token owner / creator', async () => {
+				const recipient = utils.getRandomBytes(21);
+				const differentSender = 'ce2e1c458bb616e2717aa48f7392b39b1bc01af7297755db7b6d1db605fa0ef7';
+				const validParams = codec.encode(mintSchema, {
+					tokenID,
+					amount: BigInt(1000) + BigInt(1),
+					recipient,
+				});
+				const transaction = new Transaction(
+					createSampleTransaction(validParams, MintCommand.name, differentSender),
+				);
+				const context = createMintCtx(stateStore, transaction, 'verify');
+
+				const result = await mintCommand.verify(context);
+
+				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(new Error('Sender is not the token creator'));
+			});
+
 			it('should be OK when params are correct', async () => {
 				const recipient = utils.getRandomBytes(20);
 				const validParams = codec.encode(mintSchema, {
@@ -117,7 +146,7 @@ describe.only('MintCommand', () => {
 
 	describe('execute', () => {
 		describe('valid cases', () => {
-			it.todo('should update the state store');
+			it('should send tokens to the recipient', async () => {});
 		});
 
 		describe('invalid cases', () => {

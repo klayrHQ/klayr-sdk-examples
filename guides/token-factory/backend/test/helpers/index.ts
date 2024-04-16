@@ -11,12 +11,12 @@ import {
 
 export type contextType = 'verify' | 'execute';
 
-export function createSampleTransaction(params: Buffer, command: string) {
+export function createSampleTransaction(params: Buffer, command: string, sender?: string) {
 	return {
 		module: 'token_factory',
 		command,
 		senderPublicKey: Buffer.from(
-			'3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a',
+			sender ?? '3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a',
 			'hex',
 		),
 		nonce: BigInt(0),

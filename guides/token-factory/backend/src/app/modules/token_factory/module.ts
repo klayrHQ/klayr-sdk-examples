@@ -61,6 +61,7 @@ export class TokenFactoryModule extends BaseModule {
 		// Overwrite the default module config with values from config.json, if set
 		const config = utils.objects.mergeDeep({}, defaultConfig, moduleConfig) as ModuleConfigJSON;
 		// Validate the config with the config schema
+
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
 		this._moduleConfig = getModuleConfig(config);

@@ -19,9 +19,7 @@ export interface MintParams {
 }
 
 export class MintCommand extends BaseCommand {
-	// @ts-ignore
 	private _minAmountToMint!: bigint;
-	// @ts-ignore
 	private _maxAmountToMint!: bigint;
 	// @ts-ignore
 	private _tokenMethod!: TokenMethod;
@@ -41,25 +39,41 @@ export class MintCommand extends BaseCommand {
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
 		const amount = context.params.amount;
 		const ownerStore = this.stores.get(OwnerStore);
-
 		const owner = await ownerStore.get(context, context.params.tokenID);
-		console.log(owner);
+
+		if (!owner.address.equals(context.transaction.senderAddress)) {
+			return this.failWithLog(context, `Sender is not the token creator`);
+		}
 
 		if (amount > this._maxAmountToMint || amount < this._minAmountToMint) {
-			const error = Error(
+			return this.failWithLog(
+				context,
 				`Amount can not be lower than ${this._minAmountToMint} or greater than ${this._maxAmountToMint}`,
 			);
-			context.logger.info(error);
-			return {
-				status: VerifyStatus.FAIL,
-				error,
-			};
 		}
 
 		return { status: VerifyStatus.OK };
 	}
 
-	public async execute(_context: CommandExecuteContext<MintParams>): Promise<void> {}
+	public async execute(context: CommandExecuteContext<MintParams>): Promise<void> {
+		const { recipient, tokenID, amount } = context.params;
+
+		await this._tokenMethod.mint(
+			context.getMethodContext(),
+			Buffer.from(recipient),
+			Buffer.from(tokenID),
+			BigInt(amount),
+		);
+	}
+
+	private failWithLog(context: CommandVerifyContext<MintParams>, message: string) {
+		const error = Error(message);
+		context.logger.info(error);
+		return {
+			status: VerifyStatus.FAIL,
+			error,
+		};
+	}
 }
 
 // verifcation of the user in verify function
