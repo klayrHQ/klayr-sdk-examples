@@ -57,14 +57,14 @@ export class TokenFactoryModule extends BaseModule {
 	// Lifecycle hooks
 	public async init(args: ModuleInitArgs): Promise<void> {
 		// Get the module config defined in the config.json of the node
-		const { moduleConfig } = args;
+		const { moduleConfig, genesisConfig } = args;
 		// Overwrite the default module config with values from config.json, if set
 		const config = utils.objects.mergeDeep({}, defaultConfig, moduleConfig) as ModuleConfigJSON;
 		// Validate the config with the config schema
 
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
-		this._moduleConfig = getModuleConfig(config);
+		this._moduleConfig = getModuleConfig(config, genesisConfig);
 		this._createTokenCommand.init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});

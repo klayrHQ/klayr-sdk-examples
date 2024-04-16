@@ -21,7 +21,6 @@ export interface MintParams {
 export class MintCommand extends BaseCommand {
 	private _minAmountToMint!: bigint;
 	private _maxAmountToMint!: bigint;
-	// @ts-ignore
 	private _tokenMethod!: TokenMethod;
 
 	public schema = mintSchema;
@@ -37,9 +36,9 @@ export class MintCommand extends BaseCommand {
 
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
-		const amount = context.params.amount;
+		const { amount, tokenID } = context.params;
 		const ownerStore = this.stores.get(OwnerStore);
-		const owner = await ownerStore.get(context, context.params.tokenID);
+		const owner = await ownerStore.get(context, tokenID);
 
 		if (!owner.address.equals(context.transaction.senderAddress)) {
 			return this.failWithLog(context, `Sender is not the token creator`);
@@ -56,6 +55,7 @@ export class MintCommand extends BaseCommand {
 	}
 
 	public async execute(context: CommandExecuteContext<MintParams>): Promise<void> {
+		context.logger.info('EXECUTE Mint');
 		const { recipient, tokenID, amount } = context.params;
 
 		await this._tokenMethod.mint(

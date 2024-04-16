@@ -8,6 +8,7 @@ export interface ModuleConfig {
 	maxTotalSupply: bigint;
 	minAmountToMint: bigint;
 	maxAmountToMint: bigint;
+	chainID: Buffer;
 }
 
 export type ModuleConfigJSON = JSONObject<ModuleConfig>;

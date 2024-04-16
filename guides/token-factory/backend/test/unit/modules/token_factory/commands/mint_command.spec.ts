@@ -1,7 +1,12 @@
 import { MintCommand, MintParams } from '@app/modules/token_factory/commands/mint_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
-import { createCreateTokenCtx, createMintCtx, createSampleTransaction } from '@test/helpers';
+import {
+	TokenID,
+	createCreateTokenCtx,
+	createMintCtx,
+	createSampleTransaction,
+} from '@test/helpers';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
 import { utils } from '@liskhq/lisk-cryptography';
 import {
@@ -14,9 +19,9 @@ describe('MintCommand', () => {
 	const initConfig = {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
+		chainID: Buffer.from('12345678'),
 	};
-	const tokenID = Buffer.alloc(8);
-	tokenID.writeBigUInt64BE(BigInt(1));
+	const tokenID = new TokenID(BigInt(1)).toBuffer();
 	const recipient = utils.getRandomBytes(20);
 
 	const defaultValidParams = codec.encode(mintSchema, {
@@ -26,6 +31,7 @@ describe('MintCommand', () => {
 	});
 
 	const mockMint = jest.fn();
+	const mockInitialize = jest.fn();
 
 	let mintCommand: MintCommand;
 	let createCommand: CreateTokenCommand;
@@ -40,7 +46,9 @@ describe('MintCommand', () => {
 		await mintCommand.init({ minAmountToMint, maxAmountToMint });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
-		createCommand.addDependencies({ tokenMethod: { mint: mockMint } as any });
+		createCommand.addDependencies({
+			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
+		} as any);
 		await createCommand.init(initConfig as ModuleConfig);
 
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());

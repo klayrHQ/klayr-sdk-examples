@@ -3,7 +3,9 @@
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 
 describe('TokenFactoryModule', () => {
-	const genesisConfig: any = {};
+	const genesisConfig: any = {
+		chainID: '12345678',
+	};
 	const defaultConfig = {
 		maxNameLength: 30,
 		maxSymbolLength: 5,

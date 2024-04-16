@@ -57,3 +57,15 @@ export function createMintCtx(
 		? context.createCommandVerifyContext<MintParams>(mintSchema)
 		: context.createCommandExecuteContext<MintParams>(mintSchema);
 }
+
+export class TokenID {
+	constructor(public tokenID: bigint) {}
+	toBuffer() {
+		return Buffer.concat([
+			// default genesis chainID
+			Buffer.from('12345678'),
+			// transform tokenID to hexadecimal with up to 8 leading zeros
+			Buffer.from(this.tokenID.toString(16).padStart(8, '0'), 'hex'),
+		]);
+	}
+}

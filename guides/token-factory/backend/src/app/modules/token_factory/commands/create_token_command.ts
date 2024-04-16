@@ -23,6 +23,7 @@ export interface CreateTokenParams {
 export class CreateTokenCommand extends BaseCommand {
 	private _maxTotalSupply!: bigint;
 	private _tokenMethod!: TokenMethod;
+	private _chainID!: Buffer;
 
 	public schema = createTokenSchema;
 
@@ -32,6 +33,7 @@ export class CreateTokenCommand extends BaseCommand {
 
 	public async init(config: ModuleConfig): Promise<void> {
 		this._maxTotalSupply = config.maxTotalSupply;
+		this._chainID = config.chainID;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;
 	}
@@ -57,7 +59,7 @@ export class CreateTokenCommand extends BaseCommand {
 	}
 
 	public async execute(context: CommandExecuteContext<CreateTokenParams>): Promise<void> {
-		context.logger.info('EXECUTE');
+		context.logger.info('EXECUTE Create Token');
 		const {
 			transaction: { senderAddress },
 		} = context;
@@ -71,8 +73,12 @@ export class CreateTokenCommand extends BaseCommand {
 		tokenIdCounter.counter += BigInt(1);
 
 		const currentTokenID = tokenIdCounter.counter;
-		const currentTokenIDBuff = Buffer.alloc(8);
-		currentTokenIDBuff.writeBigUInt64BE(BigInt(currentTokenID));
+		const currentTokenIDBuff = Buffer.concat([
+			this._chainID,
+			// transform tokenID to hexadecimal with up to 8 leading zeros
+			// to conform to the tokenID standard of Lisk
+			Buffer.from(currentTokenID.toString(16).padStart(8, '0'), 'hex'),
+		]);
 
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
@@ -85,7 +91,7 @@ export class CreateTokenCommand extends BaseCommand {
 			}),
 		]);
 
-		// IMPLEMENT
+		await this._tokenMethod.initializeToken(context.getMethodContext(), currentTokenIDBuff);
 		await this._tokenMethod.mint(
 			context.getMethodContext(),
 			senderAddress,
