@@ -106,7 +106,7 @@ describe('CreateTokenCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const tokenID = BigInt(1);
+				const tokenID = 1;
 				const tokenIDBuf = new TokenID(tokenID).toBuffer();
 
 				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
@@ -119,7 +119,6 @@ describe('CreateTokenCommand', () => {
 				const tokenIdCounter = await counterStore.get(context, counterKey);
 				const owner = await ownerStore.get(context, tokenIDBuf);
 
-				expect(token.tokenID).toBe(tokenID);
 				expect(token.name).toBe(defaultToken.name);
 				expect(token.symbol).toBe(defaultToken.symbol);
 				expect(token.totalSupply).toBe(defaultToken.totalSupply);

@@ -69,33 +69,28 @@ export class CreateTokenCommand extends BaseCommand {
 
 		let tokenIdCounter: CounterStoreData = await counterStore
 			.get(context, counterKey)
-			.catch(() => ({ counter: BigInt(0) }));
-		tokenIdCounter.counter += BigInt(1);
+			.catch(() => ({ counter: 0 }));
+		tokenIdCounter.counter++;
 
-		const currentTokenID = tokenIdCounter.counter;
-		const currentTokenIDBuff = Buffer.concat([
-			this._chainID,
-			// transform tokenID to hexadecimal with up to 8 leading zeros
-			// to conform to the tokenID standard of Lisk
-			Buffer.from(currentTokenID.toString(16).padStart(8, '0'), 'hex'),
-		]);
+		const newLocalIDBuffer = Buffer.alloc(4);
+		newLocalIDBuffer.writeUInt32BE(tokenIdCounter.counter);
+		const newTokenIDBuffer = Buffer.concat([this._chainID, newLocalIDBuffer]);
 
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
-			ownerStore.set(context, currentTokenIDBuff, { address: senderAddress }),
-			tokenStore.set(context, currentTokenIDBuff, {
-				tokenID: currentTokenID,
+			ownerStore.set(context, newTokenIDBuffer, { address: senderAddress }),
+			tokenStore.set(context, newTokenIDBuffer, {
 				name: context.params.name,
 				symbol: context.params.symbol,
 				totalSupply: BigInt(context.params.totalSupply),
 			}),
 		]);
 
-		await this._tokenMethod.initializeToken(context.getMethodContext(), currentTokenIDBuff);
+		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenIDBuffer);
 		await this._tokenMethod.mint(
 			context.getMethodContext(),
 			senderAddress,
-			currentTokenIDBuff,
+			newTokenIDBuffer,
 			BigInt(context.params.totalSupply),
 		);
 

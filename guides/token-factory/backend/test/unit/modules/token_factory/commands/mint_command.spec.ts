@@ -21,7 +21,7 @@ describe('MintCommand', () => {
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 		chainID: Buffer.from('12345678'),
 	};
-	const tokenID = new TokenID(BigInt(1)).toBuffer();
+	const tokenID = new TokenID(1).toBuffer();
 	const recipient = utils.getRandomBytes(20);
 
 	const defaultValidParams = codec.encode(mintSchema, {
