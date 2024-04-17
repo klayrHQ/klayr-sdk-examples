@@ -37,7 +37,7 @@
 		"token-factory": "./bin/run"
 	},
 	"klayr": {
-		"addressPrefix": "lsk"
+		"addressPrefix": "kly"
 	},
 	"oclif": {
 		"bin": "token-factory",
@@ -151,4 +151,3 @@
 		"typescript": "5.0.2"
 	}
 }
- 
