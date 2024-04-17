@@ -13,6 +13,11 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 
 ```
 ./bin/run transaction:create tokenFactory createToken 10000000 --params='{"name":"The real pepe", "symbol": "PEPE", "totalSupply": 100000}' --json --pretty
+
+./bin/run transaction:create tokenFactory mint 10000000 --params='{"tokenID": "1234567800000001", "amount": "100000000", "recipient": "lsk9gaw9ubd5q35v3mksnokpqf3stahe89uderojq"}' --json --pretty
+
+./bin/run endpoint:invoke token_getBalances '{"address":"lsk9gaw9ubd5q35v3mksnokpqf3stahe89uderojq"}' --pretty
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "1234567800010000", "address":"lsk9gaw9ubd5q35v3mksnokpqf3stahe89uderojq"}' --pretty
 ```
 
 ### Add a new module

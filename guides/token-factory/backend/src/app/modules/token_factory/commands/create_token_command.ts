@@ -8,7 +8,7 @@ import {
 	VerifyStatus,
 	TokenMethod,
 } from 'lisk-sdk';
-import { createTokenSchema } from '../schema';
+import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../types';
 import { TokenStore } from '../stores/token';
 import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';
@@ -23,6 +23,7 @@ export interface CreateTokenParams {
 export class CreateTokenCommand extends BaseCommand {
 	private _maxTotalSupply!: bigint;
 	private _tokenMethod!: TokenMethod;
+	private _chainID!: Buffer;
 
 	public schema = createTokenSchema;
 
@@ -32,6 +33,7 @@ export class CreateTokenCommand extends BaseCommand {
 
 	public async init(config: ModuleConfig): Promise<void> {
 		this._maxTotalSupply = config.maxTotalSupply;
+		this._chainID = config.chainID;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;
 	}
@@ -57,7 +59,7 @@ export class CreateTokenCommand extends BaseCommand {
 	}
 
 	public async execute(context: CommandExecuteContext<CreateTokenParams>): Promise<void> {
-		context.logger.info('EXECUTE');
+		context.logger.info('EXECUTE Create Token');
 		const {
 			transaction: { senderAddress },
 		} = context;
@@ -67,32 +69,30 @@ export class CreateTokenCommand extends BaseCommand {
 
 		let tokenIdCounter: CounterStoreData = await counterStore
 			.get(context, counterKey)
-			.catch(() => ({ counter: BigInt(0) }));
-		tokenIdCounter.counter += BigInt(1);
+			.catch(() => ({ counter: 0 }));
+		tokenIdCounter.counter++;
 
-		const currentTokenID = tokenIdCounter.counter;
-		const currentTokenIDBuff = Buffer.alloc(8);
-		currentTokenIDBuff.writeBigUInt64BE(BigInt(currentTokenID));
+		const newLocalIDBuffer = Buffer.alloc(4);
+		newLocalIDBuffer.writeUInt32BE(tokenIdCounter.counter);
+		const newTokenIDBuffer = Buffer.concat([this._chainID, newLocalIDBuffer]);
+
+		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenIDBuffer);
+		await this._tokenMethod.mint(
+			context.getMethodContext(),
+			senderAddress,
+			newTokenIDBuffer,
+			BigInt(context.params.totalSupply),
+		);
 
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
-			ownerStore.set(context, currentTokenIDBuff, { address: senderAddress }),
-			tokenStore.set(context, currentTokenIDBuff, {
-				tokenID: currentTokenID,
+			ownerStore.set(context, newTokenIDBuffer, { address: senderAddress }),
+			tokenStore.set(context, newTokenIDBuffer, {
 				name: context.params.name,
 				symbol: context.params.symbol,
 				totalSupply: BigInt(context.params.totalSupply),
 			}),
 		]);
-
-		// IMPLEMENT
-		await this._tokenMethod.mint(
-			context.getMethodContext(),
-			senderAddress,
-			currentTokenIDBuff,
-			BigInt(context.params.totalSupply),
-		);
-
 		// EVENT
 	}
 }

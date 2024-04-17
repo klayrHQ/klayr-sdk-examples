@@ -1,3 +1,25 @@
+export const mintSchema = {
+	$id: 'token_factory/mintParams',
+	title: 'Mints extra tokens to a recipient',
+	type: 'object',
+	properties: {
+		tokenID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+		amount: {
+			dataType: 'uint64',
+			fieldNumber: 2,
+		},
+		recipient: {
+			dataType: 'bytes',
+			fieldNumber: 3,
+			format: 'lisk32',
+		},
+	},
+	required: ['amount', 'recipient'],
+};
+
 export const createTokenSchema = {
 	$id: 'token_factory/createToken-params',
 	title: 'CreateTokenCommand transaction parameter for the Token Factory module',
@@ -39,6 +61,20 @@ export const configSchema = {
 			dataType: 'uint64',
 			fieldNumber: 3,
 		},
+		minAmountToMint: {
+			dataType: 'uint64',
+			fieldNumber: 4,
+		},
+		maxAmountToMint: {
+			dataType: 'uint64',
+			fieldNumber: 5,
+		},
 	},
-	required: ['maxNameLength', 'maxSymbolLength', 'maxTotalSupply'],
+	required: [
+		'maxNameLength',
+		'maxSymbolLength',
+		'maxTotalSupply',
+		'minAmountToMint',
+		'maxAmountToMint',
+	],
 };
