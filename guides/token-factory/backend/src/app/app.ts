@@ -1,4 +1,4 @@
-import { Application, PartialApplicationConfig } from 'lisk-sdk';
+import { Application, PartialApplicationConfig } from 'klayr-sdk';
 import { registerPlugins } from './plugins';
 import { TokenFactoryModule } from './modules/token_factory/module';
 

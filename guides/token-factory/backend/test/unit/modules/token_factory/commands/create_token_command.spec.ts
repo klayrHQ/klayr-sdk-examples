@@ -5,7 +5,7 @@ import {
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { createTokenSchema } from '@app/modules/token_factory/schemas';
 import { ModuleConfig } from '@app/modules/token_factory/types';
-import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
+import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
 import { TokenID, createCreateTokenCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { CounterStore, counterKey } from '@app/modules/token_factory/stores/counter';

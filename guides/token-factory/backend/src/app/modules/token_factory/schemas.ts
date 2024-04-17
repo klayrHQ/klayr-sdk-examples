@@ -14,7 +14,7 @@ export const mintSchema = {
 		recipient: {
 			dataType: 'bytes',
 			fieldNumber: 3,
-			format: 'lisk32',
+			format: 'klayr32',
 		},
 	},
 	required: ['amount', 'recipient'],

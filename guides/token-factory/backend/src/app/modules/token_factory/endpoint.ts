@@ -1,3 +1,3 @@
-import { BaseEndpoint } from 'lisk-sdk';
+import { BaseEndpoint } from 'klayr-sdk';
 
 export class TokenFactoryEndpoint extends BaseEndpoint {}

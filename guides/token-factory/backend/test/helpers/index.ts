@@ -7,7 +7,7 @@ import {
 	Transaction,
 	cryptography,
 	testing,
-} from 'lisk-sdk';
+} from 'klayr-sdk';
 
 export type contextType = 'verify' | 'execute';
 

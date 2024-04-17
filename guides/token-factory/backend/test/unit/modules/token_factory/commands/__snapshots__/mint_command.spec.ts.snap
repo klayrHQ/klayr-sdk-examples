@@ -11,7 +11,7 @@ exports[`MintCommand constructor should have valid schema 1`] = `
     "recipient": {
       "dataType": "bytes",
       "fieldNumber": 3,
-      "format": "lisk32",
+      "format": "klayr32",
     },
     "tokenID": {
       "dataType": "bytes",
