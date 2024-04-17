@@ -26,6 +26,23 @@ export function createSampleTransaction(params: Buffer, command: string, sender?
 	};
 }
 
+export function createCtx<T>(
+	stateStore: any,
+	transaction: Transaction,
+	schema: any,
+	contextType: contextType,
+): CommandVerifyContext<T> | CommandExecuteContext<T> {
+	const context = testing.createTransactionContext({
+		stateStore,
+		transaction,
+		header: testing.createFakeBlockHeader({}),
+	});
+
+	return contextType === 'verify'
+		? context.createCommandVerifyContext<T>(schema)
+		: context.createCommandExecuteContext<T>(schema);
+}
+
 export function createCreateTokenCtx(
 	stateStore: any,
 	transaction: Transaction,

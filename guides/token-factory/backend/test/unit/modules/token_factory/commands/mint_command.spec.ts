@@ -1,12 +1,7 @@
 import { MintCommand, MintParams } from '@app/modules/token_factory/commands/mint_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
-import {
-	TokenID,
-	createCreateTokenCtx,
-	createMintCtx,
-	createSampleTransaction,
-} from '@test/helpers';
+import { createTokenSchema as createSchema, mintSchema } from '@app/modules/token_factory/schemas';
+import { TokenID, createCtx, createMintCtx, createSampleTransaction } from '@test/helpers';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
 import { utils } from '@klayr/cryptography';
 import {
@@ -75,14 +70,14 @@ describe('MintCommand', () => {
 					symbol: 'PEPE',
 					totalSupply: BigInt(1e4),
 				};
-				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+				const defaultValidParams = codec.encode(createSchema, defaultToken);
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					createCommand.execute(context as CommandExecuteContext<CreateTokenParams>),
+					createCommand.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 			});
 
@@ -157,14 +152,14 @@ describe('MintCommand', () => {
 					symbol: 'PEPE',
 					totalSupply: BigInt(1e4),
 				};
-				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+				const defaultValidParams = codec.encode(createSchema, defaultToken);
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					createCommand.execute(context as CommandExecuteContext<CreateTokenParams>),
+					createCommand.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 			});
 

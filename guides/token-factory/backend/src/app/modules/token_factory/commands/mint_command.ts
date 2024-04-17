@@ -12,6 +12,7 @@ import { mintSchema } from '../schemas';
 import { OwnerStore } from '../stores/owner';
 import { TokenID } from '../types';
 import { TokenStore } from '../stores/token';
+import { failWithLog } from '../utils';
 
 export interface MintParams {
 	tokenID: TokenID;
@@ -42,11 +43,11 @@ export class MintCommand extends BaseCommand {
 		const owner = await ownerStore.get(context, tokenID);
 
 		if (!owner.address.equals(context.transaction.senderAddress)) {
-			return this.failWithLog(context, `Sender is not the token creator`);
+			return failWithLog<MintParams>(context, `Sender is not the token creator`);
 		}
 
 		if (amount > this._maxAmountToMint || amount < this._minAmountToMint) {
-			return this.failWithLog(
+			return failWithLog<MintParams>(
 				context,
 				`Amount can not be lower than ${this._minAmountToMint} or greater than ${this._maxAmountToMint}`,
 			);
@@ -70,15 +71,6 @@ export class MintCommand extends BaseCommand {
 		const token = await tokenStore.get(context, tokenID);
 		token.totalSupply += BigInt(amount);
 		await tokenStore.set(context, tokenID, token);
-	}
-
-	private failWithLog(context: CommandVerifyContext<MintParams>, message: string) {
-		const error = Error(message);
-		context.logger.info(error);
-		return {
-			status: VerifyStatus.FAIL,
-			error,
-		};
 	}
 }
 
