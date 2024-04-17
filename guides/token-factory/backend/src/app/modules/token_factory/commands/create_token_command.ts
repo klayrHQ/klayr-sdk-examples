@@ -76,6 +76,14 @@ export class CreateTokenCommand extends BaseCommand {
 		newLocalIDBuffer.writeUInt32BE(tokenIdCounter.counter);
 		const newTokenIDBuffer = Buffer.concat([this._chainID, newLocalIDBuffer]);
 
+		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenIDBuffer);
+		await this._tokenMethod.mint(
+			context.getMethodContext(),
+			senderAddress,
+			newTokenIDBuffer,
+			BigInt(context.params.totalSupply),
+		);
+
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
 			ownerStore.set(context, newTokenIDBuffer, { address: senderAddress }),
@@ -85,15 +93,6 @@ export class CreateTokenCommand extends BaseCommand {
 				totalSupply: BigInt(context.params.totalSupply),
 			}),
 		]);
-
-		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenIDBuffer);
-		await this._tokenMethod.mint(
-			context.getMethodContext(),
-			senderAddress,
-			newTokenIDBuffer,
-			BigInt(context.params.totalSupply),
-		);
-
 		// EVENT
 	}
 }

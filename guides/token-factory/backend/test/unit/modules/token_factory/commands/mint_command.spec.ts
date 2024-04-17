@@ -14,6 +14,7 @@ import {
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
 import { ModuleConfig } from '@app/modules/token_factory/types';
+import { TokenStore } from '@app/modules/token_factory/stores/token';
 
 describe('MintCommand', () => {
 	const initConfig = {
@@ -26,7 +27,7 @@ describe('MintCommand', () => {
 
 	const defaultValidParams = codec.encode(mintSchema, {
 		tokenID,
-		amount: BigInt(1000) + BigInt(1),
+		amount: BigInt(1000) * BigInt(1e8),
 		recipient,
 	});
 
@@ -36,6 +37,7 @@ describe('MintCommand', () => {
 	let mintCommand: MintCommand;
 	let createCommand: CreateTokenCommand;
 	let stateStore: any;
+	let tokenStore: TokenStore;
 
 	beforeEach(async () => {
 		const { minAmountToMint, maxAmountToMint } = initConfig;
@@ -52,6 +54,7 @@ describe('MintCommand', () => {
 		await createCommand.init(initConfig as ModuleConfig);
 
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
+		tokenStore = tokenFactory.stores.get(TokenStore);
 	});
 
 	describe('constructor', () => {
@@ -148,7 +151,24 @@ describe('MintCommand', () => {
 
 	describe('execute', () => {
 		describe('valid cases', () => {
-			it('mint function should have been called', async () => {
+			beforeEach(async () => {
+				const defaultToken = {
+					name: 'The real pepe coin',
+					symbol: 'PEPE',
+					totalSupply: BigInt(1e4),
+				};
+				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+
+				await expect(
+					createCommand.execute(context as CommandExecuteContext<CreateTokenParams>),
+				).resolves.toBeUndefined();
+			});
+
+			it('mint function should have been called and updated `totalSupply` ', async () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, MintCommand.name),
 				);
@@ -157,7 +177,12 @@ describe('MintCommand', () => {
 				await expect(
 					mintCommand.execute(context as CommandExecuteContext<MintParams>),
 				).resolves.toBeUndefined();
-				expect(mockMint).toHaveBeenCalledTimes(1);
+
+				const token = await tokenStore.get(context, tokenID);
+
+				// initial supply + minted amount
+				expect(token.totalSupply).toBe(BigInt(1e4) + BigInt(1000) * BigInt(1e8));
+				expect(mockMint).toHaveBeenCalledTimes(2);
 			});
 		});
 

@@ -11,6 +11,7 @@ import {
 import { mintSchema } from '../schemas';
 import { OwnerStore } from '../stores/owner';
 import { TokenID } from '../types';
+import { TokenStore } from '../stores/token';
 
 export interface MintParams {
 	tokenID: TokenID;
@@ -57,6 +58,7 @@ export class MintCommand extends BaseCommand {
 	public async execute(context: CommandExecuteContext<MintParams>): Promise<void> {
 		context.logger.info('EXECUTE Mint');
 		const { recipient, tokenID, amount } = context.params;
+		const tokenStore = this.stores.get(TokenStore);
 
 		await this._tokenMethod.mint(
 			context.getMethodContext(),
@@ -64,6 +66,10 @@ export class MintCommand extends BaseCommand {
 			Buffer.from(tokenID),
 			BigInt(amount),
 		);
+
+		const token = await tokenStore.get(context, tokenID);
+		token.totalSupply += BigInt(amount);
+		await tokenStore.set(context, tokenID, token);
 	}
 
 	private failWithLog(context: CommandVerifyContext<MintParams>, message: string) {
