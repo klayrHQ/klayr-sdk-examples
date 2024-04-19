@@ -80,6 +80,13 @@ export class TokenFactoryModule extends BaseModule {
 			.catch(err => {
 				console.log('Error: ', err);
 			});
+		this._burnCommand
+			.init({
+				minAmountToBurn: this._moduleConfig.minAmountToBurn,
+			})
+			.catch(err => {
+				console.log('Error: ', err);
+			});
 	}
 
 	// public async insertAssets(_context: InsertAssetContext) {

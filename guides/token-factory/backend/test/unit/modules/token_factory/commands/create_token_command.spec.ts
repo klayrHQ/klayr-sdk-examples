@@ -3,10 +3,10 @@ import {
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema } from '@app/modules/token_factory/schemas';
+import { createTokenSchema as createSchema } from '@app/modules/token_factory/schemas';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
-import { TokenID, createCreateTokenCtx, createSampleTransaction } from '@test/helpers';
+import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { CounterStore, counterKey } from '@app/modules/token_factory/stores/counter';
 import { OwnerStore } from '@app/modules/token_factory/stores/owner';
@@ -23,7 +23,7 @@ describe('CreateTokenCommand', () => {
 		symbol: 'PEPE',
 		totalSupply: BigInt(1e4),
 	};
-	const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+	const defaultValidParams = codec.encode(createSchema, defaultToken);
 	const mockMint = jest.fn();
 	const mockInitialize = jest.fn();
 
@@ -61,7 +61,7 @@ describe('CreateTokenCommand', () => {
 	describe('verify', () => {
 		describe('schema validation', () => {
 			it('should throw when `totalSupply` is too high', async () => {
-				const paramWithInvalidTotalSupply = codec.encode(createTokenSchema, {
+				const paramWithInvalidTotalSupply = codec.encode(createSchema, {
 					name: 'The real pepe coin',
 					symbol: 'PEPE',
 					totalSupply: initConfig.maxTotalSupply + BigInt(1), // invalid totalSupply
@@ -69,9 +69,9 @@ describe('CreateTokenCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(paramWithInvalidTotalSupply, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'verify');
 
-				const result = await command.verify(context);
+				const result = await command.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.FAIL);
 			});
 
@@ -79,9 +79,9 @@ describe('CreateTokenCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'verify');
 
-				const result = await command.verify(context);
+				const result = await command.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.OK);
 			});
 		});
@@ -93,10 +93,10 @@ describe('CreateTokenCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					command.execute(context as CommandExecuteContext<CreateTokenParams>),
+					command.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 				expect(mockMint).toHaveBeenCalledTimes(1);
 				expect(mockInitialize).toHaveBeenCalledTimes(1);
@@ -109,15 +109,15 @@ describe('CreateTokenCommand', () => {
 				const tokenID = 1;
 				const tokenIDBuf = new TokenID(tokenID).toBuffer();
 
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					command.execute(context as CommandExecuteContext<CreateTokenParams>),
+					command.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 
-				const token = await tokenStore.get(context, tokenIDBuf);
-				const tokenIdCounter = await counterStore.get(context, counterKey);
-				const owner = await ownerStore.get(context, tokenIDBuf);
+				const token = await tokenStore.get(ctx, tokenIDBuf);
+				const tokenIdCounter = await counterStore.get(ctx, counterKey);
+				const owner = await ownerStore.get(ctx, tokenIDBuf);
 
 				expect(token.name).toBe(defaultToken.name);
 				expect(token.symbol).toBe(defaultToken.symbol);

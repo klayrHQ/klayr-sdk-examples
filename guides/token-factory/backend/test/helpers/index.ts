@@ -1,6 +1,5 @@
 import { CreateTokenParams } from '@app/modules/token_factory/commands/create_token_command';
-import { MintParams } from '@app/modules/token_factory/commands/mint_command';
-import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
+import { createTokenSchema } from '@app/modules/token_factory/schemas';
 import {
 	CommandExecuteContext,
 	CommandVerifyContext,
@@ -57,22 +56,6 @@ export function createCreateTokenCtx(
 	return contextType === 'verify'
 		? context.createCommandVerifyContext<CreateTokenParams>(createTokenSchema)
 		: context.createCommandExecuteContext<CreateTokenParams>(createTokenSchema);
-}
-
-export function createMintCtx(
-	stateStore: any,
-	transaction: Transaction,
-	contextType: contextType,
-): CommandVerifyContext<MintParams> | CommandExecuteContext<MintParams> {
-	const context = testing.createTransactionContext({
-		stateStore,
-		transaction,
-		header: testing.createFakeBlockHeader({}),
-	});
-
-	return contextType === 'verify'
-		? context.createCommandVerifyContext<MintParams>(mintSchema)
-		: context.createCommandExecuteContext<MintParams>(mintSchema);
 }
 
 export class TokenID {

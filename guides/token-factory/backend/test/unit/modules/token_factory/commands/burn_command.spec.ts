@@ -7,6 +7,7 @@ import {
 } from '@app/modules/token_factory/commands/create_token_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { burnSchema, createTokenSchema as createSchema } from '@app/modules/token_factory/schemas';
+import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
@@ -21,6 +22,7 @@ describe('BurnCommand', () => {
 	let burnCommand: BurnCommand;
 	let createCommand: CreateTokenCommand;
 	let stateStore: any;
+	let tokenStore: TokenStore;
 
 	const mockMint = jest.fn();
 	const mockInitialize = jest.fn();
@@ -44,6 +46,7 @@ describe('BurnCommand', () => {
 		await createCommand.init(initConfig as ModuleConfig);
 
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
+		tokenStore = tokenFactory.stores.get(TokenStore);
 		getAvailableBalance.mockResolvedValue(BigInt(1e4) * BigInt(1e8));
 	});
 
@@ -107,6 +110,9 @@ describe('BurnCommand', () => {
 
 				const result = await burnCommand.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(
+					new Error('Amount can not be lower than 1000 or greater than balance'),
+				);
 			});
 
 			it('should throw when sender is not the token owner / creator', async () => {
@@ -126,6 +132,23 @@ describe('BurnCommand', () => {
 				expect(result.error).toEqual(new Error('Sender is not the token creator'));
 			});
 
+			it('should throw correct error when tokenID is invalid', async () => {
+				const invalidTokenID = new TokenID(2).toBuffer();
+				const paramsWithInvalidTokenID = codec.encode(burnSchema, {
+					tokenID: invalidTokenID,
+					amount: BigInt(1000) + BigInt(1),
+				});
+				const transaction = new Transaction(
+					createSampleTransaction(paramsWithInvalidTokenID, BurnCommand.name),
+				);
+				const ctx = createCtx<BurnParams>(stateStore, transaction, burnSchema, 'verify');
+
+				const result = await burnCommand.verify(ctx);
+
+				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(new Error(`Invalid tokenID: ${invalidTokenID}`));
+			});
+
 			it('should be OK when params are correct', async () => {
 				const validParams = codec.encode(burnSchema, {
 					tokenID,
@@ -142,7 +165,42 @@ describe('BurnCommand', () => {
 
 	describe('execute', () => {
 		describe('valid cases', () => {
-			it.todo('should update the state store');
+			beforeEach(async () => {
+				const defaultToken = {
+					name: 'The real pepe coin',
+					symbol: 'PEPE',
+					totalSupply: BigInt(1e4) * BigInt(1e8),
+				};
+				const defaultValidParams = codec.encode(createSchema, defaultToken);
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
+				);
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
+
+				await expect(
+					createCommand.execute(ctx as CommandExecuteContext<CreateTokenParams>),
+				).resolves.toBeUndefined();
+			});
+
+			it('burn function should have been called and updated `totalSupply` ', async () => {
+				const validParams = codec.encode(burnSchema, {
+					tokenID,
+					amount: BigInt(1e2) * BigInt(1e8),
+				});
+
+				const transaction = new Transaction(createSampleTransaction(validParams, BurnCommand.name));
+				const ctx = createCtx<BurnParams>(stateStore, transaction, burnSchema, 'execute');
+
+				await expect(
+					burnCommand.execute(ctx as CommandExecuteContext<BurnParams>),
+				).resolves.toBeUndefined();
+
+				const token = await tokenStore.get(ctx, tokenID);
+
+				// initial supply - burned amount
+				expect(token.totalSupply).toBe(BigInt(1e4) * BigInt(1e8) - BigInt(1e2) * BigInt(1e8));
+				expect(mockBurn).toHaveBeenCalledTimes(1);
+			});
 		});
 
 		describe('invalid cases', () => {

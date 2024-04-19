@@ -9,7 +9,7 @@ import {
 	TokenMethod,
 } from 'klayr-sdk';
 import { mintSchema } from '../schemas';
-import { OwnerStore } from '../stores/owner';
+import { OwnerStore, OwnerStoreData } from '../stores/owner';
 import { TokenID } from '../types';
 import { TokenStore } from '../stores/token';
 import { failWithLog } from '../utils';
@@ -39,8 +39,11 @@ export class MintCommand extends BaseCommand {
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
 		const { amount, tokenID } = context.params;
-		const ownerStore = this.stores.get(OwnerStore);
-		const owner = await ownerStore.get(context, tokenID);
+
+		const owner = await this.getOwnerOfToken(context, tokenID);
+		if (!owner) {
+			return failWithLog<MintParams>(context, `Invalid tokenID: ${tokenID}`);
+		}
 
 		if (!owner.address.equals(context.transaction.senderAddress)) {
 			return failWithLog<MintParams>(context, `Sender is not the token creator`);
@@ -71,6 +74,18 @@ export class MintCommand extends BaseCommand {
 		const token = await tokenStore.get(context, tokenID);
 		token.totalSupply += BigInt(amount);
 		await tokenStore.set(context, tokenID, token);
+	}
+
+	private async getOwnerOfToken(
+		context: CommandVerifyContext<MintParams>,
+		tokenID: Buffer,
+	): Promise<OwnerStoreData | undefined> {
+		try {
+			const ownerStore = this.stores.get(OwnerStore);
+			return await ownerStore.get(context, tokenID);
+		} catch {
+			return undefined;
+		}
 	}
 }
 
