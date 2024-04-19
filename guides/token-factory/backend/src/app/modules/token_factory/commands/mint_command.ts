@@ -7,7 +7,7 @@ import {
 	VerificationResult,
 	VerifyStatus,
 	TokenMethod,
-} from 'lisk-sdk';
+} from 'klayr-sdk';
 import { mintSchema } from '../schemas';
 import { OwnerStore } from '../stores/owner';
 import { TokenID } from '../types';

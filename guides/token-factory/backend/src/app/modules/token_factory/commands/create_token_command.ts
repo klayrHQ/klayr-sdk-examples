@@ -7,7 +7,7 @@ import {
 	VerificationResult,
 	VerifyStatus,
 	TokenMethod,
-} from 'lisk-sdk';
+} from 'klayr-sdk';
 import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../types';
 import { TokenStore } from '../stores/token';

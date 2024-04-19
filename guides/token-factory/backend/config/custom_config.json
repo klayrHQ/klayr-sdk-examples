@@ -1,6 +1,6 @@
 {
 	"system": {
-		"dataPath": "~/.lisk/token-factory",
+		"dataPath": "~/.klayr/token-factory",
 		"keepEventsForHeights": 300,
 		"logLevel": "info"
 	},

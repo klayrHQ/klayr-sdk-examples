@@ -1,4 +1,4 @@
-import { JSONObject } from 'lisk-sdk';
+import { JSONObject } from 'klayr-sdk';
 
 export type TokenID = Buffer;
 

@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { validator } from '@liskhq/lisk-validator';
-import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'lisk-sdk';
+import { validator } from '@klayr/validator';
+import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'klayr-sdk';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';

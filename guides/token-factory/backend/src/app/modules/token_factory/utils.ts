@@ -1,4 +1,4 @@
-import { GenesisConfig } from 'lisk-sdk';
+import { GenesisConfig } from 'klayr-sdk';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 
 export const getModuleConfig = (

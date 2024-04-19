@@ -7,8 +7,8 @@ import {
 	createMintCtx,
 	createSampleTransaction,
 } from '@test/helpers';
-import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'lisk-sdk';
-import { utils } from '@liskhq/lisk-cryptography';
+import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
+import { utils } from '@klayr/cryptography';
 import {
 	CreateTokenCommand,
 	CreateTokenParams,

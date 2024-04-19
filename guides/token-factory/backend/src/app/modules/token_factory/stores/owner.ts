@@ -1,4 +1,4 @@
-import { BaseStore } from 'lisk-sdk';
+import { BaseStore } from 'klayr-sdk';
 
 export interface OwnerStoreData {
 	address: Buffer;
@@ -12,7 +12,7 @@ export const ownerStoreSchema = {
 		address: {
 			dataType: 'bytes',
 			fieldNumber: 1,
-			format: 'lisk32',
+			format: 'klayr32',
 		},
 	},
 };
