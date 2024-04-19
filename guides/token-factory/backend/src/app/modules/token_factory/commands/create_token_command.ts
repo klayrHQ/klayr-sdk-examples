@@ -13,6 +13,7 @@ import { ModuleConfig } from '../types';
 import { TokenStore } from '../stores/token';
 import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';
 import { OwnerStore } from '../stores/owner';
+import { NewTokenEvent } from '../events/new_token';
 
 export interface CreateTokenParams {
 	name: string;
@@ -63,6 +64,34 @@ export class CreateTokenCommand extends BaseCommand {
 		const {
 			transaction: { senderAddress },
 		} = context;
+		const newTokenID = await this.getNextTokenIDAndSetStores(context, senderAddress);
+
+		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenID);
+		await this._tokenMethod.mint(
+			context.getMethodContext(),
+			senderAddress,
+			newTokenID,
+			BigInt(context.params.totalSupply),
+		);
+
+		const newTokenEvent = this.events.get(NewTokenEvent);
+		newTokenEvent.add(
+			context,
+			{
+				owner: senderAddress,
+				tokenID: newTokenID,
+				name: context.params.name,
+				symbol: context.params.symbol,
+				totalSupply: BigInt(context.params.totalSupply),
+			},
+			[newTokenID],
+		);
+	}
+
+	private async getNextTokenIDAndSetStores(
+		context: CommandExecuteContext<CreateTokenParams>,
+		senderAddress: Buffer,
+	) {
 		const tokenStore = this.stores.get(TokenStore);
 		const counterStore = this.stores.get(CounterStore);
 		const ownerStore = this.stores.get(OwnerStore);
@@ -76,14 +105,6 @@ export class CreateTokenCommand extends BaseCommand {
 		newLocalIDBuffer.writeUInt32BE(tokenIdCounter.counter);
 		const newTokenIDBuffer = Buffer.concat([this._chainID, newLocalIDBuffer]);
 
-		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenIDBuffer);
-		await this._tokenMethod.mint(
-			context.getMethodContext(),
-			senderAddress,
-			newTokenIDBuffer,
-			BigInt(context.params.totalSupply),
-		);
-
 		await Promise.all([
 			counterStore.set(context, counterKey, tokenIdCounter),
 			ownerStore.set(context, newTokenIDBuffer, { address: senderAddress }),
@@ -93,6 +114,7 @@ export class CreateTokenCommand extends BaseCommand {
 				totalSupply: BigInt(context.params.totalSupply),
 			}),
 		]);
-		// EVENT
+
+		return newTokenIDBuffer;
 	}
 }
