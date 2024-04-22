@@ -8,7 +8,7 @@ export interface NewTokenEventData {
 	totalSupply: bigint;
 }
 
-export const newTokenSchema = {
+export const newTokenDataSchema = {
 	$id: 'token_factory/events/new_token',
 	title: 'New token created with the createToken command',
 	type: 'object',
@@ -42,5 +42,5 @@ export const newTokenSchema = {
 };
 
 export class NewTokenEvent extends BaseEvent<NewTokenEventData> {
-	public schema = newTokenSchema;
+	public schema = newTokenDataSchema;
 }
