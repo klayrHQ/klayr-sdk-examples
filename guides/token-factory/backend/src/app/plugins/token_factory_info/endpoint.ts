@@ -7,11 +7,9 @@ export class Endpoint extends BasePluginEndpoint {
 	private _tokenIDZero!: Buffer;
 
 	// Initialize the database instance here
-	public init(db: klayrDB.Database, chainID: string) {
+	public init(db: klayrDB.Database, tokenIDZero: Buffer) {
 		this._pluginDB = db;
-		const tokenIDZeroBuffer = Buffer.alloc(4);
-		tokenIDZeroBuffer.writeUInt32BE(0);
-		this._tokenIDZero = Buffer.concat([Buffer.from(chainID, 'hex'), tokenIDZeroBuffer]);
+		this._tokenIDZero = tokenIDZero;
 	}
 
 	public async getTokenList(_context: PluginEndpointContext): Promise<unknown[]> {

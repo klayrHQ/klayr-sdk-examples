@@ -7,7 +7,7 @@ import { join } from 'path';
 import { ensureDir } from 'fs-extra';
 import { newTokenEventSchema, heightSchema } from './schemas';
 import { NewTokenEvent as Event, Height } from './types';
-import { DB_KEY_EVENT_INFO, DB_LAST_TOKENID_COUNTER_INFO, DB_LAST_HEIGHT_INFO } from './constants';
+import { DB_LAST_TOKENID_COUNTER_INFO, DB_LAST_HEIGHT_INFO } from './constants';
 import { NewTokenEventData } from '@app/modules/token_factory/events/new_token';
 
 const { Database } = klayrDB;
@@ -28,7 +28,7 @@ export const getEventNewTokenInfo = async (
 	db: KVStore,
 	tokenIDZero: Buffer,
 	lastTokenID: Buffer,
-): Promise<(Event & { id: Buffer })[]> => {
+): Promise<Event[]> => {
 	// 1. Look for all the given key-value pairs in the database
 	const stream = db.createReadStream({
 		gte: tokenIDZero,
@@ -36,15 +36,11 @@ export const getEventNewTokenInfo = async (
 	});
 
 	// 2. Get event's data out of the collected stream and push it in an array.
-	const results = await new Promise<(Event & { id: Buffer })[]>((resolve, reject) => {
-		const events: (Event & { id: Buffer })[] = [];
-		console.log({ events });
+	const results = await new Promise<Event[]>((resolve, reject) => {
+		const events: Event[] = [];
 		stream
-			.on('data', ({ key, value }: { key: Buffer; value: Buffer }) => {
-				events.push({
-					...codec.decode<Event>(newTokenEventSchema, value),
-					id: key.slice(DB_KEY_EVENT_INFO.length),
-				});
+			.on('data', ({ value }: { value: Buffer }) => {
+				events.push(codec.decode<Event>(newTokenEventSchema, value));
 			})
 			.on('error', error => {
 				reject(error);
@@ -72,7 +68,6 @@ export const setEventNewTokenInfo = async (
 		height: _eventHeight,
 	});
 	await db.set(tokenID, encodedAddressInfo);
-	console.log('** Single event data saved successfully in the database **');
 };
 
 export const getSingleEventTokenInfo = async (db: KVStore, tokenID: Buffer): Promise<Event> => {
@@ -87,13 +82,11 @@ export const setSingleEventTokenInfo = async (
 ): Promise<void> => {
 	const encodedTokenInfo = codec.encode(newTokenEventSchema, event);
 	await db.set(tokenID, encodedTokenInfo);
-	console.log('** Event data saved successfully in the database **');
 };
 
 // Stores lastCounter for key generation.
 export const setLastTokenID = async (db: KVStore, lastTokenID: Buffer): Promise<void> => {
 	await db.set(DB_LAST_TOKENID_COUNTER_INFO, lastTokenID);
-	console.log('** TokenID Counter saved successfully in the database **');
 };
 
 // Returns lastCounter.
@@ -106,7 +99,6 @@ export const getLastTokenID = async (db: KVStore): Promise<Buffer> => {
 export const setLastEventHeight = async (db: KVStore, lastHeight: number): Promise<void> => {
 	const encodedHeightInfo = codec.encode(heightSchema, { height: lastHeight });
 	await db.set(DB_LAST_HEIGHT_INFO, encodedHeightInfo);
-	console.log('** Height saved successfully in the database **');
 };
 
 // Returns height of block where hello event exists.

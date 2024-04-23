@@ -23,6 +23,7 @@ export class TokenFactoryInfoPlugin extends BasePlugin<TokenFactoryInfoPluginCon
 	public configSchema = configSchema;
 	public endpoint = new Endpoint();
 	private _pluginDB!: klayrDB.Database;
+	private _tokenIDZero!: Buffer;
 
 	private async _getLastHeight(): Promise<Height> {
 		try {
@@ -38,35 +39,29 @@ export class TokenFactoryInfoPlugin extends BasePlugin<TokenFactoryInfoPluginCon
 	}
 
 	private async _syncChainEvents(): Promise<void> {
-		// 1. Get the latest block height from the blockchain
 		const res = await this.apiClient.invoke<{ header: { height: number } }>(
 			'chain_getLastBlock',
 			{},
 		);
-		// 2. Get block height stored in the database
+
 		const heightObj = await this._getLastHeight();
 		const lastStoredHeight = heightObj.height + 1;
 		const { height } = res.header;
 
-		// 3. Loop through new blocks, starting from the lastStoredHeight + 1
 		for (let index = lastStoredHeight; index <= height; index += 1) {
 			const result = await this.apiClient.invoke<ApiEventResult[]>('chain_getEvents', {
 				height: index,
 			});
 
-			const newTokenEvents = result.filter(
-				e => e.module === 'tokenFactory' && e.name === 'newToken',
-			);
-			const mintEvents = result.filter(e => e.module === 'token' && e.name === 'mint');
-
-			await this.handleNewTokenEvents(newTokenEvents);
-			await this.handleMintEvents(mintEvents);
+			await Promise.all([this._handleNewTokenEvents(result), this._handleMintBurnEvents(result)]);
 		}
 
 		await setLastEventHeight(this._pluginDB, height);
 	}
 
-	private async handleNewTokenEvents(newTokenEvents: ApiEventResult[]): Promise<void> {
+	private async _handleNewTokenEvents(result: ApiEventResult[]): Promise<void> {
+		const newTokenEvents = result.filter(e => e.module === 'tokenFactory' && e.name === 'newToken');
+
 		for (const newTokenEvent of newTokenEvents) {
 			const parsedData = codec.decode<NewTokenEventData>(
 				newTokenDataSchema,
@@ -76,16 +71,26 @@ export class TokenFactoryInfoPlugin extends BasePlugin<TokenFactoryInfoPluginCon
 		}
 	}
 
-	private async handleMintEvents(mintEvents: ApiEventResult[]): Promise<void> {
-		for (const mintEvent of mintEvents) {
+	private async _handleMintBurnEvents(result: ApiEventResult[]): Promise<void> {
+		const mintBurnEvents = result.filter(
+			e =>
+				(e.module === 'token' && e.name === 'mint') || (e.module === 'token' && e.name === 'burn'),
+		);
+
+		for (const mintBurnEvent of mintBurnEvents) {
 			const parsedData = codec.decode<{
 				address: Buffer;
 				tokenID: Buffer;
 				amount: bigint;
 				result: number;
-			}>(mintEventSchema, Buffer.from(mintEvent.data, 'hex'));
+			}>(mintEventSchema, Buffer.from(mintBurnEvent.data, 'hex'));
+			// want to skip the events from tokenID 0 since it does not exist in the plugin
+			if (parsedData.tokenID.equals(this._tokenIDZero)) continue;
+
+			// Adjust total supply
 			const event = await getSingleEventTokenInfo(this._pluginDB, parsedData.tokenID);
-			event.totalSupply += parsedData.amount;
+			if (mintBurnEvent.name === 'mint') event.totalSupply += parsedData.amount;
+			if (mintBurnEvent.name === 'burn') event.totalSupply -= parsedData.amount;
 			await setSingleEventTokenInfo(this._pluginDB, parsedData.tokenID, event);
 		}
 	}
@@ -94,12 +99,10 @@ export class TokenFactoryInfoPlugin extends BasePlugin<TokenFactoryInfoPluginCon
 		parsedData: NewTokenEventData,
 		chainHeight: number,
 	): Promise<string> {
-		// 1. Saves newly generated new token events to the database
-		await setEventNewTokenInfo(this._pluginDB, parsedData, chainHeight);
-		// 2. Saves incremented tokenID value
-		await setLastTokenID(this._pluginDB, parsedData.tokenID);
-		// 3. Saves last checked block's height
-		// await setLastEventHeight(this._pluginDB, chainHeight);
+		await Promise.all([
+			setEventNewTokenInfo(this._pluginDB, parsedData, chainHeight),
+			setLastTokenID(this._pluginDB, parsedData.tokenID),
+		]);
 		return 'Data Saved';
 	}
 
@@ -108,8 +111,12 @@ export class TokenFactoryInfoPlugin extends BasePlugin<TokenFactoryInfoPluginCon
 	}
 
 	public async load(): Promise<void> {
+		const tokenIDZeroBuffer = Buffer.alloc(4);
+		tokenIDZeroBuffer.writeUInt32BE(0);
+		this._tokenIDZero = Buffer.concat([Buffer.from(this.config.chainID, 'hex'), tokenIDZeroBuffer]);
+
 		this._pluginDB = await getDBInstance(this.dataPath);
-		this.endpoint.init(this._pluginDB, this.config.chainID);
+		this.endpoint.init(this._pluginDB, this._tokenIDZero);
 
 		setInterval(() => {
 			this._syncChainEvents();
