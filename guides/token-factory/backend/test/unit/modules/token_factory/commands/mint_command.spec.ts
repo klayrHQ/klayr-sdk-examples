@@ -10,6 +10,8 @@ import {
 } from '@app/modules/token_factory/commands/create_token_command';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
+import { TokenFactoryMethod } from '@app/modules/token_factory/method';
+import { InternalMethod } from '@app/modules/token_factory/internal_methods';
 
 describe('MintCommand', () => {
 	const initConfig = {
@@ -37,13 +39,17 @@ describe('MintCommand', () => {
 	beforeEach(async () => {
 		const { minAmountToMint, maxAmountToMint } = initConfig;
 		const tokenFactory = new TokenFactoryModule();
+		const tokenFactoryMethod = new TokenFactoryMethod(tokenFactory.stores, tokenFactory.events);
+		const internalMethod = new InternalMethod(tokenFactory.stores, tokenFactory.events);
+		await internalMethod.init(initConfig.chainID);
 
 		mintCommand = new MintCommand(tokenFactory.stores, tokenFactory.events);
-		mintCommand.addDependencies({ tokenMethod: { mint: mockMint } as any });
+		mintCommand.addDependencies({ tokenFactoryMethod, tokenMethod: { mint: mockMint } as any });
 		await mintCommand.init({ minAmountToMint, maxAmountToMint });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
 		createCommand.addDependencies({
+			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
 		} as any);
 		await createCommand.init(initConfig as ModuleConfig);

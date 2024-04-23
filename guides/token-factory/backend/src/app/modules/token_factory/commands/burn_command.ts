@@ -9,9 +9,9 @@ import {
 } from 'klayr-sdk';
 import { burnSchema } from '../schemas';
 import { failWithLog } from '../utils';
-import { OwnerStore, OwnerStoreData } from '../stores/owner';
 import { TokenID } from '../types';
 import { TokenStore } from '../stores/token';
+import { TokenFactoryMethod } from '../method';
 
 export interface BurnParams {
 	tokenID: TokenID;
@@ -20,10 +20,16 @@ export interface BurnParams {
 
 export class BurnCommand extends BaseCommand {
 	private _minAmountToBurn!: bigint;
+	private _tokenFactoryMethod!: TokenFactoryMethod;
 	private _tokenMethod!: TokenMethod;
+
 	public schema = burnSchema;
 
-	public addDependencies(args: { tokenMethod: TokenMethod }) {
+	public addDependencies(args: {
+		tokenFactoryMethod: TokenFactoryMethod;
+		tokenMethod: TokenMethod;
+	}) {
+		this._tokenFactoryMethod = args.tokenFactoryMethod;
 		this._tokenMethod = args.tokenMethod;
 	}
 
@@ -43,7 +49,7 @@ export class BurnCommand extends BaseCommand {
 			);
 		}
 
-		const owner = await this.getOwnerOfToken(context, tokenID);
+		const owner = await this._tokenFactoryMethod.getOwnerOfToken<BurnParams>(context, tokenID);
 		if (!owner) {
 			return failWithLog<BurnParams>(context, `Invalid tokenID: ${tokenID}`);
 		}
@@ -83,17 +89,5 @@ export class BurnCommand extends BaseCommand {
 		);
 
 		return amount >= this._minAmountToBurn && amount <= availabeBalance;
-	}
-
-	private async getOwnerOfToken(
-		context: CommandVerifyContext<BurnParams>,
-		tokenID: Buffer,
-	): Promise<OwnerStoreData | undefined> {
-		try {
-			const ownerStore = this.stores.get(OwnerStore);
-			return await ownerStore.get(context, tokenID);
-		} catch {
-			return undefined;
-		}
 	}
 }

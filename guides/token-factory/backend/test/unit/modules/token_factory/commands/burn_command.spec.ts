@@ -5,6 +5,8 @@ import {
 	CreateTokenCommand,
 	CreateTokenParams,
 } from '@app/modules/token_factory/commands/create_token_command';
+import { InternalMethod } from '@app/modules/token_factory/internal_methods';
+import { TokenFactoryMethod } from '@app/modules/token_factory/method';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { burnSchema, createTokenSchema as createSchema } from '@app/modules/token_factory/schemas';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
@@ -32,15 +34,20 @@ describe('BurnCommand', () => {
 	beforeEach(async () => {
 		const { minAmountToBurn } = initConfig;
 		const tokenFactory = new TokenFactoryModule();
+		const tokenFactoryMethod = new TokenFactoryMethod(tokenFactory.stores, tokenFactory.events);
+		const internalMethod = new InternalMethod(tokenFactory.stores, tokenFactory.events);
+		await internalMethod.init(initConfig.chainID);
 
 		burnCommand = new BurnCommand(tokenFactory.stores, tokenFactory.events);
 		burnCommand.addDependencies({
+			tokenFactoryMethod,
 			tokenMethod: { burn: mockBurn, getAvailableBalance } as any,
 		});
 		await burnCommand.init({ minAmountToBurn });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
 		createCommand.addDependencies({
+			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
 		} as any);
 		await createCommand.init(initConfig as ModuleConfig);

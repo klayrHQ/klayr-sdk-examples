@@ -10,6 +10,7 @@ import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { CounterStore, counterKey } from '@app/modules/token_factory/stores/counter';
 import { OwnerStore } from '@app/modules/token_factory/stores/owner';
+import { InternalMethod } from '@app/modules/token_factory/internal_methods';
 
 describe('CreateTokenCommand', () => {
 	const initConfig = {
@@ -35,9 +36,12 @@ describe('CreateTokenCommand', () => {
 
 	beforeEach(async () => {
 		const tokenFactory = new TokenFactoryModule();
+		const internalMethod = new InternalMethod(tokenFactory.stores, tokenFactory.events);
+		await internalMethod.init(initConfig.chainID);
 
 		command = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
 		command.addDependencies({
+			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
 		} as any);
 		await command.init(initConfig as ModuleConfig);

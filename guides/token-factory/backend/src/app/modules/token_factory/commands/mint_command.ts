@@ -9,10 +9,10 @@ import {
 	TokenMethod,
 } from 'klayr-sdk';
 import { mintSchema } from '../schemas';
-import { OwnerStore, OwnerStoreData } from '../stores/owner';
 import { TokenID } from '../types';
 import { TokenStore } from '../stores/token';
 import { failWithLog } from '../utils';
+import { TokenFactoryMethod } from '../method';
 
 export interface MintParams {
 	tokenID: TokenID;
@@ -23,11 +23,16 @@ export interface MintParams {
 export class MintCommand extends BaseCommand {
 	private _minAmountToMint!: bigint;
 	private _maxAmountToMint!: bigint;
+	private _tokenFactoryMethod!: TokenFactoryMethod;
 	private _tokenMethod!: TokenMethod;
 
 	public schema = mintSchema;
 
-	public addDependencies(args: { tokenMethod: TokenMethod }) {
+	public addDependencies(args: {
+		tokenFactoryMethod: TokenFactoryMethod;
+		tokenMethod: TokenMethod;
+	}) {
+		this._tokenFactoryMethod = args.tokenFactoryMethod;
 		this._tokenMethod = args.tokenMethod;
 	}
 
@@ -40,7 +45,7 @@ export class MintCommand extends BaseCommand {
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
 		const { amount, tokenID } = context.params;
 
-		const owner = await this.getOwnerOfToken(context, tokenID);
+		const owner = await this._tokenFactoryMethod.getOwnerOfToken<MintParams>(context, tokenID);
 		if (!owner) {
 			return failWithLog<MintParams>(context, `Invalid tokenID: ${tokenID}`);
 		}
@@ -75,20 +80,4 @@ export class MintCommand extends BaseCommand {
 		token.totalSupply += BigInt(amount);
 		await tokenStore.set(context, tokenID, token);
 	}
-
-	private async getOwnerOfToken(
-		context: CommandVerifyContext<MintParams>,
-		tokenID: Buffer,
-	): Promise<OwnerStoreData | undefined> {
-		try {
-			const ownerStore = this.stores.get(OwnerStore);
-			return await ownerStore.get(context, tokenID);
-		} catch {
-			return undefined;
-		}
-	}
 }
-
-// verifcation of the user in verify function
-// Mint function itself in the execute
-//

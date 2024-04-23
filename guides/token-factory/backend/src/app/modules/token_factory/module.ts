@@ -15,6 +15,7 @@ import { TokenStore } from './stores/token';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { getModuleConfig } from './utils';
 import { NewTokenEvent } from './events/new_token';
+import { InternalMethod } from './internal_methods';
 
 export const defaultConfig = {
 	maxNameLength: 30,
@@ -26,6 +27,7 @@ export const defaultConfig = {
 };
 
 export class TokenFactoryModule extends BaseModule {
+	private readonly _internalMethod = new InternalMethod(this.stores, this.events);
 	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
 	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _burnCommand = new BurnCommand(this.stores, this.events);
@@ -33,7 +35,7 @@ export class TokenFactoryModule extends BaseModule {
 	private _tokenMethod!: TokenMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
-	public method = new TokenFactoryMethod(this.stores, this.events);
+	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
 	public commands = [this._createTokenCommand, this._mintCommand, this._burnCommand];
 
 	public constructor() {
@@ -48,9 +50,18 @@ export class TokenFactoryModule extends BaseModule {
 
 	public addDependencies(tokenMethod: TokenMethod) {
 		this._tokenMethod = tokenMethod;
-		this._createTokenCommand.addDependencies({ tokenMethod: this._tokenMethod });
-		this._mintCommand.addDependencies({ tokenMethod: this._tokenMethod });
-		this._burnCommand.addDependencies({ tokenMethod: this._tokenMethod });
+		this._createTokenCommand.addDependencies({
+			internalMethod: this._internalMethod,
+			tokenMethod: this._tokenMethod,
+		});
+		this._mintCommand.addDependencies({
+			tokenFactoryMethod: this.tokenFactoryMethod,
+			tokenMethod: this._tokenMethod,
+		});
+		this._burnCommand.addDependencies({
+			tokenFactoryMethod: this.tokenFactoryMethod,
+			tokenMethod: this._tokenMethod,
+		});
 	}
 
 	public metadata(): ModuleMetadata {
@@ -72,6 +83,7 @@ export class TokenFactoryModule extends BaseModule {
 		validator.validate<ModuleConfigJSON>(configSchema, config);
 
 		this._moduleConfig = getModuleConfig(config, genesisConfig);
+		this._internalMethod.init(this._moduleConfig.chainID);
 		this._createTokenCommand.init(this._moduleConfig).catch(err => {
 			console.log('Error: ', err);
 		});
