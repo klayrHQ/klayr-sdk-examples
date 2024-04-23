@@ -14,6 +14,7 @@ import { OwnerStore } from './stores/owner';
 import { TokenStore } from './stores/token';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { getModuleConfig } from './utils';
+import { NewTokenEvent } from './events/new_token';
 
 export const defaultConfig = {
 	maxNameLength: 30,
@@ -41,6 +42,8 @@ export class TokenFactoryModule extends BaseModule {
 		this.stores.register(TokenStore, new TokenStore(this.name, 0));
 		this.stores.register(CounterStore, new CounterStore(this.name, 1));
 		this.stores.register(OwnerStore, new OwnerStore(this.name, 2));
+
+		this.events.register(NewTokenEvent, new NewTokenEvent(this.name));
 	}
 
 	public addDependencies(tokenMethod: TokenMethod) {
