@@ -12,7 +12,7 @@ export class Endpoint extends BasePluginEndpoint {
 		this._tokenIDZero = tokenIDZero;
 	}
 
-	public async getTokenList(_context: PluginEndpointContext): Promise<unknown[]> {
+	public async getTokenList(context: PluginEndpointContext): Promise<unknown[]> {
 		const data: {
 			tokenID: string;
 			owner: string;
@@ -21,8 +21,14 @@ export class Endpoint extends BasePluginEndpoint {
 			totalSupply: string;
 			blockHeight: number;
 		}[] = [];
+		const address = context.params.address as string;
 		const lastTokenID = await getLastTokenID(this._pluginDB);
-		const tokenList = await getEventNewTokenInfo(this._pluginDB, this._tokenIDZero, lastTokenID);
+		const tokenList = await getEventNewTokenInfo(
+			this._pluginDB,
+			this._tokenIDZero,
+			lastTokenID,
+			address,
+		);
 
 		for (const token of tokenList) {
 			data.push({
