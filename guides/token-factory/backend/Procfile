@@ -1,1 +1,1 @@
-web: ./bin/run start --config config/custom_config.json --overwrite-config --port $PORT
+web: ./bin/run start --config config/custom_config.json --overwrite-config
