@@ -39,6 +39,8 @@ export class CreateTokenCommand extends BaseCommand {
 	}
 
 	public async init(config: ModuleConfig): Promise<void> {
+		// Test code
+		/////////////////////////////
 		const tokenIDZeroBuffer = Buffer.alloc(4);
 		tokenIDZeroBuffer.writeUInt32BE(0);
 
@@ -53,6 +55,7 @@ export class CreateTokenCommand extends BaseCommand {
 			minFeePerByte: 1000,
 			maxBlockHeightZeroFeePerByte: 0,
 		});
+		/////////////////////////////
 
 		this._maxTotalSupply = config.maxTotalSupply;
 		this._chainID = config.chainID;
@@ -85,11 +88,7 @@ export class CreateTokenCommand extends BaseCommand {
 			transaction: { senderAddress },
 		} = context;
 
-		try {
-			this._feeMethod.payFee(context.getMethodContext(), this._createTokenFee);
-		} catch (e) {
-			console.log('hiiii', e);
-		}
+		this._feeMethod.payFee(context.getMethodContext(), this._createTokenFee);
 
 		const newTokenID = await this.getNextTokenIDAndSetStores(context, senderAddress);
 		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenID);
