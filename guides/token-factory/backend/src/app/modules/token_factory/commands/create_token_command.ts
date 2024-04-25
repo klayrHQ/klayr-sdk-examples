@@ -7,6 +7,8 @@ import {
 	VerificationResult,
 	VerifyStatus,
 	TokenMethod,
+	FeeMethod,
+	cryptography,
 } from 'klayr-sdk';
 import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../types';
@@ -22,17 +24,36 @@ export interface CreateTokenParams {
 }
 
 export class CreateTokenCommand extends BaseCommand {
-	private _maxTotalSupply!: bigint;
 	private _tokenMethod!: TokenMethod;
+	private _feeMethod!: FeeMethod;
+	private _maxTotalSupply!: bigint;
 	private _chainID!: Buffer;
+	private _createTokenFee: bigint = BigInt(33333); ///////////////////////////////////
+	private tokenIDZero!: Buffer;
 
 	public schema = createTokenSchema;
 
-	public addDependencies(args: { tokenMethod: TokenMethod }) {
+	public addDependencies(args: { tokenMethod: TokenMethod; feeMethod: FeeMethod }) {
 		this._tokenMethod = args.tokenMethod;
+		this._feeMethod = args.feeMethod;
 	}
 
 	public async init(config: ModuleConfig): Promise<void> {
+		const tokenIDZeroBuffer = Buffer.alloc(4);
+		tokenIDZeroBuffer.writeUInt32BE(0);
+
+		const pool = cryptography.address.getAddressFromKlayr32Address(
+			'klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8',
+		);
+		this.tokenIDZero = Buffer.concat([config.chainID, tokenIDZeroBuffer]);
+
+		console.log({ pool });
+		this._feeMethod.init({
+			feeTokenID: this.tokenIDZero,
+			minFeePerByte: 1000,
+			maxBlockHeightZeroFeePerByte: 0,
+		});
+
 		this._maxTotalSupply = config.maxTotalSupply;
 		this._chainID = config.chainID;
 		this.schema.properties.name.maxLength = config.maxNameLength;
@@ -44,7 +65,6 @@ export class CreateTokenCommand extends BaseCommand {
 		context: CommandVerifyContext<CreateTokenParams>,
 	): Promise<VerificationResult> {
 		context.logger.info('TX VERIFICATION');
-
 		if (context.params.totalSupply > this._maxTotalSupply) {
 			const error = Error(`Total supply cannot be greater than ${this._maxTotalSupply}`);
 			context.logger.info(error);
@@ -64,8 +84,14 @@ export class CreateTokenCommand extends BaseCommand {
 		const {
 			transaction: { senderAddress },
 		} = context;
-		const newTokenID = await this.getNextTokenIDAndSetStores(context, senderAddress);
 
+		try {
+			this._feeMethod.payFee(context.getMethodContext(), this._createTokenFee);
+		} catch (e) {
+			console.log('hiiii', e);
+		}
+
+		const newTokenID = await this.getNextTokenIDAndSetStores(context, senderAddress);
 		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenID);
 		await this._tokenMethod.mint(
 			context.getMethodContext(),

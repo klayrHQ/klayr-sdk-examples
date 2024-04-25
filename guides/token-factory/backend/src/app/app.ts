@@ -6,7 +6,7 @@ export const getApplication = (config: PartialApplicationConfig): Application =>
 	const { app, method } = Application.defaultApplication(config);
 
 	const tokenFactoryModule = new TokenFactoryModule();
-	tokenFactoryModule.addDependencies(method.token);
+	tokenFactoryModule.addDependencies(method.token, method.fee);
 
 	app.registerModule(tokenFactoryModule);
 	registerPlugins(app);

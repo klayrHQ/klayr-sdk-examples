@@ -2,7 +2,14 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { validator } from '@klayr/validator';
-import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'klayr-sdk';
+import {
+	BaseModule,
+	FeeMethod,
+	ModuleInitArgs,
+	ModuleMetadata,
+	TokenMethod,
+	utils,
+} from 'klayr-sdk';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
@@ -28,9 +35,10 @@ export class TokenFactoryModule extends BaseModule {
 	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
+	private _feeMethod!: FeeMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
-	public method = new TokenFactoryMethod(this.stores, this.events);
+	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
 	public commands = [this._createTokenCommand, this._mintCommand];
 
 	public constructor() {
@@ -43,9 +51,13 @@ export class TokenFactoryModule extends BaseModule {
 		this.events.register(NewTokenEvent, new NewTokenEvent(this.name));
 	}
 
-	public addDependencies(tokenMethod: TokenMethod) {
+	public addDependencies(tokenMethod: TokenMethod, feeMethod: FeeMethod) {
 		this._tokenMethod = tokenMethod;
-		this._createTokenCommand.addDependencies({ tokenMethod: this._tokenMethod });
+		this._feeMethod = feeMethod;
+		this._createTokenCommand.addDependencies({
+			tokenMethod: this._tokenMethod,
+			feeMethod: this._feeMethod,
+		});
 		this._mintCommand.addDependencies({ tokenMethod: this._tokenMethod });
 	}
 
