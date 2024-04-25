@@ -69,6 +69,10 @@ export const configSchema = {
 			dataType: 'uint64',
 			fieldNumber: 5,
 		},
+		createTokenFee: {
+			dataType: 'uint64',
+			fieldNumber: 6,
+		},
 	},
 	required: [
 		'maxNameLength',
@@ -76,5 +80,6 @@ export const configSchema = {
 		'maxTotalSupply',
 		'minAmountToMint',
 		'maxAmountToMint',
+		'createTokenFee',
 	],
 };

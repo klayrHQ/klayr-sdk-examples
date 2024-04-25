@@ -12,12 +12,13 @@ describe('TokenFactoryModule', () => {
 		maxTotalSupply: BigInt(1e18),
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
+		createTokenFee: BigInt(100_000),
 	};
 	let tokenFactory: TokenFactoryModule;
 
 	beforeEach(async () => {
 		tokenFactory = new TokenFactoryModule();
-		await tokenFactory.init({ genesisConfig, moduleConfig: defaultConfig });
+		await tokenFactory.init({ genesisConfig, moduleConfig: {} });
 	});
 
 	describe('init', () => {
@@ -27,6 +28,7 @@ describe('TokenFactoryModule', () => {
 			expect(tokenFactory['_moduleConfig'].maxTotalSupply).toBe(defaultConfig.maxTotalSupply);
 			expect(tokenFactory['_moduleConfig'].minAmountToMint).toBe(defaultConfig.minAmountToMint);
 			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(defaultConfig.maxAmountToMint);
+			expect(tokenFactory['_moduleConfig'].createTokenFee).toBe(defaultConfig.createTokenFee);
 		});
 
 		it('should initialize config with custom values when module config is set', async () => {
@@ -36,6 +38,7 @@ describe('TokenFactoryModule', () => {
 				maxTotalSupply: BigInt(1e10),
 				minAmountToMint: BigInt(2000),
 				maxAmountToMint: BigInt(1e2) * BigInt(1e8),
+				createTokenFee: BigInt(200_000),
 			};
 			tokenFactory = new TokenFactoryModule();
 
@@ -51,6 +54,7 @@ describe('TokenFactoryModule', () => {
 			expect(tokenFactory['_moduleConfig'].maxTotalSupply).toBe(moduleConfig.maxTotalSupply);
 			expect(tokenFactory['_moduleConfig'].minAmountToMint).toBe(moduleConfig.minAmountToMint);
 			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(moduleConfig.maxAmountToMint);
+			expect(tokenFactory['_moduleConfig'].createTokenFee).toBe(moduleConfig.createTokenFee);
 		});
 
 		it('should not initialize config with invalid value for `maxSymbolLength`', async () => {

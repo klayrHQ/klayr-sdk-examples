@@ -21,6 +21,7 @@ describe('MintCommand', () => {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 		chainID: Buffer.from('12345678'),
+		createTokenFee: BigInt(100_000),
 	};
 	const tokenID = new TokenID(1).toBuffer();
 	const recipient = utils.getRandomBytes(20);
@@ -33,6 +34,7 @@ describe('MintCommand', () => {
 
 	const mockMint = jest.fn();
 	const mockInitialize = jest.fn();
+	const mockPayFee = jest.fn();
 
 	let mintCommand: MintCommand;
 	let createCommand: CreateTokenCommand;
@@ -50,6 +52,7 @@ describe('MintCommand', () => {
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
 		createCommand.addDependencies({
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
+			feeMethod: { payFee: mockPayFee },
 		} as any);
 		await createCommand.init(initConfig as ModuleConfig);
 

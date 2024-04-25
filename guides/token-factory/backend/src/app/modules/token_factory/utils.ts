@@ -11,5 +11,6 @@ export const getModuleConfig = (
 		minAmountToMint: BigInt(config.minAmountToMint),
 		maxAmountToMint: BigInt(config.maxAmountToMint),
 		chainID: Buffer.from(genesisConfig.chainID, 'hex'),
+		createTokenFee: BigInt(config.createTokenFee),
 	};
 };

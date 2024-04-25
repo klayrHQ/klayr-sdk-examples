@@ -8,7 +8,6 @@ import {
 	VerifyStatus,
 	TokenMethod,
 	FeeMethod,
-	cryptography,
 } from 'klayr-sdk';
 import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../types';
@@ -28,8 +27,7 @@ export class CreateTokenCommand extends BaseCommand {
 	private _feeMethod!: FeeMethod;
 	private _maxTotalSupply!: bigint;
 	private _chainID!: Buffer;
-	private _createTokenFee: bigint = BigInt(33333); ///////////////////////////////////
-	private tokenIDZero!: Buffer;
+	private _createTokenFee!: bigint;
 
 	public schema = createTokenSchema;
 
@@ -39,26 +37,9 @@ export class CreateTokenCommand extends BaseCommand {
 	}
 
 	public async init(config: ModuleConfig): Promise<void> {
-		// Test code
-		/////////////////////////////
-		const tokenIDZeroBuffer = Buffer.alloc(4);
-		tokenIDZeroBuffer.writeUInt32BE(0);
-
-		const pool = cryptography.address.getAddressFromKlayr32Address(
-			'klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8',
-		);
-		this.tokenIDZero = Buffer.concat([config.chainID, tokenIDZeroBuffer]);
-
-		console.log({ pool });
-		this._feeMethod.init({
-			feeTokenID: this.tokenIDZero,
-			minFeePerByte: 1000,
-			maxBlockHeightZeroFeePerByte: 0,
-		});
-		/////////////////////////////
-
 		this._maxTotalSupply = config.maxTotalSupply;
 		this._chainID = config.chainID;
+		this._createTokenFee = config.createTokenFee;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;
 	}
@@ -67,13 +48,22 @@ export class CreateTokenCommand extends BaseCommand {
 	public async verify(
 		context: CommandVerifyContext<CreateTokenParams>,
 	): Promise<VerificationResult> {
-		context.logger.info('TX VERIFICATION');
-		if (context.params.totalSupply > this._maxTotalSupply) {
+		const { logger, params, transaction } = context;
+
+		logger.info('TX VERIFICATION');
+		if (params.totalSupply > this._maxTotalSupply) {
 			const error = Error(`Total supply cannot be greater than ${this._maxTotalSupply}`);
-			context.logger.info(error);
+			logger.info(error);
 			return {
 				status: VerifyStatus.FAIL,
 				error,
+			};
+		}
+
+		if (transaction.fee < this._createTokenFee) {
+			return {
+				status: VerifyStatus.FAIL,
+				error: new Error('Insufficient transaction fee'),
 			};
 		}
 

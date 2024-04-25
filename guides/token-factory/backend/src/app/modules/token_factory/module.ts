@@ -28,6 +28,7 @@ export const defaultConfig = {
 	maxTotalSupply: BigInt(1e18), // max: 9223372036854775807 = 9e18
 	minAmountToMint: BigInt(1000),
 	maxAmountToMint: BigInt(1e6) * BigInt(1e8),
+	createTokenFee: BigInt(100_000),
 };
 
 export class TokenFactoryModule extends BaseModule {
