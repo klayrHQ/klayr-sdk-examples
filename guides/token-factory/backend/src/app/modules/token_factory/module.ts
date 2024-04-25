@@ -30,7 +30,7 @@ export class TokenFactoryModule extends BaseModule {
 	private _tokenMethod!: TokenMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
-	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
+	public method = new TokenFactoryMethod(this.stores, this.events);
 	public commands = [this._createTokenCommand, this._mintCommand];
 
 	public constructor() {
