@@ -38,7 +38,7 @@ describe('TokenFactoryModule', () => {
 				maxTotalSupply: BigInt(1e10),
 				minAmountToMint: BigInt(2000),
 				maxAmountToMint: BigInt(1e2) * BigInt(1e8),
-				createTokenFee: BigInt(300_000),
+				createTokenFee: BigInt(200_000),
 			};
 			tokenFactory = new TokenFactoryModule();
 
