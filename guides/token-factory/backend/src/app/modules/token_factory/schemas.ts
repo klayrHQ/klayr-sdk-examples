@@ -1,3 +1,31 @@
+export const batchTransferParamsSchema = {
+	$id: 'token_factory/batchTransferParams',
+	title: 'Transfer transaction params',
+	type: 'object',
+	required: ['tokenID', 'amounts', 'recipients'],
+	properties: {
+		tokenID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+			// max length
+		},
+		amounts: {
+			type: 'array',
+			fieldNumber: 2,
+			items: {
+				dataType: 'uint64',
+			},
+		},
+		recipients: {
+			type: 'array',
+			fieldNumber: 3,
+			items: {
+				dataType: 'bytes',
+			},
+		},
+	},
+};
+
 export const mintSchema = {
 	$id: 'token_factory/mintParams',
 	title: 'Mints extra tokens to a recipient',

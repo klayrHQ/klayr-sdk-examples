@@ -15,7 +15,7 @@ export function createSampleTransaction(params: Buffer, command: string, sender?
 		module: 'token_factory',
 		command,
 		senderPublicKey: Buffer.from(
-			sender ?? '3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a',
+			sender ?? 'c1f5cbe79363efd6ba5cc9c80f9f405e7cea0bb9e7824875f7fb3305e08886d0',
 			'hex',
 		),
 		nonce: BigInt(0),

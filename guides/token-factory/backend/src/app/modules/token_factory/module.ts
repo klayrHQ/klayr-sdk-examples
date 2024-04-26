@@ -3,10 +3,13 @@
 
 import { validator } from '@klayr/validator';
 import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'klayr-sdk';
+import { BatchTransferCommand } from "./commands/batch_transfer_command";
 import { BurnCommand } from './commands/burn_command';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
 import { TokenFactoryEndpoint } from './endpoint';
+import { NewTokenEvent } from './events/new_token';
+import { InternalMethod } from './internal_methods';
 import { TokenFactoryMethod } from './method';
 import { configSchema } from './schemas';
 import { CounterStore } from './stores/counter';
@@ -14,8 +17,6 @@ import { OwnerStore } from './stores/owner';
 import { TokenStore } from './stores/token';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { getModuleConfig } from './utils';
-import { NewTokenEvent } from './events/new_token';
-import { InternalMethod } from './internal_methods';
 
 export const defaultConfig = {
 	maxNameLength: 30,
@@ -36,7 +37,7 @@ export class TokenFactoryModule extends BaseModule {
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
-	public commands = [this._createTokenCommand, this._mintCommand, this._burnCommand];
+	public commands = [this._createTokenCommand, this._mintCommand, this._burnCommand, new BatchTransferCommand(this.stores, this.events)];
 
 	public constructor() {
 		super();
