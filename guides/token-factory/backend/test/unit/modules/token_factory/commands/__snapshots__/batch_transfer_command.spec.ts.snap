@@ -15,6 +15,7 @@ exports[`BatchTransferCommand constructor should have valid schema 1`] = `
       "fieldNumber": 3,
       "items": {
         "dataType": "bytes",
+        "format": "klayr32",
       },
       "type": "array",
     },

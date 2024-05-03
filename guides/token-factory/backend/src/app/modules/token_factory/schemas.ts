@@ -21,6 +21,7 @@ export const batchTransferParamsSchema = {
 			fieldNumber: 3,
 			items: {
 				dataType: 'bytes',
+				format: 'klayr32',
 			},
 		},
 	},

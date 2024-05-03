@@ -71,3 +71,11 @@ export class TokenID {
 		]);
 	}
 }
+
+export const createBatchTransferParams = (numberOfTransfers: number) => {
+	const amounts = Array.from({ length: numberOfTransfers }, (_, i) => BigInt(1e10) * BigInt(i + 1));
+	const recipients = Array.from({ length: numberOfTransfers }, () =>
+		cryptography.utils.getRandomBytes(20),
+	);
+	return { amounts, recipients };
+};

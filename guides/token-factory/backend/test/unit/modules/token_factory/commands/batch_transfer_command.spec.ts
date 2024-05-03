@@ -6,16 +6,13 @@ import {
 } from '@app/modules/token_factory/commands/batch_transfer_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { batchTransferParamsSchema as schema } from '@app/modules/token_factory/schemas';
-import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
 import {
-	CommandExecuteContext,
-	Transaction,
-	VerifyStatus,
-	chain,
-	codec,
-	cryptography,
-	db,
-} from 'klayr-sdk';
+	TokenID,
+	createBatchTransferParams,
+	createCtx,
+	createSampleTransaction,
+} from '@test/helpers';
+import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
 
 describe('BatchTransferCommand', () => {
 	const tokenID = new TokenID(0).toBuffer();
@@ -37,7 +34,7 @@ describe('BatchTransferCommand', () => {
 		stateStore = new chain.StateStore(new db.InMemoryDatabase());
 
 		// mock available balance in the sender wallet
-		getAvailableBalance.mockResolvedValue(BigInt(1e12));
+		getAvailableBalance.mockResolvedValue(BigInt(1e14));
 	});
 
 	describe('constructor', () => {
@@ -52,11 +49,15 @@ describe('BatchTransferCommand', () => {
 
 	describe('verify', () => {
 		describe('schema validation', () => {
-			it('should throw errors for invalid schema', async () => {
+			it('should throw errors for insufficient balance', async () => {
+				const numberOfTransfers = 1000;
+				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+
+				// invalid amount cause of too many transfers
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID: tokenID,
-					amounts: [BigInt(1e14)],
-					recipients: [cryptography.utils.getRandomBytes(20)],
+					amounts,
+					recipients,
 				});
 
 				const transaction = new Transaction(
@@ -69,11 +70,38 @@ describe('BatchTransferCommand', () => {
 				expect(result.error).toEqual(new Error(`Insufficient Balance`));
 			});
 
-			it('should be ok for valid schema', async () => {
+			it('should throw error when `amounts` and `recipients` are not the same length', async () => {
+				const numberOfTransfers = 1000;
+				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+				amounts.push(BigInt(1e4));
+
+				// invalid amount cause of too many transfers
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID: tokenID,
-					amounts: [BigInt(1e10)],
-					recipients: [cryptography.utils.getRandomBytes(20)],
+					amounts,
+					recipients,
+				});
+
+				const transaction = new Transaction(
+					createSampleTransaction(paramWithInvalidAmount, batchTransfer.name),
+				);
+				const ctx = createCtx<Params>(stateStore, transaction, schema, 'verify');
+
+				const result = await batchTransfer.verify(ctx);
+				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(
+					new Error(`Amounts and Recipients arrays not the same length`),
+				);
+			});
+
+			it('should be ok for valid schema', async () => {
+				const numberOfTransfers = 50;
+				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+
+				const paramWithInvalidAmount = codec.encode(schema, {
+					tokenID: tokenID,
+					amounts,
+					recipients,
 				});
 
 				const transaction = new Transaction(
@@ -90,13 +118,13 @@ describe('BatchTransferCommand', () => {
 	describe('execute', () => {
 		describe('valid cases', () => {
 			it('should execute transfers', async () => {
-				const amount = BigInt(5);
-				const recipientAddress = cryptography.utils.getRandomBytes(20);
+				const numberOfTransfers = 10;
+				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
 
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID,
-					amounts: [amount],
-					recipients: [recipientAddress],
+					amounts,
+					recipients,
 				});
 
 				const transaction = new Transaction(
@@ -106,7 +134,7 @@ describe('BatchTransferCommand', () => {
 				await expect(
 					batchTransfer.execute(ctx as CommandExecuteContext<Params>),
 				).resolves.toBeUndefined();
-				expect(mockTransfer).toHaveBeenCalledTimes(1);
+				expect(mockTransfer).toHaveBeenCalledTimes(numberOfTransfers);
 			});
 		});
 

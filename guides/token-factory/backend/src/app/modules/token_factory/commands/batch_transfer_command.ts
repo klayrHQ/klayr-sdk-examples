@@ -29,15 +29,20 @@ export class BatchTransferCommand extends BaseCommand {
 
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<Params>): Promise<VerificationResult> {
-		const { params } = context;
+		const {
+			params: { tokenID, amounts, recipients },
+		} = context;
+
 		const availableBalance = await this._tokenMethod.getAvailableBalance(
 			context.getMethodContext(),
 			context.transaction.senderAddress,
-			params.tokenID,
+			tokenID,
 		);
+		const totalAmount = amounts.reduce((a, b) => a + b, BigInt(0));
 
-		const totalAmount = params.amounts.reduce((a, b) => a + b, BigInt(0));
-		console.log({ totalAmount });
+		if (amounts.length !== recipients.length) {
+			return failWithLog<Params>(context, `Amounts and Recipients arrays not the same length`);
+		}
 
 		if (availableBalance < totalAmount) {
 			return failWithLog<Params>(context, `Insufficient Balance`);
@@ -46,7 +51,6 @@ export class BatchTransferCommand extends BaseCommand {
 		return { status: VerifyStatus.OK };
 	}
 
-	// NAIVE IMPLEMENTATION FOR NOW? /////////////
 	public async execute(context: CommandExecuteContext<Params>): Promise<void> {
 		const { params } = context;
 

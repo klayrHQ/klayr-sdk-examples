@@ -31,9 +31,9 @@ export class TokenFactoryModule extends BaseModule {
 	private readonly _internalMethod = new InternalMethod(this.stores, this.events);
 
 	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
+	private _batchTransferCommand = new BatchTransferCommand(this.stores, this.events);
 	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _burnCommand = new BurnCommand(this.stores, this.events);
-	private _batchTransferCommand = new BatchTransferCommand(this.stores, this.events);
 
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
@@ -69,6 +69,9 @@ export class TokenFactoryModule extends BaseModule {
 		});
 		this._burnCommand.addDependencies({
 			tokenFactoryMethod: this.tokenFactoryMethod,
+			tokenMethod: this._tokenMethod,
+		});
+		this._batchTransferCommand.addDependencies({
 			tokenMethod: this._tokenMethod,
 		});
 	}
