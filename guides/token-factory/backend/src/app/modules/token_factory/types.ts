@@ -2,6 +2,13 @@ import { JSONObject } from 'klayr-sdk';
 
 export type TokenID = Buffer;
 
+export interface TokenInfoData {
+	name: string;
+	symbol: string;
+	totalSupply: bigint;
+	owner: string;
+}
+
 export interface ModuleConfig {
 	maxNameLength: number;
 	maxSymbolLength: number;

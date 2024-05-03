@@ -95,3 +95,15 @@ export const configSchema = {
 		'maxAmountToMint',
 	],
 };
+
+export const getTokenInfoSchema = {
+	$id: '/token_factory/endpoint/getTokenInfo',
+	type: 'object',
+	properties: {
+		tokenID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+	},
+	required: ['tokenID'],
+};
