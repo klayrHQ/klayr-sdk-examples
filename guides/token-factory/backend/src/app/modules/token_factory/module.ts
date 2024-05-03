@@ -3,7 +3,7 @@
 
 import { validator } from '@klayr/validator';
 import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'klayr-sdk';
-import { BatchTransferCommand } from "./commands/batch_transfer_command";
+import { BatchTransferCommand } from './commands/batch_transfer_command';
 import { BurnCommand } from './commands/burn_command';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
@@ -29,15 +29,23 @@ export const defaultConfig = {
 
 export class TokenFactoryModule extends BaseModule {
 	private readonly _internalMethod = new InternalMethod(this.stores, this.events);
+
 	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
 	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _burnCommand = new BurnCommand(this.stores, this.events);
+	private _batchTransferCommand = new BatchTransferCommand(this.stores, this.events);
+
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
-	public commands = [this._createTokenCommand, this._mintCommand, this._burnCommand, new BatchTransferCommand(this.stores, this.events)];
+	public commands = [
+		this._createTokenCommand,
+		this._mintCommand,
+		this._burnCommand,
+		this._batchTransferCommand,
+	];
 
 	public constructor() {
 		super();
@@ -68,6 +76,14 @@ export class TokenFactoryModule extends BaseModule {
 	public metadata(): ModuleMetadata {
 		return {
 			...this.baseMetadata(),
+			commands: this.commands.map(command => ({
+				name: command.name,
+				params: command.schema,
+			})),
+			events: this.events.values().map(v => ({
+				name: v.name,
+				data: v.schema,
+			})),
 			endpoints: [],
 			assets: [],
 		};
