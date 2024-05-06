@@ -1,7 +1,20 @@
+"use client"
+import React from "react";
 import { createTheme} from '@mui/material/styles';
 import type { ThemeOptions } from '@mui/material/styles';
-import Inter from '../assets/fonts/Inter-Regular.ttf';
-import Utendo from '../assets/fonts/Utendo-Regular.ttf';
+import { LinkProps } from '@mui/material/Link';
+import Link from 'next/link';
+import {LinkProps as NextLinkProps } from 'next/link';
+
+// eslint-disable-next-line react/display-name
+const LinkBehavior = React.forwardRef<
+	HTMLAnchorElement,
+	Omit<NextLinkProps, 'to'> & { href: NextLinkProps['href'] }
+	>((props, ref) => {
+	const { href, ...other } = props;
+	// Map href (MUI) -> to (react-router)
+	return <Link data-testid="custom-link" ref={ref} href={href} {...other} />;
+});
 
 declare module '@mui/material/styles' {
 	interface Palette {
@@ -68,7 +81,18 @@ const typography: ThemeOptions['typography'] = {
 	}
 };
 
+// @ts-ignore
 const components: ThemeOptions['components'] = {
+	MuiLink: {
+		defaultProps: {
+			component: LinkBehavior,
+		} as LinkProps,
+	},
+	MuiButtonBase: {
+		defaultProps: {
+			LinkComponent: LinkBehavior,
+		},
+	},
 	MuiButton: {
 		defaultProps: {
 			variant: 'contained',
@@ -76,6 +100,7 @@ const components: ThemeOptions['components'] = {
 		styleOverrides: {
 			root: ({ ownerState }) => ({
 				borderRadius: borderRadius.default,
+				paddingBottom: "2px",
 				...(ownerState.variant === 'contained' &&
 					ownerState.color === 'primary' && {
 						color: `${primary.contrastText} !important`,
@@ -150,6 +175,9 @@ export const muiLightTheme = createTheme({
 			800: '#212B36',
 			900: '#1a1a1a',
 		},
+		background: {
+			default: "gray.100",
+		}
 	},
 	typography,
 	components: {
@@ -199,6 +227,9 @@ export const muiDarkTheme = createTheme({
 			300: '#454F5B',
 			200: '#212B36',
 			100: '#1a1a1a',
+		},
+		background: {
+			default: darkBlue.light,
 		},
 	},
 	typography,
