@@ -16,6 +16,8 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 
 ./bin/run transaction:create tokenFactory mint 10000000 --params='{"tokenID": "1234567800000001", "amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
 
+./bin/run transaction:create tokenFactory burn 10000000 --params='{"tokenID": "1234567800000001", "amount": "9999", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
+
 ./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
 ./bin/run endpoint:invoke token_getBalance '{"tokenID": "1234567800010000", "address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
 ```

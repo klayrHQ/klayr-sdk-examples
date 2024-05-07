@@ -10,10 +10,8 @@ import {
 } from 'klayr-sdk';
 import { createTokenSchema } from '../schemas';
 import { ModuleConfig } from '../types';
-import { TokenStore } from '../stores/token';
-import { CounterStore, CounterStoreData, counterKey } from '../stores/counter';
-import { OwnerStore } from '../stores/owner';
 import { NewTokenEvent } from '../events/new_token';
+import { InternalMethod } from '../internal_methods';
 
 export interface CreateTokenParams {
 	name: string;
@@ -24,17 +22,17 @@ export interface CreateTokenParams {
 export class CreateTokenCommand extends BaseCommand {
 	private _maxTotalSupply!: bigint;
 	private _tokenMethod!: TokenMethod;
-	private _chainID!: Buffer;
+	private _internalMethod!: InternalMethod;
 
 	public schema = createTokenSchema;
 
-	public addDependencies(args: { tokenMethod: TokenMethod }) {
+	public addDependencies(args: { internalMethod: InternalMethod; tokenMethod: TokenMethod }) {
+		this._internalMethod = args.internalMethod;
 		this._tokenMethod = args.tokenMethod;
 	}
 
 	public async init(config: ModuleConfig): Promise<void> {
 		this._maxTotalSupply = config.maxTotalSupply;
-		this._chainID = config.chainID;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;
 	}
@@ -64,7 +62,10 @@ export class CreateTokenCommand extends BaseCommand {
 		const {
 			transaction: { senderAddress },
 		} = context;
-		const newTokenID = await this.getNextTokenIDAndSetStores(context, senderAddress);
+		const newTokenID = await this._internalMethod.getNextTokenIDAndSetStores(
+			context,
+			senderAddress,
+		);
 
 		await this._tokenMethod.initializeToken(context.getMethodContext(), newTokenID);
 		await this._tokenMethod.mint(
@@ -86,35 +87,5 @@ export class CreateTokenCommand extends BaseCommand {
 			},
 			[newTokenID],
 		);
-	}
-
-	private async getNextTokenIDAndSetStores(
-		context: CommandExecuteContext<CreateTokenParams>,
-		senderAddress: Buffer,
-	) {
-		const tokenStore = this.stores.get(TokenStore);
-		const counterStore = this.stores.get(CounterStore);
-		const ownerStore = this.stores.get(OwnerStore);
-
-		let tokenIdCounter: CounterStoreData = await counterStore
-			.get(context, counterKey)
-			.catch(() => ({ counter: 0 }));
-		tokenIdCounter.counter++;
-
-		const newLocalIDBuffer = Buffer.alloc(4);
-		newLocalIDBuffer.writeUInt32BE(tokenIdCounter.counter);
-		const newTokenIDBuffer = Buffer.concat([this._chainID, newLocalIDBuffer]);
-
-		await Promise.all([
-			counterStore.set(context, counterKey, tokenIdCounter),
-			ownerStore.set(context, newTokenIDBuffer, { address: senderAddress }),
-			tokenStore.set(context, newTokenIDBuffer, {
-				name: context.params.name,
-				symbol: context.params.symbol,
-				totalSupply: BigInt(context.params.totalSupply),
-			}),
-		]);
-
-		return newTokenIDBuffer;
 	}
 }

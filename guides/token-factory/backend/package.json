@@ -120,7 +120,7 @@
 		"axios": "0.21.2",
 		"fs-extra": "11.1.0",
 		"inquirer": "8.2.5",
-		"klayr-commander": "^6.0.2",
+		"klayr-commander": "^6.0.3",
 		"klayr-sdk": "^6.0.2",
 		"tar": "6.1.11",
 		"tslib": "2.4.1"
