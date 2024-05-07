@@ -1,17 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MintCommand constructor should have valid schema 1`] = `
+exports[`BurnCommand constructor should have valid schema 1`] = `
 {
-  "$id": "token_factory/mintParams",
+  "$id": "token_factory/burnParams",
   "properties": {
     "amount": {
       "dataType": "uint64",
       "fieldNumber": 2,
-    },
-    "recipient": {
-      "dataType": "bytes",
-      "fieldNumber": 3,
-      "format": "klayr32",
     },
     "tokenID": {
       "dataType": "bytes",
@@ -21,9 +16,8 @@ exports[`MintCommand constructor should have valid schema 1`] = `
   "required": [
     "tokenID",
     "amount",
-    "recipient",
   ],
-  "title": "Mints extra tokens to a recipient",
+  "title": "Burns tokens that the creator of the token owns",
   "type": "object",
 }
 `;

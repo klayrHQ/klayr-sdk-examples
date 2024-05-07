@@ -17,7 +17,24 @@ export const mintSchema = {
 			format: 'klayr32',
 		},
 	},
-	required: ['amount', 'recipient'],
+	required: ['tokenID', 'amount', 'recipient'],
+};
+
+export const burnSchema = {
+	$id: 'token_factory/burnParams',
+	title: 'Burns tokens that the creator of the token owns',
+	type: 'object',
+	properties: {
+		tokenID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+		amount: {
+			dataType: 'uint64',
+			fieldNumber: 2,
+		},
+	},
+	required: ['tokenID', 'amount'],
 };
 
 export const createTokenSchema = {
