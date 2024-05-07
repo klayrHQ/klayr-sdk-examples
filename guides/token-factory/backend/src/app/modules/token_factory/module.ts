@@ -70,6 +70,7 @@ export class TokenFactoryModule extends BaseModule {
 		this._tokenMethod = tokenMethod;
 		this._feeMethod = feeMethod;
 		this._createTokenCommand.addDependencies({
+			internalMethod: this._internalMethod,
 			tokenMethod: this._tokenMethod,
 			feeMethod: this._feeMethod,
 		});
