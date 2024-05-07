@@ -10,7 +10,12 @@ import {
 
 export type contextType = 'verify' | 'execute';
 
-export function createSampleTransaction(params: Buffer, command: string, sender?: string) {
+export function createSampleTransaction(
+	params: Buffer,
+	command: string,
+	sender?: string,
+	fee?: bigint,
+) {
 	return {
 		module: 'token_factory',
 		command,
@@ -19,7 +24,7 @@ export function createSampleTransaction(params: Buffer, command: string, sender?
 			'hex',
 		),
 		nonce: BigInt(0),
-		fee: BigInt(100000000),
+		fee: fee ?? BigInt(10000000),
 		params,
 		signatures: [cryptography.utils.getRandomBytes(64)],
 	};

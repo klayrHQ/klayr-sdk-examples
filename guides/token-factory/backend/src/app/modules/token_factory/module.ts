@@ -2,8 +2,16 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { validator } from '@klayr/validator';
-import { BaseModule, ModuleInitArgs, ModuleMetadata, TokenMethod, utils } from 'klayr-sdk';
+import {
+	BaseModule,
+	FeeMethod,
+	ModuleInitArgs,
+	ModuleMetadata,
+	TokenMethod,
+	utils,
+} from 'klayr-sdk';
 import { BatchTransferCommand } from './commands/batch_transfer_command';
+import { ModuleConfig, ModuleConfigJSON } from './types';
 import { BurnCommand } from './commands/burn_command';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
@@ -15,7 +23,6 @@ import { configSchema } from './schemas';
 import { CounterStore } from './stores/counter';
 import { OwnerStore } from './stores/owner';
 import { TokenStore } from './stores/token';
-import { ModuleConfig, ModuleConfigJSON } from './types';
 import { getModuleConfig } from './utils';
 
 export const defaultConfig = {
@@ -24,6 +31,7 @@ export const defaultConfig = {
 	maxTotalSupply: BigInt(1e18), // max: 9223372036854775807 = 9e18
 	minAmountToMint: BigInt(1000),
 	maxAmountToMint: BigInt(1e6) * BigInt(1e8),
+	createTokenFee: BigInt(100_000),
 	minAmountToBurn: BigInt(1000),
 };
 
@@ -37,6 +45,7 @@ export class TokenFactoryModule extends BaseModule {
 
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
+	private _feeMethod!: FeeMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
@@ -57,11 +66,12 @@ export class TokenFactoryModule extends BaseModule {
 		this.events.register(NewTokenEvent, new NewTokenEvent(this.name));
 	}
 
-	public addDependencies(tokenMethod: TokenMethod) {
+	public addDependencies(tokenMethod: TokenMethod, feeMethod: FeeMethod) {
 		this._tokenMethod = tokenMethod;
+		this._feeMethod = feeMethod;
 		this._createTokenCommand.addDependencies({
-			internalMethod: this._internalMethod,
 			tokenMethod: this._tokenMethod,
+			feeMethod: this._feeMethod,
 		});
 		this._mintCommand.addDependencies({
 			tokenFactoryMethod: this.tokenFactoryMethod,
