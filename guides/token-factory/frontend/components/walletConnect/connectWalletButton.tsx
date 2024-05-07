@@ -1,20 +1,31 @@
 "use client"
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
+import { WalletPopover } from '@/components/walletConnect/walletPopover';
+import { useRef, useState } from 'react';
 
 export const ConnectWalletButton = () => {
 	const { connect, session } = useWalletConnect()
+	const [openPopover, setOpenPopover] = useState(false)
+	const anchor = useRef();
 
 	return (
 		<>
 			{
 				!session ?
-				<Button onClick={() => connect()} sx={{ width: 'max-content', marginInline: 'auto', marginTop: '10px' }}>
+				<Button className={"w-max mx-auto"} onClick={() => connect()}>
 					Connect Wallet
 				</Button> :
-				<Button	 sx={{width: 'max-content', marginInline: 'auto', marginTop: '10px'}}>
-					Wallet
-				</Button>
+					<Box>
+						<Button
+							className={"w-max mx-auto"}
+							ref={anchor}
+							onClick={() => setOpenPopover(!openPopover)}
+						>
+							Wallet
+						</Button>
+						<WalletPopover anchorEl={anchor.current} open={openPopover} onClose={() => setOpenPopover(false)} />
+					</Box>
 			}
 		</>
 	)

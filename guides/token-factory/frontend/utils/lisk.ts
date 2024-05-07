@@ -1,98 +1,16 @@
-import * as crypto from 'crypto';
-import { emptySchema, Schema, codec } from '@liskhq/lisk-codec';
-import { validator } from '@liskhq/lisk-validator';
+if (typeof window !== "undefined") window.Buffer = window.Buffer || require("buffer").Buffer;
+
 export const DEFAULT_LISK32_ADDRESS_PREFIX = 'lsk';
 export const BINARY_ADDRESS_LENGTH = 20;
 export const LISK32_ADDRESS_LENGTH = 41;
 export const LISK32_CHARSET = 'zxvcpmbn3465o978uyrtkqew2adsjhfg'
 const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
 
-export const validateTransaction = (
-  transaction: Record<string, unknown>,
-  paramsSchema: object = emptySchema,
-) => {
-  const transactionWithEmptyParams = {
-    ...transaction,
-    params: Buffer.alloc(0),
-  };
-  validator.validate(baseTransactionSchema, transactionWithEmptyParams);
+const cryptoHashSha256 = async (data: ArrayBuffer) =>
+  // eslint-disable-next-line no-restricted-globals
+  await crypto.subtle.digest('sha-256', data);
 
-  if (typeof transaction.params !== 'object' || transaction.params === null) {
-    throw new Error('Transaction object params must be of type object and not null');
-  }
-  validator.validate(paramsSchema, transaction.params);
-};
-
-export const baseTransactionSchema = {
-  $id: '/lisk/baseTransaction',
-  type: 'object',
-  required: ['module', 'command', 'nonce', 'fee', 'senderPublicKey', 'params'],
-  properties: {
-    module: {
-      dataType: 'string',
-      fieldNumber: 1,
-    },
-    command: {
-      dataType: 'string',
-      fieldNumber: 2,
-    },
-    nonce: {
-      dataType: 'uint64',
-      fieldNumber: 3,
-    },
-    fee: {
-      dataType: 'uint64',
-      fieldNumber: 4,
-    },
-    senderPublicKey: {
-      dataType: 'bytes',
-      fieldNumber: 5,
-    },
-    params: {
-      dataType: 'bytes',
-      fieldNumber: 6,
-    },
-    signatures: {
-      type: 'array',
-      items: {
-        dataType: 'bytes',
-      },
-      fieldNumber: 7,
-    },
-  },
-};
-
-const encodeParams = (
-  transaction: Record<string, unknown>,
-  paramsSchema = emptySchema as object,
-): Buffer => {
-  validateTransaction(transaction, paramsSchema);
-
-  const hasParams =
-    typeof transaction.params === 'object' && transaction.params !== null && paramsSchema;
-
-  return hasParams
-    ? codec.encode(paramsSchema as unknown as Schema, transaction.params as object)
-    : Buffer.alloc(0);
-};
-
-export const getSigningBytes = (
-  transaction: Record<string, unknown>,
-  paramsSchema?: object,
-): Buffer => {
-  const params = encodeParams(transaction, paramsSchema);
-
-  return codec.encode(baseTransactionSchema, { ...transaction, params, signatures: [], });
-};
-
-const cryptoHashSha256 = (data: Buffer): Buffer => {
-  const dataHash = crypto.createHash('sha256');
-  dataHash.update(data);
-
-  return dataHash.digest();
-};
-
-export const hash = (data: Buffer | string, format?: string): Buffer => {
+export const hash = async (data: Buffer | string, format?: string) => {
   if (Buffer.isBuffer(data)) {
     return cryptoHashSha256(data);
   }
@@ -176,8 +94,8 @@ const convertUIntArray = (uintArray: number[], fromBits: number, toBits: number)
   return result;
 };
 
-export const getAddressFromPublicKey = (publicKey: Buffer): Buffer => {
-  const buffer = hash(publicKey);
+export const getAddressFromPublicKey = async (publicKey: Buffer) => {
+  const buffer = Buffer.from(await hash(publicKey));
   const truncatedBuffer = buffer.slice(0, BINARY_ADDRESS_LENGTH);
 
   if (truncatedBuffer.length !== BINARY_ADDRESS_LENGTH) {
@@ -189,7 +107,6 @@ export const getAddressFromPublicKey = (publicKey: Buffer): Buffer => {
 
 export const addressToLisk32 = (address: Buffer): string => {
   const byteSequence = [];
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   for (const b of address) {
     byteSequence.push(b);
@@ -199,7 +116,7 @@ export const addressToLisk32 = (address: Buffer): string => {
   return convertUInt5ToBase32(uint5Address.concat(uint5Checksum));
 };
 
-export const getLisk32AddressFromPublicKey = (
+export const getLisk32AddressFromPublicKey = async (
   publicKey: Buffer,
   prefix = DEFAULT_LISK32_ADDRESS_PREFIX,
-): string => `${prefix}${addressToLisk32(getAddressFromPublicKey(publicKey))}`;
+) => `${prefix}${addressToLisk32(await getAddressFromPublicKey(publicKey))}`;

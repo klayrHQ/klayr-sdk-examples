@@ -5,15 +5,26 @@ import WCClient, {SignClient} from '@walletconnect/sign-client';
 import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
 import { getLisk32AddressFromPublicKey } from '@/utils/lisk';
-//import { getLisk32AddressFromPublicKey } from '../utils/lisk';
 
 interface WalletConnectProps {
 	session: any
 	connect: () => void
 	disconnect: () => void
-	addresses: string[] | undefined
-	publicKeys: string[] | undefined
+	address: string | undefined
+	publicKey: string | undefined
+	sendTransaction: () => void
 }
+
+type TransactionResult = {
+	module?: string;
+	command?: string;
+	nonce?: string;
+	fee?: string;
+	senderPublicKey?: string;
+	params?: any;
+	signatures?: string[];
+	error?: { code: number; message: string };
+};
 
 export const WalletConnect = createContext<WalletConnectProps>(
 	{} as WalletConnectProps,
@@ -27,8 +38,8 @@ export const WalletConnectProvider = ({ children }: {
 	const [session, setSession] = useState<any>()
 	const [signClient, setSignClient] = useState<WCClient>();
 	const [topic, setTopic] = useState<string | undefined>();
-	const [addresses, setAddresses] = useState<string[] | undefined>();
-	const [publicKeys, setPublicKeys] = useState<string[] | undefined>();
+	const [address, setAddress] = useState<string | undefined>();
+	const [publicKey, setPublicKey] = useState<string | undefined>();
 
 	//const projectID = process.env.REACT_APP_WC_PROJECT_ID as string
 	const projectID = "730e84c79793076a98d0f8830ce1a1a9"
@@ -101,19 +112,15 @@ export const WalletConnectProvider = ({ children }: {
 
 	useEffect(() => {
 		if (session) {
-			setTopic(session.topic);
-			const addresses = [];
-			const publicKeys = [];
-			for (const account of session.namespaces.lisk.accounts) {
-				const publicKey = account.split(":")[2];
-				const address = getLisk32AddressFromPublicKey(
+			(async () => {
+				setTopic(session.topic);
+				const publicKey = session.namespaces.lisk.accounts[0].split(":")[2];
+				const address = await getLisk32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
-				addresses.push(address);
-				publicKeys.push(publicKey);
-			}
-			setAddresses(addresses);
-			setPublicKeys(publicKeys);
+				setAddress(address);
+				setPublicKey(publicKey);
+			})();
 		}
 	}, [session]);
 
@@ -126,7 +133,7 @@ export const WalletConnectProvider = ({ children }: {
 			// pairingTopic: topic,
 			requiredNamespaces: {
 				lisk: {
-					methods: ["sign_transaction", "sign_message"],
+					methods: ["send_transaction", "sign_transaction", "sign_message"],
 					chains: ["lisk:01000000"],
 					events: [
 						"session_proposal",
@@ -179,14 +186,46 @@ export const WalletConnectProvider = ({ children }: {
 		}
 	}
 
+	async function sendTransaction() {
+		try {
+			if (!signClient || !session || !publicKey) {
+				console.error('Prerequisites not met');
+				return;
+			}
+			const responseJSON = await signClient.request({
+				topic: session.topic,
+				chainId: 'lisk:01000000',
+				request: {
+					method: 'send_transaction',
+					params: {
+						address: publicKey,
+					},
+				},
+			}) as string;
+
+			const result = JSON.parse(responseJSON) as TransactionResult;
+
+			if (result && result.error) {
+				console.error('ERROR');
+				console.log('Transaction failed');
+			}
+			if (result && result.signatures) {
+				console.log('RESULT', result);
+			}
+		} catch (e) {
+			console.error(e, "ERROR");
+		}
+	}
+
 	return (
 		<WalletConnect.Provider
 			value={{
 				session,
 				connect,
 				disconnect,
-				addresses,
-				publicKeys,
+				address,
+				publicKey,
+				sendTransaction,
 			}}
 		>
 			{children}

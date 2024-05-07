@@ -1,20 +1,21 @@
 "use client"
-import React, { useState } from 'react';
-import { IconButton } from '@mui/material';
+import React from 'react';
+import { IconButton, SxProps } from '@mui/material';
 import { DarkMode, LightMode } from '@mui/icons-material';
 import { useTheme } from '@/providers/themeProvider';
 import { cls } from '@/utils/functions';
 
-export const ThemeSwitcher = () => {
+export const ThemeSwitcher = ({ className, sx }: {className?: string, sx?: SxProps}) => {
 	const {themeMode, switchThemeMode} = useTheme()
 
 	return (
 			<IconButton
-				className={"relative"}
+				className={cls(["relative", className])}
 				onClick={() => {
 					switchThemeMode();
 					//setThemeMode(themeMode === "light" ? "dark" : "light");
 				}}
+				sx={sx}
 			>
 				<LightMode
 					className={cls([

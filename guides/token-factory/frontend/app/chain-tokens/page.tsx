@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { ReactElement } from 'react';
 import { Settings } from '@mui/icons-material';
+import { PageLayout } from '@/components/layout/pageLayout';
 
 interface column {
 	value: string | ReactElement
@@ -39,44 +40,39 @@ const Page = () => {
 	]
 
 	return (
-		<Box sx={{maxWidth: "90%", width: {xs: "auto", lg: "1150px"}, marginInline: "auto"}}>
-			<Stack>
-				<Typography component={"h1"} variant={"h1"}>
-					Owned Tokens
-				</Typography>
-				<Typography component={"span"}>
-					All tokens in your wallet
-				</Typography>
-				<Table sx={{mt: "100px"}}>
-					<TableHead>
-						<TableRow>
-							{headColumns.map(({ value, props }, column) => {
-								return (
-									<TableCell key={`head-column-${column + 1}`} variant={'head'} sx={{fontSize: "small"}} {...props}>
-										{value}
-									</TableCell>
-								);
-							})}
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{
-							rows.map((columns, row) => (
-								<TableRow key={`row-${row + 1}`}>
-									{
-										columns.map(({value, props}, column) => (
-											<TableCell key={`row-${row + 1}-column-${column + 1}`} variant={"body"} {...props}>
-												{value}
-											</TableCell>
-										))
-									}
-								</TableRow>
-							))
-						}
-					</TableBody>
-				</Table>
-			</Stack>
-		</Box>
+		<PageLayout
+			title={"Owned Tokens"}
+			subTitle={"All tokens in your wallet"}
+		>
+			<Table>
+				<TableHead>
+					<TableRow>
+						{headColumns.map(({ value, props }, column) => {
+							return (
+								<TableCell key={`head-column-${column + 1}`} variant={'head'} sx={{fontSize: "small"}} {...props}>
+									{value}
+								</TableCell>
+							);
+						})}
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{
+						rows.map((columns, row) => (
+							<TableRow key={`row-${row + 1}`}>
+								{
+									columns.map(({value, props}, column) => (
+										<TableCell key={`row-${row + 1}-column-${column + 1}`} variant={"body"} {...props}>
+											{value}
+										</TableCell>
+									))
+								}
+							</TableRow>
+						))
+					}
+				</TableBody>
+			</Table>
+		</PageLayout>
 	)
 }
 

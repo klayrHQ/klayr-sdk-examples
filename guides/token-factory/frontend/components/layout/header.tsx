@@ -32,12 +32,11 @@ export const Header = () => {
 				<Grid item sx={{display: "flex", alignItems: "center"}}>
 					<nav>
 						<ul style={{display: "flex", alignItems: "center", gap: "1rem", color: "white"}}>
-							<MenuItem>Create Token</MenuItem>
-							<MenuItem>Send tx</MenuItem>
+							<MenuItem><Link href={"/create-token"}>Create Token</Link></MenuItem>
 							<MenuItem><Link href={"/owned-tokens"}>Owned tokens</Link></MenuItem>
 							<MenuItem><Link href={"/chain-tokens"}>Chain tokens</Link></MenuItem>
 							<ConnectWalletButton />
-							<ThemeSwitcher />
+							<ThemeSwitcher className={"mx-4"} />
 						</ul>
 					</nav>
 				</Grid>
