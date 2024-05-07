@@ -1,12 +1,7 @@
 import { MintCommand, MintParams } from '@app/modules/token_factory/commands/mint_command';
 import { TokenFactoryModule } from '@app/modules/token_factory/module';
-import { createTokenSchema, mintSchema } from '@app/modules/token_factory/schemas';
-import {
-	TokenID,
-	createCreateTokenCtx,
-	createMintCtx,
-	createSampleTransaction,
-} from '@test/helpers';
+import { createTokenSchema as createSchema, mintSchema } from '@app/modules/token_factory/schemas';
+import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
 import { utils } from '@klayr/cryptography';
 import {
@@ -15,6 +10,8 @@ import {
 } from '@app/modules/token_factory/commands/create_token_command';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
+import { TokenFactoryMethod } from '@app/modules/token_factory/method';
+import { InternalMethod } from '@app/modules/token_factory/internal_methods';
 
 describe('MintCommand', () => {
 	const initConfig = {
@@ -44,13 +41,17 @@ describe('MintCommand', () => {
 	beforeEach(async () => {
 		const { minAmountToMint, maxAmountToMint } = initConfig;
 		const tokenFactory = new TokenFactoryModule();
+		const tokenFactoryMethod = new TokenFactoryMethod(tokenFactory.stores, tokenFactory.events);
+		const internalMethod = new InternalMethod(tokenFactory.stores, tokenFactory.events);
+		await internalMethod.init(initConfig.chainID);
 
 		mintCommand = new MintCommand(tokenFactory.stores, tokenFactory.events);
-		mintCommand.addDependencies({ tokenMethod: { mint: mockMint } as any });
+		mintCommand.addDependencies({ tokenFactoryMethod, tokenMethod: { mint: mockMint } as any });
 		await mintCommand.init({ minAmountToMint, maxAmountToMint });
 
 		createCommand = new CreateTokenCommand(tokenFactory.stores, tokenFactory.events);
 		createCommand.addDependencies({
+			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
 			feeMethod: { payFee: mockPayFee },
 		} as any);
@@ -78,14 +79,14 @@ describe('MintCommand', () => {
 					symbol: 'PEPE',
 					totalSupply: BigInt(1e4),
 				};
-				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+				const defaultValidParams = codec.encode(createSchema, defaultToken);
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					createCommand.execute(context as CommandExecuteContext<CreateTokenParams>),
+					createCommand.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 			});
 
@@ -99,9 +100,9 @@ describe('MintCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(paramWithInvalidamount, MintCommand.name),
 				);
-				const context = createMintCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'verify');
 
-				const result = await mintCommand.verify(context);
+				const result = await mintCommand.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.FAIL);
 			});
 
@@ -115,9 +116,9 @@ describe('MintCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(paramWithInvalidamount, MintCommand.name),
 				);
-				const context = createMintCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'verify');
 
-				const result = await mintCommand.verify(context);
+				const result = await mintCommand.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.FAIL);
 			});
 
@@ -132,21 +133,40 @@ describe('MintCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(validParams, MintCommand.name, differentSender),
 				);
-				const context = createMintCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'verify');
 
-				const result = await mintCommand.verify(context);
+				const result = await mintCommand.verify(ctx);
 
 				expect(result.status).toBe(VerifyStatus.FAIL);
 				expect(result.error).toEqual(new Error('Sender is not the token creator'));
+			});
+
+			it('should throw correct error when tokenID is invalid', async () => {
+				const recipient = utils.getRandomBytes(20);
+				const invalidTokenID = new TokenID(20).toBuffer();
+				const paramsWithInvalidTokenID = codec.encode(mintSchema, {
+					tokenID: invalidTokenID,
+					amount: BigInt(1000) + BigInt(1),
+					recipient,
+				});
+				const transaction = new Transaction(
+					createSampleTransaction(paramsWithInvalidTokenID, MintCommand.name),
+				);
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'verify');
+
+				const result = await mintCommand.verify(ctx);
+
+				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(new Error(`Invalid tokenID: ${invalidTokenID}`));
 			});
 
 			it('should be OK when params are correct', async () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, MintCommand.name),
 				);
-				const context = createMintCtx(stateStore, transaction, 'verify');
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'verify');
 
-				const result = await mintCommand.verify(context);
+				const result = await mintCommand.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.OK);
 			});
 		});
@@ -160,14 +180,14 @@ describe('MintCommand', () => {
 					symbol: 'PEPE',
 					totalSupply: BigInt(1e4),
 				};
-				const defaultValidParams = codec.encode(createTokenSchema, defaultToken);
+				const defaultValidParams = codec.encode(createSchema, defaultToken);
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, CreateTokenCommand.name),
 				);
-				const context = createCreateTokenCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<CreateTokenParams>(stateStore, transaction, createSchema, 'execute');
 
 				await expect(
-					createCommand.execute(context as CommandExecuteContext<CreateTokenParams>),
+					createCommand.execute(ctx as CommandExecuteContext<CreateTokenParams>),
 				).resolves.toBeUndefined();
 			});
 
@@ -175,13 +195,13 @@ describe('MintCommand', () => {
 				const transaction = new Transaction(
 					createSampleTransaction(defaultValidParams, MintCommand.name),
 				);
-				const context = createMintCtx(stateStore, transaction, 'execute');
+				const ctx = createCtx<MintParams>(stateStore, transaction, mintSchema, 'execute');
 
 				await expect(
-					mintCommand.execute(context as CommandExecuteContext<MintParams>),
+					mintCommand.execute(ctx as CommandExecuteContext<MintParams>),
 				).resolves.toBeUndefined();
 
-				const token = await tokenStore.get(context, tokenID);
+				const token = await tokenStore.get(ctx, tokenID);
 
 				// initial supply + minted amount
 				expect(token.totalSupply).toBe(BigInt(1e4) + BigInt(1000) * BigInt(1e8));

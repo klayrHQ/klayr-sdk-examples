@@ -9,9 +9,10 @@ import {
 	TokenMethod,
 } from 'klayr-sdk';
 import { mintSchema } from '../schemas';
-import { OwnerStore } from '../stores/owner';
 import { TokenID } from '../types';
 import { TokenStore } from '../stores/token';
+import { failWithLog } from '../utils';
+import { TokenFactoryMethod } from '../method';
 
 export interface MintParams {
 	tokenID: TokenID;
@@ -22,11 +23,16 @@ export interface MintParams {
 export class MintCommand extends BaseCommand {
 	private _minAmountToMint!: bigint;
 	private _maxAmountToMint!: bigint;
+	private _tokenFactoryMethod!: TokenFactoryMethod;
 	private _tokenMethod!: TokenMethod;
 
 	public schema = mintSchema;
 
-	public addDependencies(args: { tokenMethod: TokenMethod }) {
+	public addDependencies(args: {
+		tokenFactoryMethod: TokenFactoryMethod;
+		tokenMethod: TokenMethod;
+	}) {
+		this._tokenFactoryMethod = args.tokenFactoryMethod;
 		this._tokenMethod = args.tokenMethod;
 	}
 
@@ -38,15 +44,18 @@ export class MintCommand extends BaseCommand {
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<MintParams>): Promise<VerificationResult> {
 		const { amount, tokenID } = context.params;
-		const ownerStore = this.stores.get(OwnerStore);
-		const owner = await ownerStore.get(context, tokenID);
+
+		const owner = await this._tokenFactoryMethod.getOwnerOfToken<MintParams>(context, tokenID);
+		if (!owner) {
+			return failWithLog<MintParams>(context, `Invalid tokenID: ${tokenID}`);
+		}
 
 		if (!owner.address.equals(context.transaction.senderAddress)) {
-			return this.failWithLog(context, `Sender is not the token creator`);
+			return failWithLog<MintParams>(context, `Sender is not the token creator`);
 		}
 
 		if (amount > this._maxAmountToMint || amount < this._minAmountToMint) {
-			return this.failWithLog(
+			return failWithLog<MintParams>(
 				context,
 				`Amount can not be lower than ${this._minAmountToMint} or greater than ${this._maxAmountToMint}`,
 			);
@@ -71,17 +80,4 @@ export class MintCommand extends BaseCommand {
 		token.totalSupply += BigInt(amount);
 		await tokenStore.set(context, tokenID, token);
 	}
-
-	private failWithLog(context: CommandVerifyContext<MintParams>, message: string) {
-		const error = Error(message);
-		context.logger.info(error);
-		return {
-			status: VerifyStatus.FAIL,
-			error,
-		};
-	}
 }
-
-// verifcation of the user in verify function
-// Mint function itself in the execute
-//

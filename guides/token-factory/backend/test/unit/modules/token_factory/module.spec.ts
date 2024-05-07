@@ -13,6 +13,7 @@ describe('TokenFactoryModule', () => {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
 		createTokenFee: BigInt(100_000),
+		minAmountToBurn: BigInt(1000),
 	};
 	let tokenFactory: TokenFactoryModule;
 
@@ -29,6 +30,7 @@ describe('TokenFactoryModule', () => {
 			expect(tokenFactory['_moduleConfig'].minAmountToMint).toBe(defaultConfig.minAmountToMint);
 			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(defaultConfig.maxAmountToMint);
 			expect(tokenFactory['_moduleConfig'].createTokenFee).toBe(defaultConfig.createTokenFee);
+			expect(tokenFactory['_moduleConfig'].minAmountToBurn).toBe(defaultConfig.minAmountToBurn);
 		});
 
 		it('should initialize config with custom values when module config is set', async () => {
@@ -55,6 +57,7 @@ describe('TokenFactoryModule', () => {
 			expect(tokenFactory['_moduleConfig'].minAmountToMint).toBe(moduleConfig.minAmountToMint);
 			expect(tokenFactory['_moduleConfig'].maxAmountToMint).toBe(moduleConfig.maxAmountToMint);
 			expect(tokenFactory['_moduleConfig'].createTokenFee).toBe(moduleConfig.createTokenFee);
+			expect(tokenFactory['_moduleConfig'].minAmountToBurn).toBe(defaultConfig.minAmountToBurn);
 		});
 
 		it('should not initialize config with invalid value for `maxSymbolLength`', async () => {
