@@ -10,6 +10,7 @@ export interface ModuleConfig {
 	maxAmountToMint: bigint;
 	minAmountToBurn: bigint;
 	chainID: Buffer;
+	createTokenFee: bigint;
 }
 
 export type ModuleConfigJSON = JSONObject<ModuleConfig>;

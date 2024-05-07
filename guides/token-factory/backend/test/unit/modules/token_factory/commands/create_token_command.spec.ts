@@ -18,6 +18,7 @@ describe('CreateTokenCommand', () => {
 		maxSymbolLength: 6,
 		maxTotalSupply: BigInt(1e6),
 		chainID: Buffer.from('12345678'),
+		createTokenFee: BigInt(100_000),
 	};
 	const defaultToken = {
 		name: 'The real pepe coin',
@@ -27,6 +28,7 @@ describe('CreateTokenCommand', () => {
 	const defaultValidParams = codec.encode(createSchema, defaultToken);
 	const mockMint = jest.fn();
 	const mockInitialize = jest.fn();
+	const mockPayFee = jest.fn();
 
 	let command: CreateTokenCommand;
 	let stateStore: any;
@@ -43,6 +45,7 @@ describe('CreateTokenCommand', () => {
 		command.addDependencies({
 			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
+			feeMethod: { payFee: mockPayFee },
 		} as any);
 		await command.init(initConfig as ModuleConfig);
 
@@ -77,6 +80,20 @@ describe('CreateTokenCommand', () => {
 
 				const result = await command.verify(ctx);
 				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(new Error('Total supply cannot be greater than 1000000'));
+			});
+
+			it('should throw when `fee` is too low', async () => {
+				const invalidFee = BigInt(10_000);
+				const sender = '3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a';
+				const transaction = new Transaction(
+					createSampleTransaction(defaultValidParams, CreateTokenCommand.name, sender, invalidFee),
+				);
+				const context = createCreateTokenCtx(stateStore, transaction, 'verify');
+
+				const result = await command.verify(context);
+				expect(result.status).toBe(VerifyStatus.FAIL);
+				expect(result.error).toEqual(new Error('Insufficient transaction fee'));
 			});
 
 			it('should be ok when valid params', async () => {
@@ -104,6 +121,7 @@ describe('CreateTokenCommand', () => {
 				).resolves.toBeUndefined();
 				expect(mockMint).toHaveBeenCalledTimes(1);
 				expect(mockInitialize).toHaveBeenCalledTimes(1);
+				expect(mockPayFee).toHaveBeenCalledTimes(1);
 			});
 
 			it('should update the `token`, `counter` and `owner` store', async () => {
