@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { codec, db as klayrDB } from 'klayr-sdk';
+import { codec, cryptography, db as klayrDB } from 'klayr-sdk';
 import * as os from 'os';
 import { join } from 'path';
 import { ensureDir } from 'fs-extra';
@@ -28,6 +28,7 @@ export const getEventNewTokenInfo = async (
 	db: KVStore,
 	tokenIDZero: Buffer,
 	lastTokenID: Buffer,
+	address: string | undefined,
 ): Promise<Event[]> => {
 	// 1. Look for all the given key-value pairs in the database
 	const stream = db.createReadStream({
@@ -40,7 +41,13 @@ export const getEventNewTokenInfo = async (
 		const events: Event[] = [];
 		stream
 			.on('data', ({ value }: { value: Buffer }) => {
-				events.push(codec.decode<Event>(newTokenEventSchema, value));
+				const parsedData = codec.decode<Event>(newTokenEventSchema, value);
+				if (address) {
+					const owner = cryptography.address.getKlayr32AddressFromAddress(parsedData.owner);
+					if (owner === address) events.push(parsedData);
+				} else {
+					events.push(parsedData);
+				}
 			})
 			.on('error', error => {
 				reject(error);

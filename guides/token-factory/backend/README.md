@@ -30,6 +30,12 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 ./bin/run endpoint:invoke tokenFactoryInfo_getTokenList --pretty
 ```
 
+#### Get all tokens for address
+
+```
+./bin/run endpoint:invoke tokenFactoryInfo_getTokenList '{"address": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+```
+
 ### Add a new module
 
 ```
