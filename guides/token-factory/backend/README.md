@@ -38,7 +38,7 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 ### Batch Transfer
 
 ```
-./bin/run transaction:create tokenFactory batchTransfer 10000000 --params='{"tokenID": "1234567800000000", "amounts": ["9999", "9999"], "recipients": ["klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8", "klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz"]}' --json --pretty
+./bin/run transaction:create tokenFactory batchTransfer 10000000 --params='{"tokenID": "1234567800000000", "recipients": [{"recipient": "klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8", "amount": "9999"}, {"recipient": "klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz", "amount": "9999"}]}' --json --pretty
 ```
 
 ### Batch Transfer test script

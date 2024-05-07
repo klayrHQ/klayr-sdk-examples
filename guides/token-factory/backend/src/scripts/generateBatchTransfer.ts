@@ -5,14 +5,14 @@ function generateParams() {
 	const numberOfTransfers = 20;
 	const maxAmount = 100;
 
-	const amounts = Array.from({ length: numberOfTransfers }, () =>
-		BigInt(Math.floor(Math.random() * maxAmount)).toString(),
-	);
-	const recipients = Array.from({ length: numberOfTransfers }, () =>
-		cryptography.address.getKlayr32AddressFromAddress(cryptography.utils.getRandomBytes(20)),
-	);
+	const recipients = Array.from({ length: numberOfTransfers }, () => ({
+		recipient: cryptography.address.getKlayr32AddressFromAddress(
+			cryptography.utils.getRandomBytes(20),
+		),
+		amount: BigInt(Math.floor(Math.random() * maxAmount)).toString(),
+	}));
 
-	return JSON.stringify({ tokenID, amounts, recipients });
+	return JSON.stringify({ tokenID, recipients });
 }
 
 const params = generateParams();
