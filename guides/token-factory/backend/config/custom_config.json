@@ -41,5 +41,10 @@
 			"maxSymbolLength": 6
 		}
 	},
-	"plugins": {}
+	"plugins": {
+		"token_factory": {
+			"syncInterval": 10000,
+			"chainID": "12345678"
+		}
+	}
 }
