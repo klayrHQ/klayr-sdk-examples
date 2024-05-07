@@ -2,26 +2,30 @@ export const batchTransferParamsSchema = {
 	$id: 'token_factory/batchTransferParams',
 	title: 'Transfer transaction params',
 	type: 'object',
-	required: ['tokenID', 'amounts', 'recipients'],
+	required: ['tokenID', 'recipients'],
 	properties: {
 		tokenID: {
 			dataType: 'bytes',
 			fieldNumber: 1,
-			// max length
-		},
-		amounts: {
-			type: 'array',
-			fieldNumber: 2,
-			items: {
-				dataType: 'uint64',
-			},
 		},
 		recipients: {
 			type: 'array',
-			fieldNumber: 3,
+			fieldNumber: 2,
+			minItems: 1,
+			maxItems: 20,
 			items: {
-				dataType: 'bytes',
-				format: 'klayr32',
+				type: 'object',
+				required: ['recipient', 'amount'],
+				properties: {
+					recipient: {
+						dataType: 'bytes',
+						fieldNumber: 1,
+					},
+					amount: {
+						dataType: 'uint64',
+						fieldNumber: 2,
+					},
+				},
 			},
 		},
 	},

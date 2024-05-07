@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
 	BaseCommand,
 	CommandVerifyContext,
@@ -13,12 +12,13 @@ import { failWithLog } from '../utils';
 
 export interface Params {
 	tokenID: TokenID;
-	amounts: bigint[];
-	recipients: Buffer[];
+	recipients: {
+		recipient: Buffer;
+		amount: bigint;
+	}[];
 }
 
 export class BatchTransferCommand extends BaseCommand {
-	// @ts-ignore
 	private _tokenMethod!: TokenMethod;
 
 	public schema = batchTransferParamsSchema;
@@ -27,10 +27,9 @@ export class BatchTransferCommand extends BaseCommand {
 		this._tokenMethod = args.tokenMethod;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(context: CommandVerifyContext<Params>): Promise<VerificationResult> {
 		const {
-			params: { tokenID, amounts, recipients },
+			params: { tokenID, recipients },
 		} = context;
 
 		const availableBalance = await this._tokenMethod.getAvailableBalance(
@@ -38,11 +37,11 @@ export class BatchTransferCommand extends BaseCommand {
 			context.transaction.senderAddress,
 			tokenID,
 		);
-		const totalAmount = amounts.reduce((a, b) => a + b, BigInt(0));
 
-		if (amounts.length !== recipients.length) {
-			return failWithLog<Params>(context, `Amounts and Recipients arrays not the same length`);
-		}
+		const totalAmount = recipients.reduce(
+			(total, recipient) => total + recipient.amount,
+			BigInt(0),
+		);
 
 		if (availableBalance < totalAmount) {
 			return failWithLog<Params>(context, `Insufficient Balance`);
@@ -52,15 +51,17 @@ export class BatchTransferCommand extends BaseCommand {
 	}
 
 	public async execute(context: CommandExecuteContext<Params>): Promise<void> {
-		const { params } = context;
+		const {
+			params: { tokenID, recipients },
+		} = context;
 
-		for (const [i, recipientAddress] of params.recipients.entries()) {
+		for (const recipient of recipients) {
 			await this._tokenMethod.transfer(
 				context.getMethodContext(),
 				context.transaction.senderAddress,
-				recipientAddress,
-				params.tokenID,
-				params.amounts[i],
+				recipient.recipient,
+				tokenID,
+				recipient.amount,
 			);
 		}
 	}

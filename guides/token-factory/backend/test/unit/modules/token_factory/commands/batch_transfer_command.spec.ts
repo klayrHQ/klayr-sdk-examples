@@ -51,12 +51,11 @@ describe('BatchTransferCommand', () => {
 		describe('schema validation', () => {
 			it('should throw errors for insufficient balance', async () => {
 				const numberOfTransfers = 1000;
-				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+				const recipients = createBatchTransferParams(numberOfTransfers);
 
 				// invalid amount cause of too many transfers
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID: tokenID,
-					amounts,
 					recipients,
 				});
 
@@ -70,37 +69,12 @@ describe('BatchTransferCommand', () => {
 				expect(result.error).toEqual(new Error(`Insufficient Balance`));
 			});
 
-			it('should throw error when `amounts` and `recipients` are not the same length', async () => {
-				const numberOfTransfers = 1000;
-				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
-				amounts.push(BigInt(1e4));
-
-				// invalid amount cause of too many transfers
-				const paramWithInvalidAmount = codec.encode(schema, {
-					tokenID: tokenID,
-					amounts,
-					recipients,
-				});
-
-				const transaction = new Transaction(
-					createSampleTransaction(paramWithInvalidAmount, batchTransfer.name),
-				);
-				const ctx = createCtx<Params>(stateStore, transaction, schema, 'verify');
-
-				const result = await batchTransfer.verify(ctx);
-				expect(result.status).toBe(VerifyStatus.FAIL);
-				expect(result.error).toEqual(
-					new Error(`Amounts and Recipients arrays not the same length`),
-				);
-			});
-
 			it('should be ok for valid schema', async () => {
 				const numberOfTransfers = 50;
-				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+				const recipients = createBatchTransferParams(numberOfTransfers);
 
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID: tokenID,
-					amounts,
 					recipients,
 				});
 
@@ -119,11 +93,10 @@ describe('BatchTransferCommand', () => {
 		describe('valid cases', () => {
 			it('should execute transfers', async () => {
 				const numberOfTransfers = 10;
-				const { amounts, recipients } = createBatchTransferParams(numberOfTransfers);
+				const recipients = createBatchTransferParams(numberOfTransfers);
 
 				const paramWithInvalidAmount = codec.encode(schema, {
 					tokenID,
-					amounts,
 					recipients,
 				});
 
