@@ -151,6 +151,16 @@ const components: ThemeOptions['components'] = {
 			},
 		},
 	},
+	/*MuiInputBase: {
+		styleOverrides: {
+			root: ({ ownerState }) => ({
+				marginTop: "2px !important",
+				...(ownerState.error === true && {
+					borderColor: "#FF1208",
+				})
+			}),
+		},
+	},*/
 };
 
 const shape: ThemeOptions['shape'] = {
@@ -184,7 +194,7 @@ export const muiLightTheme = createTheme({
 		...components,
 		MuiInput: {
 			styleOverrides: {
-				root: {
+				root: ({ ownerState }) => ({
 					borderWidth: '1px',
 					borderColor: '#919EAB',
 					borderStyle: 'solid',
@@ -204,7 +214,10 @@ export const muiLightTheme = createTheme({
 					'&::after': {
 						border: 'none !important',
 					},
-				},
+					...(ownerState.error === true && {
+						borderColor: "#FF422D",
+					}),
+				}),
 			},
 		},
 	},
@@ -237,7 +250,7 @@ export const muiDarkTheme = createTheme({
 		...components,
 		MuiInput: {
 			styleOverrides: {
-				root: {
+				root: ({ ownerState }) => ({
 					borderWidth: '1px',
 					borderColor: '#919EAB',
 					borderStyle: 'solid',
@@ -257,7 +270,10 @@ export const muiDarkTheme = createTheme({
 					'&::after': {
 						border: 'none !important',
 					},
-				},
+					...(ownerState.error === true && {
+						borderColor: "#FF422D",
+					})
+				}),
 			},
 		},
 	},
