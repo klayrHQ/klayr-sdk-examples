@@ -9,6 +9,13 @@ This project was bootstrapped with [klayr SDK](https://github.com/klayrHQ/klayr-
 npm run build && ./bin/run start --config config/custom_config.json --overwrite-config
 ```
 
+### Info Plugin endpoints
+
+```
+/bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "1234567800000000", "address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+```
+
 ### Commands
 
 ```
