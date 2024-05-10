@@ -1,0 +1,11 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+COPY . .
+RUN npm run build
+
+CMD [ "./bin/run", "start", "--config", "config/custom_deploy_config.json", "--overwrite-config" ]
