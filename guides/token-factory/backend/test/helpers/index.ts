@@ -20,7 +20,7 @@ export function createSampleTransaction(
 		module: 'token_factory',
 		command,
 		senderPublicKey: Buffer.from(
-			sender ?? '3bb9a44b71c83b95045486683fc198fe52dcf27b55291003590fcebff0a45d9a',
+			sender ?? 'c1f5cbe79363efd6ba5cc9c80f9f405e7cea0bb9e7824875f7fb3305e08886d0',
 			'hex',
 		),
 		nonce: BigInt(0),
@@ -76,3 +76,12 @@ export class TokenID {
 		]);
 	}
 }
+
+export const createBatchTransferParams = (
+	numberOfTransfers: number,
+): { recipient: Buffer; amount: bigint }[] => {
+	return Array.from({ length: numberOfTransfers }, (_, i) => ({
+		recipient: cryptography.utils.getRandomBytes(20),
+		amount: BigInt(1e10) * BigInt(i + 1),
+	}));
+};

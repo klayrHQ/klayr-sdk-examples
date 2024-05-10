@@ -30,6 +30,7 @@ describe('BurnCommand', () => {
 	const mockInitialize = jest.fn();
 	const mockBurn = jest.fn();
 	const getAvailableBalance = jest.fn();
+	const mockPayFee = jest.fn();
 
 	beforeEach(async () => {
 		const { minAmountToBurn } = initConfig;
@@ -49,6 +50,7 @@ describe('BurnCommand', () => {
 		createCommand.addDependencies({
 			internalMethod,
 			tokenMethod: { mint: mockMint, initializeToken: mockInitialize },
+			feeMethod: { payFee: mockPayFee },
 		} as any);
 		await createCommand.init(initConfig as ModuleConfig);
 

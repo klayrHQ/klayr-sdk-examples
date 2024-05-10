@@ -24,7 +24,6 @@ export class CreateTokenCommand extends BaseCommand {
 	private _tokenMethod!: TokenMethod;
 	private _feeMethod!: FeeMethod;
 	private _maxTotalSupply!: bigint;
-	private _chainID!: Buffer;
 	private _createTokenFee!: bigint;
 	private _internalMethod!: InternalMethod;
 
@@ -42,7 +41,6 @@ export class CreateTokenCommand extends BaseCommand {
 
 	public async init(config: ModuleConfig): Promise<void> {
 		this._maxTotalSupply = config.maxTotalSupply;
-		this._chainID = config.chainID;
 		this._createTokenFee = config.createTokenFee;
 		this.schema.properties.name.maxLength = config.maxNameLength;
 		this.schema.properties.symbol.maxLength = config.maxSymbolLength;

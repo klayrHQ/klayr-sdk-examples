@@ -10,19 +10,20 @@ import {
 	TokenMethod,
 	utils,
 } from 'klayr-sdk';
+import { BatchTransferCommand } from './commands/batch_transfer_command';
 import { ModuleConfig, ModuleConfigJSON } from './types';
 import { BurnCommand } from './commands/burn_command';
 import { CreateTokenCommand } from './commands/create_token_command';
 import { MintCommand } from './commands/mint_command';
 import { TokenFactoryEndpoint } from './endpoint';
+import { NewTokenEvent } from './events/new_token';
+import { InternalMethod } from './internal_methods';
 import { TokenFactoryMethod } from './method';
 import { configSchema } from './schemas';
 import { CounterStore } from './stores/counter';
 import { OwnerStore } from './stores/owner';
 import { TokenStore } from './stores/token';
 import { getModuleConfig } from './utils';
-import { NewTokenEvent } from './events/new_token';
-import { InternalMethod } from './internal_methods';
 
 export const defaultConfig = {
 	maxNameLength: 30,
@@ -36,16 +37,24 @@ export const defaultConfig = {
 
 export class TokenFactoryModule extends BaseModule {
 	private readonly _internalMethod = new InternalMethod(this.stores, this.events);
+
 	private _createTokenCommand = new CreateTokenCommand(this.stores, this.events);
+	private _batchTransferCommand = new BatchTransferCommand(this.stores, this.events);
 	private _mintCommand = new MintCommand(this.stores, this.events);
 	private _burnCommand = new BurnCommand(this.stores, this.events);
+
 	private _moduleConfig!: ModuleConfig;
 	private _tokenMethod!: TokenMethod;
 	private _feeMethod!: FeeMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
 	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
-	public commands = [this._createTokenCommand, this._mintCommand, this._burnCommand];
+	public commands = [
+		this._createTokenCommand,
+		this._mintCommand,
+		this._burnCommand,
+		this._batchTransferCommand,
+	];
 
 	public constructor() {
 		super();
@@ -61,6 +70,7 @@ export class TokenFactoryModule extends BaseModule {
 		this._tokenMethod = tokenMethod;
 		this._feeMethod = feeMethod;
 		this._createTokenCommand.addDependencies({
+			internalMethod: this._internalMethod,
 			tokenMethod: this._tokenMethod,
 			feeMethod: this._feeMethod,
 		});
@@ -72,11 +82,22 @@ export class TokenFactoryModule extends BaseModule {
 			tokenFactoryMethod: this.tokenFactoryMethod,
 			tokenMethod: this._tokenMethod,
 		});
+		this._batchTransferCommand.addDependencies({
+			tokenMethod: this._tokenMethod,
+		});
 	}
 
 	public metadata(): ModuleMetadata {
 		return {
 			...this.baseMetadata(),
+			commands: this.commands.map(command => ({
+				name: command.name,
+				params: command.schema,
+			})),
+			events: this.events.values().map(v => ({
+				name: v.name,
+				data: v.schema,
+			})),
 			endpoints: [],
 			assets: [],
 		};

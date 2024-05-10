@@ -6,7 +6,7 @@ import { TokenFactoryModule } from '@app/modules/token_factory/module';
 import { createTokenSchema as createSchema } from '@app/modules/token_factory/schemas';
 import { ModuleConfig } from '@app/modules/token_factory/types';
 import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } from 'klayr-sdk';
-import { TokenID, createCtx, createSampleTransaction } from '@test/helpers';
+import { TokenID, createCreateTokenCtx, createCtx, createSampleTransaction } from '@test/helpers';
 import { TokenStore } from '@app/modules/token_factory/stores/token';
 import { CounterStore, counterKey } from '@app/modules/token_factory/stores/counter';
 import { OwnerStore } from '@app/modules/token_factory/stores/owner';
