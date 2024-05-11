@@ -4,7 +4,10 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - deploy-token-factory
+      - token-factory
+  pull_request:
+    branches:
+      - token-factory
 
 env:
   # Use docker.io for Docker Hub if empty
