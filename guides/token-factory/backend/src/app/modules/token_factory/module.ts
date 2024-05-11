@@ -48,7 +48,7 @@ export class TokenFactoryModule extends BaseModule {
 	private _feeMethod!: FeeMethod;
 
 	public endpoint = new TokenFactoryEndpoint(this.stores, this.offchainStores);
-	public tokenFactoryMethod = new TokenFactoryMethod(this.stores, this.events);
+	public method = new TokenFactoryMethod(this.stores, this.events);
 	public commands = [
 		this._createTokenCommand,
 		this._mintCommand,
@@ -75,11 +75,11 @@ export class TokenFactoryModule extends BaseModule {
 			feeMethod: this._feeMethod,
 		});
 		this._mintCommand.addDependencies({
-			tokenFactoryMethod: this.tokenFactoryMethod,
+			tokenFactoryMethod: this.method,
 			tokenMethod: this._tokenMethod,
 		});
 		this._burnCommand.addDependencies({
-			tokenFactoryMethod: this.tokenFactoryMethod,
+			tokenFactoryMethod: this.method,
 			tokenMethod: this._tokenMethod,
 		});
 		this._batchTransferCommand.addDependencies({
