@@ -4,7 +4,8 @@ import { WalletConnectModal } from '@walletconnect/modal';
 import WCClient, {SignClient} from '@walletconnect/sign-client';
 import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
-import { getLisk32AddressFromPublicKey } from '@/utils/lisk';
+import { getLisk32AddressFromPublicKey } from '@/utils/chainFunctions';
+import { chains, currentChain, projectID } from '@/utils/constants';
 
 interface WalletConnectProps {
 	session: any
@@ -41,16 +42,9 @@ export const WalletConnectProvider = ({ children }: {
 	const [address, setAddress] = useState<string | undefined>();
 	const [publicKey, setPublicKey] = useState<string | undefined>();
 
-	//const projectID = process.env.REACT_APP_WC_PROJECT_ID as string
-	const projectID = "730e84c79793076a98d0f8830ce1a1a9"
-
-	/*if(!projectID) {
-		throw new Error('Please add a project id to .env');
-	}*/
-
 	const modal = new WalletConnectModal({
 		projectId: projectID,
-		chains: ["lisk:01000000"],
+		chains: chains,
 		themeVariables: {
 			"--wcm-accent-color": "rgb(13, 117, 253)",
 			"--wcm-background-color": "rgb(13, 117, 253)",
@@ -134,7 +128,7 @@ export const WalletConnectProvider = ({ children }: {
 			requiredNamespaces: {
 				lisk: {
 					methods: ["send_transaction", "sign_transaction", "sign_message"],
-					chains: ["lisk:01000000"],
+					chains: chains,
 					events: [
 						"session_proposal",
 						"session_request",
@@ -189,14 +183,14 @@ export const WalletConnectProvider = ({ children }: {
 	async function sendTransaction() {
 		try {
 			if (!signClient || !session || !publicKey) {
-				console.error('Prerequisites not met');
+				console.error("Prerequisites not met");
 				return;
 			}
 			const responseJSON = await signClient.request({
 				topic: session.topic,
-				chainId: 'lisk:01000000',
+				chainId: currentChain,
 				request: {
-					method: 'send_transaction',
+					method: "send_transaction",
 					params: {
 						address: publicKey,
 					},
@@ -206,11 +200,11 @@ export const WalletConnectProvider = ({ children }: {
 			const result = JSON.parse(responseJSON) as TransactionResult;
 
 			if (result && result.error) {
-				console.error('ERROR');
-				console.log('Transaction failed');
+				console.error("ERROR");
+				console.log("Transaction failed");
 			}
 			if (result && result.signatures) {
-				console.log('RESULT', result);
+				console.log("RESULT", result);
 			}
 		} catch (e) {
 			console.error(e, "ERROR");
