@@ -1,5 +1,5 @@
 import {
-	Box, Button, IconButton,
+	Box,
 	Stack,
 	Table,
 	TableBody,
@@ -9,12 +9,10 @@ import {
 	TableRow,
 	Typography,
 } from '@mui/material';
-import { ReactElement } from 'react';
-import { Settings } from '@mui/icons-material';
 import { PageLayout } from '@/components/layout/pageLayout';
 
 interface column {
-	value: string | ReactElement
+	value: string
 	props?: TableCellProps
 }
 
@@ -27,23 +25,18 @@ const Page = () => {
 			{value: "KlayrToken"},
 			{value: "KLY"},
 			{value: "Klayr"},
-			{value: "5.000", props: {align: "right"}},
-			{value: <IconButton><Settings /></IconButton>, props: {sx: {width: "50px"}}},
+			{value: "5.000.000", props: {align: "right"}}
 		]
 	]
 	const headColumns: columns = [
 		{ value: 'Token', props: {size: "small"}},
 		{ value: 'Symbol', props: {size: "small"}},
 		{ value: 'Creator', props: {size: "medium"}},
-		{ value: 'Amount', props: {size: "medium", align: "right"}},
-		{ value: ""},
+		{ value: 'Amount on chain', props: {size: "medium", align: "right"}}
 	]
 
 	return (
-		<PageLayout
-			title={"Owned Tokens"}
-			subTitle={"All tokens in your wallet"}
-		>
+		<PageLayout title={"Tokens"} subTitle={"All tokens on the sidechain"}>
 			<Table>
 				<TableHead>
 					<TableRow>
