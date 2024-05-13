@@ -1,10 +1,6 @@
-if (typeof window !== "undefined") window.Buffer = window.Buffer || require("buffer").Buffer;
+import { BINARY_ADDRESS_LENGTH, DEFAULT_LISK32_ADDRESS_PREFIX, GENERATOR, LISK32_CHARSET } from '@/utils/constants';
 
-export const DEFAULT_LISK32_ADDRESS_PREFIX = 'lsk';
-export const BINARY_ADDRESS_LENGTH = 20;
-export const LISK32_ADDRESS_LENGTH = 41;
-export const LISK32_CHARSET = 'zxvcpmbn3465o978uyrtkqew2adsjhfg'
-const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+if (typeof window !== "undefined") window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const cryptoHashSha256 = async (data: ArrayBuffer) =>
   // eslint-disable-next-line no-restricted-globals
