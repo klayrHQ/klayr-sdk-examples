@@ -4,7 +4,7 @@ import { WalletConnectModal } from '@walletconnect/modal';
 import WCClient, {SignClient} from '@walletconnect/sign-client';
 import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
-import { getLisk32AddressFromPublicKey } from '@/utils/chainFunctions';
+import { getKlayr32AddressFromPublicKey } from '@/utils/chainFunctions';
 import { chains, currentChain, projectID } from '@/utils/constants';
 
 interface WalletConnectProps {
@@ -109,7 +109,7 @@ export const WalletConnectProvider = ({ children }: {
 			(async () => {
 				setTopic(session.topic);
 				const publicKey = session.namespaces.lisk.accounts[0].split(":")[2];
-				const address = await getLisk32AddressFromPublicKey(
+				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
 				setAddress(address);
@@ -127,7 +127,7 @@ export const WalletConnectProvider = ({ children }: {
 			// pairingTopic: topic,
 			requiredNamespaces: {
 				lisk: {
-					methods: ["send_transaction", "sign_transaction", "sign_message"],
+					methods: ["sign_transaction", "sign_message"],
 					chains: chains,
 					events: [
 						"session_proposal",
@@ -160,6 +160,8 @@ export const WalletConnectProvider = ({ children }: {
 	}
 
 	async function disconnect() {
+		console.log("sign client", signClient);
+		console.log("topic", topic);
 		if (!signClient) return;
 		try {
 			if (topic) {
@@ -172,11 +174,12 @@ export const WalletConnectProvider = ({ children }: {
 				});
 				setSession(undefined);
 				setTopic(undefined);
-				/*setAddresses(undefined);*/
+				setAddress(undefined);
 				console.log("Wallet disconnected");
 			}
 		} catch (e) {
 			console.error(e);
+			console.log("error")
 		}
 	}
 
@@ -190,7 +193,7 @@ export const WalletConnectProvider = ({ children }: {
 				topic: session.topic,
 				chainId: currentChain,
 				request: {
-					method: "send_transaction",
+					method: "sign_transaction",
 					params: {
 						address: publicKey,
 					},

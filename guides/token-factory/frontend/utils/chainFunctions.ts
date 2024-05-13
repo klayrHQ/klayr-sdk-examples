@@ -1,4 +1,4 @@
-import { BINARY_ADDRESS_LENGTH, DEFAULT_LISK32_ADDRESS_PREFIX, GENERATOR, LISK32_CHARSET } from '@/utils/constants';
+import { BINARY_ADDRESS_LENGTH, DEFAULT_KLAYR32_ADDRESS_PREFIX, GENERATOR, KLAYR32_CHARSET } from '@/utils/constants';
 
 if (typeof window !== "undefined") window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -28,7 +28,7 @@ export const hash = async (data: Buffer | string, format?: string) => {
 };
 
 const convertUInt5ToBase32 = (uint5Array: number[]): string =>
-  uint5Array.map((val: number) => LISK32_CHARSET[val]).join('');
+  uint5Array.map((val: number) => KLAYR32_CHARSET[val]).join('');
 
 // See for details: https://github.com/LiskHQ/lips/blob/master/proposals/lip-0018.md#creating-checksum
 const polymod = (uint5Array: number[]): number => {
@@ -101,7 +101,7 @@ export const getAddressFromPublicKey = async (publicKey: Buffer) => {
   return truncatedBuffer;
 };
 
-export const addressToLisk32 = (address: Buffer): string => {
+export const addressToKlayr32 = (address: Buffer): string => {
   const byteSequence = [];
   // @ts-ignore
   for (const b of address) {
@@ -112,7 +112,7 @@ export const addressToLisk32 = (address: Buffer): string => {
   return convertUInt5ToBase32(uint5Address.concat(uint5Checksum));
 };
 
-export const getLisk32AddressFromPublicKey = async (
+export const getKlayr32AddressFromPublicKey = async (
   publicKey: Buffer,
-  prefix = DEFAULT_LISK32_ADDRESS_PREFIX,
-) => `${prefix}${addressToLisk32(await getAddressFromPublicKey(publicKey))}`;
+  prefix = DEFAULT_KLAYR32_ADDRESS_PREFIX,
+) => `${prefix}${addressToKlayr32(await getAddressFromPublicKey(publicKey))}`;
