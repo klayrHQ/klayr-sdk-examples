@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'inter';
+  font-style: normal;
+  font-weight: normal;
+  src: url("../assets/fonts/Inter-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'utendo';
+  font-style: normal;
+  font-weight: normal;
+  src: url("../assets/fonts/Utendo-Regular.ttf") format('truetype');
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
