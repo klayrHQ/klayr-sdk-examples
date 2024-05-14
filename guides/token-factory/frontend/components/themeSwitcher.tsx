@@ -19,13 +19,13 @@ export const ThemeSwitcher = ({ className, sx }: {className?: string, sx?: SxPro
 			>
 				<LightMode
 					className={cls([
-						"text-white absolute transition-all ease duration-200",
+						"absolute transition-all ease duration-200",
 						themeMode === "light" ? "opacity-1 rotate-0" : "opacity-0 rotate-180",
 					])}
 				/>
 				<DarkMode
 					className={cls([
-						"text-white absolute transition-all ease duration-200",
+						"absolute transition-all ease duration-200",
 						themeMode === "dark" ? "opacity-1 rotate-0" : "opacity-0 rotate-180",
 					])}
 				/>

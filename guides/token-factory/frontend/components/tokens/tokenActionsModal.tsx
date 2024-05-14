@@ -1,5 +1,5 @@
 "use client"
-import { Box, IconButton, Modal, Tab, Tabs } from '@mui/material';
+import { Box, Button, IconButton, Modal, Tab, Tabs, Typography } from '@mui/material';
 import { Mint, Burn, Transfer, BatchTransfer } from '@/components/tokens/actions';
 import { SyntheticEvent, useState } from 'react';
 import { Settings } from '@mui/icons-material';
@@ -11,10 +11,14 @@ function a11yProps(index: number) {
 	};
 }
 
-export interface tsxProps {
-	amount?: string
+export interface tokenActionsProps {
 	tokenID: string
 	tokenName?: string
+}
+
+export interface TxsProps {
+	amount?: string
+	tokenID: string
 	recipients?: {recipient: string, amount: string}[]
 }
 
@@ -49,14 +53,18 @@ export const TokenActionsModal = ({tokenID, tokenName}: { tokenID: string, token
 
 	return (
 		<Box>
-			<IconButton onClick={toggleModal}>
+			<Button onClick={toggleModal}>
 				<Settings />
-			</IconButton>
+				<Typography className={"ml-2"}>Manage</Typography>
+			</Button>
 			<Modal open={modalOpen} onClose={toggleModal}>
-				<Box className={"max-w-[90%] w-[800px] h-[800px] rounded-xl flex flex-col absolute inset-0 m-auto"} sx={{backgroundColor: "background.default"}}>
+				<Box className={"max-w-[90%] w-[800px] h-[400px] rounded-xl flex flex-col absolute inset-0 m-auto overflow-hidden"} sx={{backgroundColor: "background.default"}}>
 					<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-						<Tabs value={currentTab} onChange={(event: SyntheticEvent, newValue: number) => setCurrentTab(newValue)}
-									aria-label="transaction tabs">
+						<Tabs
+							value={currentTab}
+							onChange={(event: SyntheticEvent, newValue: number) => setCurrentTab(newValue)}
+							aria-label="transaction tabs"
+						>
 							{
 								tabs.map(({ name }, index) => (
 									<Tab className={"pt-4"} label={name} key={`tab-${name}`} {...a11yProps(index)} />
