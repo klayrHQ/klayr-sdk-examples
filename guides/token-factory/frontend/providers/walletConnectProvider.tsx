@@ -5,9 +5,11 @@ import WCClient, {SignClient} from '@walletconnect/sign-client';
 import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
 import { getKlayr32AddressFromPublicKey } from '@/utils/chainFunctions';
-import { chains, currentChain, projectID } from '@/utils/constants';
+import { chains, currentChain, projectID, recipientChainID } from '@/utils/constants';
 import { useSchemas } from '@/providers/schemaProvider';
 import { codec } from '@klayr/codec';
+
+type TRpcRequestCallback = (chainId: string, address: string, schema: any, rawTx: any) => Promise<void>;
 
 interface WalletConnectProps {
 	session: any
@@ -15,7 +17,8 @@ interface WalletConnectProps {
 	disconnect: () => void
 	address: string | undefined
 	publicKey: string | undefined
-	sendTransaction: (payload, schema) => void
+	//signTransaction: (payload, schema) => void
+	signTransaction: TRpcRequestCallback
 }
 
 type TransactionResult = {
@@ -28,6 +31,13 @@ type TransactionResult = {
 	signatures?: string[];
 	error?: { code: number; message: string };
 };
+
+interface IFormattedRpcResponse {
+	method?: string;
+	address?: string;
+	valid: boolean;
+	result: string;
+}
 
 export const WalletConnect = createContext<WalletConnectProps>(
 	{} as WalletConnectProps,
@@ -44,6 +54,8 @@ export const WalletConnectProvider = ({ children }: {
 	const [topic, setTopic] = useState<string | undefined>();
 	const [address, setAddress] = useState<string | undefined>();
 	const [publicKey, setPublicKey] = useState<string | undefined>();
+	const [pending, setPending] = useState(false);
+	const [result, setResult] = useState<IFormattedRpcResponse | null>();
 
 	const baseTransactionSchema = getSchema(true);
 
@@ -113,7 +125,7 @@ export const WalletConnectProvider = ({ children }: {
 		if (session) {
 			(async () => {
 				setTopic(session.topic);
-				const publicKey = session.namespaces.lisk.accounts[0].split(":")[2];
+				const publicKey = session.namespaces.klayr.accounts[0].split(":")[2];
 				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
@@ -131,7 +143,7 @@ export const WalletConnectProvider = ({ children }: {
 		return signClient.connect({
 			// pairingTopic: topic,
 			requiredNamespaces: {
-				lisk: {
+				klayr: {
 					methods: ["sign_transaction", "sign_message"],
 					chains: chains,
 					events: [
@@ -227,7 +239,78 @@ export const WalletConnectProvider = ({ children }: {
 		};
 	};
 
-	async function signTransaction(schema, payload) {
+	const _createJsonRpcRequestHandler =
+		(rpcRequest: (chainId: string, address: string, schema: any, rawTx: any) => Promise<IFormattedRpcResponse>) =>
+			async (chainId: string, address: string, schema: any, rawTx: any) => {
+				if (typeof signClient === 'undefined') {
+					throw new Error('WalletConnect is not initialized');
+				}
+				if (typeof session === 'undefined') {
+					throw new Error('Session is not connected');
+				}
+
+				try {
+					setPending(true);
+					const result = await rpcRequest(chainId, address, schema, rawTx);
+					setResult(result);
+				} catch (err: any) {
+					console.error('RPC request failed: ', err);
+					setResult({
+						address,
+						valid: false,
+						result: err?.message ?? err,
+					});
+					throw new Error(err);
+				} finally {
+					setPending(false);
+				}
+			};
+
+	const signTransaction = _createJsonRpcRequestHandler(
+		async (chainId: string, address: string, schema: any, rawTx: any): Promise<IFormattedRpcResponse> => {
+			const tx = await fromTransactionJSON(rawTx, schema);
+			const binary = await encodeTransaction(tx, schema);
+			const payload = binary.toString('hex');
+
+			try {
+				console.log('client: ', signClient);
+				const result = await signClient!.request<string>({
+					chainId,
+					topic: session!.topic,
+					request: {
+						method: "sign_transaction",
+						params: {
+							payload,
+							schema,
+							recipientChainID: recipientChainID,
+						},
+					},
+				});
+
+				console.log('before valid true');
+
+				const valid = true;
+
+				rawTx.signatures = [...JSON.parse(result).signatures];
+
+				const _tx = await fromTransactionJSON(rawTx, schema);
+				const _binary = await encodeTransaction(_tx, schema);
+				const _signedTransaction = _binary.toString('hex');
+
+				return {
+					method: "sign_transaction",
+					address,
+					valid,
+					result: _signedTransaction,
+				};
+			} catch (error: any) {
+				console.log('error', error);
+				throw new Error(error);
+			}
+		},
+	)
+
+	/*async function signTransaction(schema, payload) {
 		try {
 			if (!signClient || !session || !publicKey) {
 				console.error("Prerequisites not met");
@@ -258,7 +341,7 @@ export const WalletConnectProvider = ({ children }: {
 		} catch (e) {
 			console.error(e, "ERROR");
 		}
-	}
+	}*/
 
 	return (
 		<WalletConnect.Provider
@@ -268,7 +351,7 @@ export const WalletConnectProvider = ({ children }: {
 				disconnect,
 				address,
 				publicKey,
-				sendTransaction: signTransaction,
+				signTransaction,
 			}}
 		>
 			{children}

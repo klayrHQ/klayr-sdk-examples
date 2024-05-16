@@ -13,7 +13,7 @@ const post = async (call: string, data) => {
 export const mintToken = async (tokenID: string, amount: string) => {
 	try {
 		const response = await post("mint", {tokenID, amount});
-		return response;
+		return response.data;
 	} catch (error) {
 		console.log(error)
 	}
@@ -22,6 +22,15 @@ export const mintToken = async (tokenID: string, amount: string) => {
 export const getSchemas = async () => {
 	try {
 		const response = await get("schemas");
+		return response.data;
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+export const getAuth = async (params: any) => {
+	try {
+		const response = await get("auth", params);
 		return response.data;
 	} catch (error) {
 		console.log(error)

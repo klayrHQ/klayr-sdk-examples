@@ -68,7 +68,7 @@ export const CreateToken = () => {
 						/>
 						{errors.totalSupply && getErrorText(errors.totalSupply.type, "number")}
 					</InputLabel>
-					<Button onClick={handleSubmit(onSubmit, onError)}><Typography>Submit</Typography></Button>
+					<Button className={"mt-2"} variant={"input"} onClick={handleSubmit(onSubmit, onError)}><Typography>Submit</Typography></Button>
 				</Stack>
 			</form>
 		</PageLayout>
