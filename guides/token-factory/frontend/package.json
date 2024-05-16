@@ -13,6 +13,8 @@
     "@chainsafe/blst": "^1.0.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@klayr/codec": "^0.4.2",
+    "@klayr/cryptography": "^4.0.2",
     "@mui/icons-material": "^5.15.16",
     "@mui/material": "^5.15.16",
     "@walletconnect/modal": "^2.6.2",

@@ -6,6 +6,8 @@ import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
 import { getKlayr32AddressFromPublicKey } from '@/utils/chainFunctions';
 import { chains, currentChain, projectID } from '@/utils/constants';
+import { useSchemas } from '@/providers/schemaProvider';
+import { codec } from '@klayr/codec';
 
 interface WalletConnectProps {
 	session: any
@@ -13,7 +15,7 @@ interface WalletConnectProps {
 	disconnect: () => void
 	address: string | undefined
 	publicKey: string | undefined
-	sendTransaction: () => void
+	sendTransaction: (payload, schema) => void
 }
 
 type TransactionResult = {
@@ -36,11 +38,14 @@ export const useWalletConnect = () => useContext(WalletConnect)
 export const WalletConnectProvider = ({ children }: {
 	children: ReactNode;
 }) => {
+	const { schemas, getSchema } = useSchemas()
 	const [session, setSession] = useState<any>()
 	const [signClient, setSignClient] = useState<WCClient>();
 	const [topic, setTopic] = useState<string | undefined>();
 	const [address, setAddress] = useState<string | undefined>();
 	const [publicKey, setPublicKey] = useState<string | undefined>();
+
+	const baseTransactionSchema = getSchema(true);
 
 	const modal = new WalletConnectModal({
 		projectId: projectID,
@@ -143,6 +148,7 @@ export const WalletConnectProvider = ({ children }: {
 	}
 
 	async function connect() {
+		console.log(schemas)
 		try {
 			const {uri, approval,} = await getUri();
 			if (uri && approval) {
@@ -183,7 +189,45 @@ export const WalletConnectProvider = ({ children }: {
 		}
 	}
 
-	async function sendTransaction() {
+	const encodeTransaction = async (tx: any, paramsSchema: any) => {
+		let encodedParams;
+		if (!Buffer.isBuffer(tx.params)) {
+			encodedParams = paramsSchema ? codec.encode(paramsSchema, tx.params) : Buffer.alloc(0);
+		} else {
+			encodedParams = tx.params;
+		}
+
+		// @ts-ignore
+		const encodedTransaction = codec.encode(baseTransactionSchema, {
+			...tx,
+			params: encodedParams,
+		});
+
+		return encodedTransaction;
+	};
+
+	const fromTransactionJSON = async (rawTx: any, paramsSchema: any) => {
+		// @ts-ignore
+		const tx = codec.fromJSON(baseTransactionSchema, {
+			...rawTx,
+			params: '',
+		});
+
+		let params;
+		if (typeof rawTx.params === 'string') {
+			params = paramsSchema ? codec.decode(paramsSchema, Buffer.from(rawTx.params, 'hex')) : {};
+		} else {
+			params = paramsSchema ? codec.fromJSON(paramsSchema, rawTx.params) : {};
+		}
+
+		return {
+			...tx,
+			id: rawTx.id ? Buffer.from(rawTx.id, 'hex') : Buffer.alloc(0),
+			params,
+		};
+	};
+
+	async function signTransaction(schema, payload) {
 		try {
 			if (!signClient || !session || !publicKey) {
 				console.error("Prerequisites not met");
@@ -196,6 +240,8 @@ export const WalletConnectProvider = ({ children }: {
 					method: "sign_transaction",
 					params: {
 						address: publicKey,
+						payload,
+						schema: schema || getSchema(true),
 					},
 				},
 			}) as string;
@@ -222,7 +268,7 @@ export const WalletConnectProvider = ({ children }: {
 				disconnect,
 				address,
 				publicKey,
-				sendTransaction,
+				sendTransaction: signTransaction,
 			}}
 		>
 			{children}
