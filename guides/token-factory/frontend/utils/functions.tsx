@@ -1,9 +1,9 @@
 import { getAuth } from '@/utils/api';
+import { CommandType, IAccount, ITransactionObject } from '@/types/transactions';
 
 export const cls = (classes: Array<undefined | null | boolean | string>) => classes.filter(Boolean).join(" ");
 
-/*
-export const createTransactionObject = async <T>(module: TransactionModule, command: string, account: IAccount, params: T): Promise<{
+export const createTransactionObject = async (command: CommandType, account: IAccount, params: any): Promise<{
 	feeTokenID: string,
 	transactionObject: ITransactionObject
 }> => {
@@ -15,7 +15,7 @@ export const createTransactionObject = async <T>(module: TransactionModule, comm
 		});
 
 		const transaction = {
-			module,
+			module: "tokenFactory",
 			command,
 			fee: '0',
 			nonce: authResponse.data.nonce || 0,
@@ -24,20 +24,14 @@ export const createTransactionObject = async <T>(module: TransactionModule, comm
 			params
 		};
 
-		const networkFeeReponse: INetwrokFeeResponse = await apiGetEstimationFee({
-			transaction,
-		});
-
 		return {
-			feeTokenID: networkFeeReponse.data.transaction.fee.tokenID,
 			transactionObject: {
 				...transaction,
-				fee: '2000000000',
+				//fee: '2000000000',
 			}
 		};
-	} catch (e: any) {
-		if (e instanceof AxiosError)
-			throw new Error(e.response?.data.message);
-		throw new Error(e);
+	} catch (error: any) {
+		console.log(error)
+		throw new Error(error);
 	}
-};*/
+};

@@ -2,6 +2,9 @@
 import { Button, Input, InputLabel, Stack, Typography } from '@mui/material';
 import { PageLayout } from '@/components/layout/pageLayout';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { useWalletConnect } from '@/providers/walletConnectProvider';
+import { createTransactionObject } from '@/utils/functions';
+import { useSchemas } from '@/providers/schemaProvider';
 
 interface CreateTokenProps {
 	name: string
@@ -11,8 +14,31 @@ interface CreateTokenProps {
 
 export const CreateToken = () => {
 	const { register, handleSubmit, formState: { errors } } = useForm();
+	const { account, signTransaction } = useWalletConnect();
+	const { getSchema } = useSchemas();
 
-	const onSubmit: SubmitHandler<CreateTokenProps> = (data) => console.log(data);
+	const onSubmit: SubmitHandler<CreateTokenProps> = (data) => {
+		console.log(data);
+
+		if(account) {
+			const { chainID, publicKey } = account;
+			const schema = getSchema(false, "tokenFactory:createToken")
+
+			createTransactionObject("createToken", account, data)
+				.then(({ feeTokenID: _feeTokenID, transactionObject: rawTx, }) => {
+					console.log('transaction: ', rawTx);
+					/*setTransactionObject(rawTx);
+					setFeeTokenID(_feeTokenID);*/
+
+					signTransaction(chainID, publicKey, schema, rawTx);
+					/*setOpenTransactionStatusModal(true);
+					setCloseTransactionModal(false);*/
+				})
+				.catch(error => {
+					console.log(error)
+				});
+		}
+	}
 	const onError: SubmitErrorHandler<CreateTokenProps> = (errors) => console.log(errors);
 
 	const getErrorText = (errorType: string, fieldType?: string | undefined) => {

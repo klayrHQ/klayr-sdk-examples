@@ -8,6 +8,7 @@ import { getKlayr32AddressFromPublicKey } from '@/utils/chainFunctions';
 import { chains, currentChain, projectID, recipientChainID } from '@/utils/constants';
 import { useSchemas } from '@/providers/schemaProvider';
 import { codec } from '@klayr/codec';
+import { IAccount } from '@/types/transactions';
 
 type TRpcRequestCallback = (chainId: string, address: string, schema: any, rawTx: any) => Promise<void>;
 
@@ -15,10 +16,10 @@ interface WalletConnectProps {
 	session: any
 	connect: () => void
 	disconnect: () => void
-	address: string | undefined
-	publicKey: string | undefined
+	account: IAccount | undefined
 	//signTransaction: (payload, schema) => void
 	signTransaction: TRpcRequestCallback
+	rpcResult: IFormattedRpcResponse | null
 }
 
 type TransactionResult = {
@@ -43,7 +44,7 @@ export const WalletConnect = createContext<WalletConnectProps>(
 	{} as WalletConnectProps,
 );
 
-export const useWalletConnect = () => useContext(WalletConnect)
+export const useWalletConnect = () => useContext(WalletConnect);
 
 export const WalletConnectProvider = ({ children }: {
 	children: ReactNode;
@@ -52,10 +53,9 @@ export const WalletConnectProvider = ({ children }: {
 	const [session, setSession] = useState<any>()
 	const [signClient, setSignClient] = useState<WCClient>();
 	const [topic, setTopic] = useState<string | undefined>();
-	const [address, setAddress] = useState<string | undefined>();
-	const [publicKey, setPublicKey] = useState<string | undefined>();
+	const [account, setAccount] = useState<IAccount>()
 	const [pending, setPending] = useState(false);
-	const [result, setResult] = useState<IFormattedRpcResponse | null>();
+	const [result, setResult] = useState<IFormattedRpcResponse | null>(null);
 
 	const baseTransactionSchema = getSchema(true);
 
@@ -129,8 +129,7 @@ export const WalletConnectProvider = ({ children }: {
 				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
-				setAddress(address);
-				setPublicKey(publicKey);
+				setAccount({chainID: currentChain, address, publicKey});
 			})();
 		}
 	}, [session]);
@@ -192,7 +191,7 @@ export const WalletConnectProvider = ({ children }: {
 				});
 				setSession(undefined);
 				setTopic(undefined);
-				setAddress(undefined);
+				setAccount(undefined);
 				console.log("Wallet disconnected");
 			}
 		} catch (e) {
@@ -349,8 +348,8 @@ export const WalletConnectProvider = ({ children }: {
 				session,
 				connect,
 				disconnect,
-				address,
-				publicKey,
+				account,
+				rpcResult: result,
 				signTransaction,
 			}}
 		>
