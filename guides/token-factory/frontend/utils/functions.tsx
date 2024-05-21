@@ -1,10 +1,15 @@
 import { getAuth } from '@/utils/api';
 import { CommandType, IAccount, ITransactionObject } from '@/types/transactions';
 
+export const returnIfString = (value: unknown) => {
+	if (typeof value !== "string") return undefined;
+	else return value;
+}
+
 export const cls = (classes: Array<undefined | null | boolean | string>) => classes.filter(Boolean).join(" ");
 
 export const createTransactionObject = async (command: CommandType, account: IAccount, params: any): Promise<{
-	feeTokenID: string,
+	//feeTokenID: string,
 	transactionObject: ITransactionObject
 }> => {
 	try {

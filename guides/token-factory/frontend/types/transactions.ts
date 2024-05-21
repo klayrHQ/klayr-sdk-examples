@@ -74,3 +74,9 @@ export interface INetworkFeeResponse extends IResponse {
 		}
 	}
 }
+
+export enum TransactionStatus {
+	PENDING,
+	SUCCESS,
+	FAILURE,
+  }
