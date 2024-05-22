@@ -95,7 +95,7 @@ export const getAddressFromPublicKey = async (publicKey: Buffer) => {
   const truncatedBuffer = buffer.slice(0, BINARY_ADDRESS_LENGTH);
 
   if (truncatedBuffer.length !== BINARY_ADDRESS_LENGTH) {
-    throw new Error(`Lisk address must contain exactly ${BINARY_ADDRESS_LENGTH} bytes`);
+    throw new Error(`Klayr address must contain exactly ${BINARY_ADDRESS_LENGTH} bytes`);
   }
 
   return truncatedBuffer;

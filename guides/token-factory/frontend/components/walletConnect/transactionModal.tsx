@@ -1,6 +1,7 @@
-import { CommandType, TransactionStatus } from "@/types/transactions"
-import { Modal, Typography, Box, Button } from "@mui/material"
-import { useEffect, useState } from "react"
+import { CommandType, TransactionStatus } from '@/types/transactions';
+import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Close } from '@mui/icons-material';
 
 interface TransactionModalProps {
     open: boolean
@@ -60,12 +61,29 @@ export const TransactionModal = ({open, onClose, type, status, onApprove, modalT
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Box className={"flex items-center justify-center w-[400px] h-[300px]"}>
+            <Box className={"flex items-center justify-center w-[400px] h-[300px] absolute inset-0 m-auto rounded-xl"} sx={{backgroundColor: "background.default"}}>
                 {
-                    modalType === "status" ? 
-                        <Typography variant="h2">{stateText}</Typography> 
-                        : <Button onClick={onApprove}>Approve</Button>
+                    modalType === "status" ?
+                        <Stack className={"justify-center items-center"}>
+                            <Typography variant='h2'>{stateText}</Typography>
+                            {
+                                status === TransactionStatus.PENDING && <Typography variant='span'>Sign transaction in your wallet</Typography>
+                            }
+                            {
+                                status === TransactionStatus.FAILURE && <Typography variant='span'>You can close this window and try again</Typography>
+                            }
+                            {
+                              status === TransactionStatus.SUCCESS && <Typography variant='span'>You can close this window</Typography>
+                            }
+                        </Stack>
+                        : <Stack className={"gap-8"}>
+                              <Typography variant="h2">Confirm Transaction</Typography>
+                              <Button onClick={onApprove}><Typography>Approve</Typography></Button>
+                          </Stack>
                 }
+                <IconButton className={"absolute right-2 top-2"} onClick={onClose}>
+                    <Close />
+                </IconButton>
             </Box>
         </Modal>
     )

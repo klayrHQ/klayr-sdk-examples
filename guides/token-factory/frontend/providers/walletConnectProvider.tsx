@@ -99,11 +99,13 @@ export const WalletConnectProvider = ({ children }: {
 		}
 
 		if (signClient) {
+			// @ts-ignore
 			signClient.on("session_event", (event) => {
 				console.log("event", event);
 				// Handle session events, such as "chainChanged", "accountsChanged", etc.
 			});
 
+			// @ts-ignore
 			signClient.on("session_update", ({ topic, params, }) => {
 				const { namespaces, } = params;
 				const _session = signClient.session.get(topic);
@@ -129,6 +131,7 @@ export const WalletConnectProvider = ({ children }: {
 				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
+				console.log(address);
 				setAccount({chainID: currentChain, address, publicKey});
 			})();
 		}
@@ -143,7 +146,7 @@ export const WalletConnectProvider = ({ children }: {
 			// pairingTopic: topic,
 			requiredNamespaces: {
 				klayr: {
-					methods: ["sign_transaction", "sign_message"],
+					methods: ["sign_transaction"],
 					chains: chains,
 					events: [
 						"session_proposal",
@@ -273,7 +276,7 @@ export const WalletConnectProvider = ({ children }: {
 
 			try {
 				console.log('client: ', signClient);
-				const result = await signClient!.request<string>({
+				const result = await signClient!.request({
 					chainId,
 					topic: session!.topic,
 					request: {

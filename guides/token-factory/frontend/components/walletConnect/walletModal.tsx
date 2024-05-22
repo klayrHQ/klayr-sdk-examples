@@ -3,7 +3,7 @@ import { Button, Modal, ModalProps, Popover, PopoverProps, Slide, Stack, Typogra
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 
 export const WalletModal = ({open, onClose}: ModalProps) => {
-	const { address, disconnect } = useWalletConnect()
+	const { account, disconnect } = useWalletConnect()
 
 	return (
 		<Modal
@@ -21,7 +21,7 @@ export const WalletModal = ({open, onClose}: ModalProps) => {
 					</Typography>
 					<Stack className={'gap-1'}>
 						<Typography>Wallet address:</Typography>
-						<Typography title={address}>{address?.substring(0, 20)}...</Typography>
+						<Typography title={account?.address}>{account?.address?.substring(0, 20)}...</Typography>
 					</Stack>
 					<Button onClick={disconnect}><Typography>Disconnect</Typography></Button>
 				</Stack>

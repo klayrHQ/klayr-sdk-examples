@@ -5,9 +5,23 @@ const get = async (call: string, params?: any) => {
 }
 
 const post = async (call: string, data) => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_TOKEN_FACTORY_SERVICE_URL}/api/v3/${call}`, data);
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_TOKEN_FACTORY_SERVICE_URL}/api/v3/${call}`,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		}
+	);
 
 	return (await response.json())
+}
+
+export const api = {
+	get,
+	post
 }
 
 export const mintToken = async (tokenID: string, amount: string) => {
@@ -28,10 +42,10 @@ export const getSchemas = async () => {
 	}
 }
 
-export const getAuth = async (params: any) => {
+export const getAuth = async (address: any) => {
 	try {
-		const response = await get("auth", params);
-		return response.data;
+		const response = await get(`auth?address=${address}`);
+		return response;
 	} catch (error) {
 		console.log(error)
 	}

@@ -15,14 +15,13 @@ export const createTransactionObject = async (command: CommandType, account: IAc
 	try {
 		const { address, publicKey } = account;
 
-		const authResponse = await getAuth({
-			address,
-		});
+		const authResponse = await getAuth(address);
+		console.log(authResponse);
 
 		const transaction = {
 			module: "tokenFactory",
 			command,
-			fee: '0',
+			fee: '150000',
 			nonce: authResponse.data.nonce || 0,
 			senderPublicKey: publicKey,
 			signatures: [],
