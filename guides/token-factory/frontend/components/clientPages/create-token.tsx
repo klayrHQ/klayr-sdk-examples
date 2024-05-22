@@ -31,10 +31,7 @@ export const CreateToken = () => {
 
 			createTransactionObject("createToken", account, data)
 				.then(({ transactionObject: rawTx, }) => {
-					console.log('transaction: ', rawTx);
-					/*setTransactionObject(rawTx);
-					setFeeTokenID(_feeTokenID);*/
-
+					//console.log('transaction: ', rawTx);
 					signTransaction(chainID, publicKey, schema, rawTx);
 					setTransactionModalType("status")
 					setOpenTransactionModal(true);
@@ -45,7 +42,7 @@ export const CreateToken = () => {
 		}
 	}
 
-	 useEffect(() => {
+	useEffect(() => {
 		if (rpcResult && rpcResult.valid) {
 			setTransactionModalType("approve");
 			if (!openTransactionModal) setOpenTransactionModal(true);
