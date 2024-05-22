@@ -8,6 +8,7 @@ import { useSchemas } from '@/providers/schemaProvider';
 import { TransactionStatus } from '@/types/transactions';
 import { createTransactionObject, returnIfString } from '@/utils/functions';
 import { api } from '@/utils/api';
+import { TransactionModal } from '@/components/walletConnect/transactionModal';
 
 export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 	const { register, handleSubmit, control, formState: { errors } } = useForm({
@@ -145,6 +146,14 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 					</Button>
 				</Stack>
 			</form>
+			<TransactionModal
+				modalType={transactionModalType}
+				type={"batchTransfer"}
+				open={openTransactionModal}
+				onClose={() => setOpenTransactionModal(false)}
+				onApprove={onConfirmApproval}
+				status={transactionStatus}
+			/>
 		</Stack>
 	)
 }
