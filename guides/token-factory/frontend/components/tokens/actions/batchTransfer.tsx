@@ -6,7 +6,7 @@ import { Key, useEffect, useState } from 'react';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 import { useSchemas } from '@/providers/schemaProvider';
 import { TransactionStatus } from '@/types/transactions';
-import { createTransactionObject, returnIfString } from '@/utils/functions';
+import { createTransactionObject, getErrorText, returnIfString } from '@/utils/functions';
 import { api } from '@/utils/api';
 import { TransactionModal } from '@/components/walletConnect/transactionModal';
 
@@ -75,22 +75,6 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 	};
 
 	const onError: SubmitErrorHandler<TxsProps> = (errors) => console.log(errors);
-
-	const getErrorText = (errorType: string | undefined, fieldType?: string | undefined) => {
-		let errorText = "Unknown input error";
-
-		if (errorType === "required") errorText = "This field is required";
-
-		if (errorType === "pattern") {
-			if(fieldType === "number") {
-				errorText = "This field only accepts numbers";
-			} else {
-				errorText = "Invalid input";
-			}
-		}
-
-		return <Typography className={"text-xs text-[#FF422D] mt-1"}>{errorText}</Typography>;
-	}
 
 	const { fields, append, remove } = useFieldArray({
 		name: 'recipients',

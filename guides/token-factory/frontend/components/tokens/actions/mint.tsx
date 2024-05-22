@@ -6,7 +6,7 @@ import { useWalletConnect } from '@/providers/walletConnectProvider';
 import { useSchemas } from '@/providers/schemaProvider';
 import { useEffect, useState } from 'react';
 import { TransactionStatus } from '@/types/transactions';
-import { createTransactionObject, returnIfString } from '@/utils/functions';
+import { createTransactionObject, getErrorText, returnIfString } from '@/utils/functions';
 import { api } from '@/utils/api';
 
 export const Mint = ({ tokenID, tokenName }: tokenActionsProps) => {
@@ -65,22 +65,6 @@ export const Mint = ({ tokenID, tokenName }: tokenActionsProps) => {
 
 	const onError: SubmitErrorHandler<TxsProps> = (errors) => console.log(errors);
 
-	const getErrorText = (errorType: string | undefined, fieldType?: string | undefined) => {
-		let errorText = "Unknown input error";
-
-		if (errorType === "required") errorText = "This field is required";
-
-		if (errorType === "pattern") {
-			if(fieldType === "number") {
-				errorText = "This field only accepts numbers";
-			} else {
-				errorText = "Invalid input";
-			}
-		}
-
-		return <Typography className={"text-xs text-[#FF422D] mt-1"}>{errorText}</Typography>;
-	}
-
 	return (
 		<Stack className={"gap-8 min-h-full"}>
 			<Typography variant={"h2"}>Mint tokens for {tokenName}</Typography>
@@ -107,7 +91,7 @@ export const Mint = ({ tokenID, tokenName }: tokenActionsProps) => {
 			</form>
 			<TransactionModal
 				modalType={transactionModalType}
-				type={"batchTransfer"}
+				type={"mint"}
 				open={openTransactionModal}
 				onClose={() => setOpenTransactionModal(false)}
 				onApprove={onConfirmApproval}
