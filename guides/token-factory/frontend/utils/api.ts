@@ -1,3 +1,5 @@
+import { IToken } from '@/types/types';
+
 const get = async (call: string, params?: any) => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_TOKEN_FACTORY_SERVICE_URL}/api/v3/${call}`, params);
 
@@ -19,8 +21,15 @@ const post = async (call: string, data) => {
 	return (await response.json())
 }
 
+const getFromCore = async (call: string, params?: any) => {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_TOKEN_FACTORY_CORE_URL}/api/v3/${call}`, params);
+
+	return (await response.json())
+}
+
 export const api = {
 	get,
+	getFromCore,
 	post
 }
 
@@ -42,10 +51,33 @@ export const getSchemas = async () => {
 	}
 }
 
-export const getAuth = async (address: any) => {
+export const getAuth = async (address: string) => {
 	try {
 		const response = await get(`auth?address=${address}`);
 		return response;
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+export const getTokens = async (address?: string) => {
+	try {
+		if(address) {
+			const response = await post(`invoke`, {
+				endpoint: "tokenFactoryInfo_getTokenList",
+				params: {
+					address: address
+				}
+			});
+			return response.data as IToken[]
+		}
+
+		const response = await post(`invoke`, {
+			endpoint: "tokenFactoryInfo_getTokenList",
+			params: {}
+		});
+
+		return response.data as IToken[]
 	} catch (error) {
 		console.log(error)
 	}

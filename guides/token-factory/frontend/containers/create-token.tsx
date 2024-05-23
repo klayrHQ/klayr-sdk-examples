@@ -7,7 +7,7 @@ import { createTransactionObject, returnIfString } from '@/utils/functions';
 import { useSchemas } from '@/providers/schemaProvider';
 import { useEffect, useState } from 'react';
 import { ITransactionObject, TransactionStatus } from '@/types/transactions';
-import { TransactionModal } from '../walletConnect/transactionModal';
+import { TransactionModal } from '../components/walletConnect/transactionModal';
 import { api } from '@/utils/api';
 
 interface CreateTokenProps {

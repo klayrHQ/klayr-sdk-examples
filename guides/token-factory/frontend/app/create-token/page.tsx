@@ -1,4 +1,4 @@
-import { CreateToken } from '@/components/clientPages/create-token';
+import { CreateToken } from '@/containers/create-token';
 
 const Page = () => {
 	return <CreateToken />
