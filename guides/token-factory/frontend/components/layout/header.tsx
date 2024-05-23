@@ -5,7 +5,6 @@ import { ConnectWalletButton } from '@/components/walletConnect/connectWalletBut
 import { ThemeSwitcher } from '@/components/themeSwitcher';
 import { MobileMenu } from '@/components/layout/mobileMenu';
 
-
 export const Header = () => {
 	return (
 		<Box
@@ -44,7 +43,7 @@ export const Header = () => {
 							<MenuItem><Link href={"/owned-tokens"}>Owned tokens</Link></MenuItem>
 							<MenuItem><Link href={"/chain-tokens"}>Chain tokens</Link></MenuItem>
 							<ConnectWalletButton />
-							<ThemeSwitcher className={"mx-4"} />
+							<ThemeSwitcher className={"mx-4"} alwaysWhite />
 						</ul>
 					</nav>
 					<MobileMenu />

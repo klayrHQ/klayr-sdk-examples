@@ -83,7 +83,7 @@ export const OwnedTokens = () => {
 								</TableRow>
 							)) :
 								<TableRow>
-									<TableCell variant={"body"} align={"center"} colspan={6}>
+									<TableCell variant={"body"} align={"center"} colSpan={6}>
 										No tokens found...
 									</TableCell>
 								</TableRow>

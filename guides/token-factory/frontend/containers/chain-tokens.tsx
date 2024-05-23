@@ -73,7 +73,7 @@ export const ChainTokens = () => {
 								</TableRow>
 							)) :
 								<TableRow>
-									<TableCell variant={"body"} align={"center"} colspan={5}>
+									<TableCell variant={"body"} align={"center"} colSpan={5}>
 										No tokens found...
 									</TableCell>
 								</TableRow>

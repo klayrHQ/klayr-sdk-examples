@@ -18,3 +18,14 @@ export interface IToken {
 	totalSupply: string,
 	blockHeight: number
 }
+
+export interface ITokenActionsProps {
+	tokenID: string
+	tokenName?: string
+}
+
+export interface ITransactionFormProps {
+	amount?: string
+	tokenID: string
+	recipients?: {recipient: string, amount: string}[]
+}

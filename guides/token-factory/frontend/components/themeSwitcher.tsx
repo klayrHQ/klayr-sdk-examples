@@ -5,7 +5,7 @@ import { DarkMode, LightMode } from '@mui/icons-material';
 import { useTheme } from '@/providers/themeProvider';
 import { cls } from '@/utils/functions';
 
-export const ThemeSwitcher = ({ className, sx, alwaysWhite }: {className?: string, sx?: SxProps, alwaysWhite: boolean}) => {
+export const ThemeSwitcher = ({ className, sx, alwaysWhite }: {className?: string, sx?: SxProps, alwaysWhite?: boolean}) => {
 	const {themeMode, switchThemeMode} = useTheme()
 
 	return (
@@ -13,7 +13,6 @@ export const ThemeSwitcher = ({ className, sx, alwaysWhite }: {className?: strin
 				className={cls(["relative", className])}
 				onClick={() => {
 					switchThemeMode();
-					//setThemeMode(themeMode === "light" ? "dark" : "light");
 				}}
 				sx={sx}
 			>
@@ -31,7 +30,6 @@ export const ThemeSwitcher = ({ className, sx, alwaysWhite }: {className?: strin
 						alwaysWhite && "text-white",
 					])}
 				/>
-				{/*themeMode === "light" ? <LightMode sx={{color: "white"}} /> : <DarkMode sx={{color: "white"}} />*/}
 			</IconButton>
 	)
 }

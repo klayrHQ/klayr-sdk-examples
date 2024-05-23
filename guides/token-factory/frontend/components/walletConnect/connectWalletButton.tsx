@@ -9,7 +9,6 @@ export const ConnectWalletButton = ({buttonClassName}: {buttonClassName?: string
 	const { connect, session } = useWalletConnect();
 	const [openWallet, setOpenWallet] = useState(false);
 	const toggleWallet = () => {
-		console.log("wallet open", openWallet)
 		setOpenWallet(!openWallet);
 	}
 

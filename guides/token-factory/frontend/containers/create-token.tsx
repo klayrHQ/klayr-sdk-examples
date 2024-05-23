@@ -1,14 +1,14 @@
 'use client';
 import { Button, Input, InputLabel, Stack, Typography } from '@mui/material';
 import { PageLayout } from '@/components/layout/pageLayout';
-import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
-import { createTransactionObject, returnIfString } from '@/utils/functions';
+import { getErrorText, onError, returnIfString } from '@/utils/functions';
 import { useSchemas } from '@/providers/schemaProvider';
 import { useEffect, useState } from 'react';
-import { ITransactionObject, TransactionStatus } from '@/types/transactions';
+import { TransactionStatus } from '@/types/transactions';
 import { TransactionModal } from '../components/walletConnect/transactionModal';
-import { api } from '@/utils/api';
+import { createTransactionObject, onConfirmApproval } from '@/utils/transactionFunctions';
 
 interface CreateTokenProps {
 	name: string
@@ -37,7 +37,7 @@ export const CreateToken = () => {
 					setOpenTransactionModal(true);
 				})
 				.catch(error => {
-					console.log(error)
+					//console.log(error)
 				});
 		}
 	}
@@ -48,45 +48,6 @@ export const CreateToken = () => {
 			if (!openTransactionModal) setOpenTransactionModal(true);
 		}
 	}, [rpcResult]);
-
-	//submit signed transaction
-	const onConfirmApproval = () => {
-		if (rpcResult?.result) {
-			console.log(rpcResult)
-		  api.post("transactions", { transaction: rpcResult.result })
-				.then(r => {
-					if(r.error) {
-						setTransactionStatus(TransactionStatus.FAILURE);
-						setTransactionModalType("status");
-					}
-					else {
-						setTransactionStatus(TransactionStatus.SUCCESS);
-						setTransactionModalType('status');
-					}
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		}
-	};
-
-	const onError: SubmitErrorHandler<CreateTokenProps> = (errors) => console.log(errors);
-
-	const getErrorText = (errorType: string | undefined, fieldType?: string | undefined) => {
-		let errorText = "Unknown input error";
-
-		if (errorType === "required") errorText = "This field is required";
-
-		if (errorType === "pattern") {
-			if(fieldType === "number") {
-				errorText = "This field only accepts numbers";
-			} else {
-				errorText = "Invalid input";
-			}
-		}
-
-		return <Typography className={"text-xs text-[#FF422D] mt-1"}>{errorText}</Typography>;
-	}
 
 	return (
 		<PageLayout title={"Create Token"} subTitle={"Create your own token"}>
@@ -134,7 +95,7 @@ export const CreateToken = () => {
 				type={"createToken"}
 				open={openTransactionModal}
 				onClose={() => setOpenTransactionModal(false)}
-				onApprove={onConfirmApproval}
+				onApprove={() => onConfirmApproval(rpcResult, setTransactionStatus, setTransactionModalType)}
 				status={transactionStatus}
 			/>
 		</PageLayout>
