@@ -1,4 +1,4 @@
-= Lisk SDK examples
+= Klayr SDK examples
 :toc:
 
 This repository contains working code examples and example blockchain applications using the Lisk SDK.
