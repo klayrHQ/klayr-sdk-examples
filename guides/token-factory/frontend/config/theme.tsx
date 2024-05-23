@@ -67,13 +67,14 @@ const typography: ThemeOptions['typography'] = {
 	button: {
 		fontFamily: 'utendo, inter, sans-serif',
 		fontSize: '1.3rem',
+		lineHeight: "1",
 	},
 	h1: {
 		fontSize: '3rem',
 		fontFamily: 'utendo, inter, sans-serif',
 	},
 	h2: {
-		fontSize: '4rem',
+		fontSize: '2rem',
 		fontFamily: 'utendo, inter, sans-serif',
 	},
 	h3: {
@@ -97,10 +98,22 @@ const components: ThemeOptions['components'] = {
 		defaultProps: {
 			variant: 'contained',
 		},
+		variants: [
+			{
+				props: {variant: "input"},
+				style: {
+					padding: "10px 16px",
+					backgroundColor: primary.main,
+					color: `${primary.contrastText} !important`,
+					'&:hover': {
+						backgroundColor: primary.dark,
+					},
+				}
+			},
+		],
 		styleOverrides: {
 			root: ({ ownerState }) => ({
 				borderRadius: borderRadius.default,
-				paddingBottom: "2px",
 				...(ownerState.variant === 'contained' &&
 					ownerState.color === 'primary' && {
 						color: `${primary.contrastText} !important`,
@@ -151,6 +164,13 @@ const components: ThemeOptions['components'] = {
 			},
 		},
 	},
+	MuiTableCell: {
+		styleOverrides: {
+			root: {
+				fontSize: "18px",
+			}
+		}
+	}
 };
 
 const shape: ThemeOptions['shape'] = {
@@ -176,7 +196,7 @@ export const muiLightTheme = createTheme({
 			900: '#1a1a1a',
 		},
 		background: {
-			default: "gray.100",
+			default: "#f3f3f0",
 		}
 	},
 	typography,
@@ -184,7 +204,7 @@ export const muiLightTheme = createTheme({
 		...components,
 		MuiInput: {
 			styleOverrides: {
-				root: {
+				root: ({ ownerState }) => ({
 					borderWidth: '1px',
 					borderColor: '#919EAB',
 					borderStyle: 'solid',
@@ -204,7 +224,10 @@ export const muiLightTheme = createTheme({
 					'&::after': {
 						border: 'none !important',
 					},
-				},
+					...(ownerState.error === true && {
+						borderColor: "#FF422D",
+					}),
+				}),
 			},
 		},
 	},
@@ -237,7 +260,7 @@ export const muiDarkTheme = createTheme({
 		...components,
 		MuiInput: {
 			styleOverrides: {
-				root: {
+				root: ({ ownerState }) => ({
 					borderWidth: '1px',
 					borderColor: '#919EAB',
 					borderStyle: 'solid',
@@ -257,7 +280,10 @@ export const muiDarkTheme = createTheme({
 					'&::after': {
 						border: 'none !important',
 					},
-				},
+					...(ownerState.error === true && {
+						borderColor: "#FF422D",
+					})
+				}),
 			},
 		},
 	},

@@ -1,30 +1,33 @@
 "use client"
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
-import { WalletPopover } from '@/components/walletConnect/walletPopover';
+import { WalletModal } from '@/components/walletConnect/walletModal';
 import { useRef, useState } from 'react';
+import { cls } from '@/utils/functions';
 
-export const ConnectWalletButton = () => {
-	const { connect, session } = useWalletConnect()
-	const [openPopover, setOpenPopover] = useState(false)
-	const anchor = useRef();
+export const ConnectWalletButton = ({buttonClassName}: {buttonClassName?: string}) => {
+	const { connect, session } = useWalletConnect();
+	const [openWallet, setOpenWallet] = useState(false);
+	const toggleWallet = () => {
+		console.log("wallet open", openWallet)
+		setOpenWallet(!openWallet);
+	}
 
 	return (
 		<>
 			{
 				!session ?
-				<Button className={"w-max mx-auto"} onClick={() => connect()}>
-					Connect Wallet
+				<Button className={buttonClassName} onClick={() => connect()}>
+					<Typography>Connect Wallet</Typography>
 				</Button> :
-					<Box>
+					<Box className={"w-full box-border"}>
 						<Button
-							className={"w-max mx-auto"}
-							ref={anchor}
-							onClick={() => setOpenPopover(!openPopover)}
+							className={cls([buttonClassName, "box-border"])}
+							onClick={toggleWallet}
 						>
-							Wallet
+							<Typography>Wallet</Typography>
 						</Button>
-						<WalletPopover anchorEl={anchor.current} open={openPopover} onClose={() => setOpenPopover(false)} />
+						<WalletModal open={openWallet} onClose={toggleWallet} />
 					</Box>
 			}
 		</>

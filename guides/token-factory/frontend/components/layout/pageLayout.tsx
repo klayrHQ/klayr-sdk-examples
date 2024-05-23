@@ -16,14 +16,14 @@ export const PageLayout = ({
 }) => {
 	return (
 		<Box className={cls([
-			"max-w-[90%] lg:w-1150px mx-auto",
+			"max-w-[90%] w-[1280px] mx-auto",
 			containerClassName,
 		])}>
-			<Stack className={"gap-20"}>
-				<Stack>
+			<Stack className={"gap-20 items-center"}>
+				<Stack className={"items-center"}>
 					{
 						title &&
-						<Typography component={'h1'} variant={'h1'}>
+						<Typography variant={'h1'}>
 							{title}
 						</Typography>
 					}

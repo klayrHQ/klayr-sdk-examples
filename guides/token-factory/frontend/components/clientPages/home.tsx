@@ -16,7 +16,7 @@ export const ClientHome = () => {
 							onClick={() => disconnect()}
 							sx={{ width: 'max-content', marginInline: 'auto', marginTop: '10px' }}
 						>
-							Disconnect Wallet
+							<Typography>Disconnect Wallet</Typography>
 						</Button>
 					</>
 					:
@@ -26,7 +26,7 @@ export const ClientHome = () => {
 							onClick={() => connect()}
 							sx={{ width: 'max-content', marginInline: 'auto', marginTop: '10px' }}
 						>
-							Connect Wallet
+							<Typography>Connect Wallet</Typography>
 						</Button>
 					</>
 			}
