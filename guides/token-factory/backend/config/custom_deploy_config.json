@@ -58,7 +58,8 @@
 			"captchaSecretkey": "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
 			"captchaSitekey": "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
 			"host": "0.0.0.0",
-			"port": 4004
+			"port": 4004,
+      "amount": "1000000000"
 		}
 	}
 }
