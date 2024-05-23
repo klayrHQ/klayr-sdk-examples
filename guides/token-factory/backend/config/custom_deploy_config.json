@@ -8,7 +8,8 @@
 		"modes": ["ipc", "ws", "http"],
 		"port": 7887,
 		"host": "0.0.0.0",
-		"allowedMethods": ["*"]
+		"allowedMethods": ["*"],
+    "accessControlAllowOrigin": "*"
 	},
 	"network": {
 		"version": "1.0",
