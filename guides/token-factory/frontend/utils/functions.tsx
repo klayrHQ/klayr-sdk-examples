@@ -1,5 +1,6 @@
 import { getAuth } from '@/utils/api';
 import { CommandType, IAccount, ITransactionObject } from '@/types/transactions';
+import { Typography } from '@mui/material';
 
 export const returnIfString = (value: unknown) => {
 	if (typeof value !== "string") return undefined;
@@ -39,3 +40,19 @@ export const createTransactionObject = async (command: CommandType, account: IAc
 		throw new Error(error);
 	}
 };
+
+export const getErrorText = (errorType: string | undefined, fieldType?: string | undefined) => {
+	let errorText = "Unknown input error";
+
+	if (errorType === "required") errorText = "This field is required";
+
+	if (errorType === "pattern") {
+		if(fieldType === "number") {
+			errorText = "This field only accepts numbers";
+		} else {
+			errorText = "Invalid input";
+		}
+	}
+
+	return <Typography className={"text-xs text-[#FF422D] mt-1"}>{errorText}</Typography>;
+}
