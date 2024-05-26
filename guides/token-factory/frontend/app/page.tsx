@@ -1,4 +1,4 @@
-import { ClientHome } from "@/components/clientPages/home"
+import { ClientHome } from "@/containers/home"
 
 export default function Home() {
   return (

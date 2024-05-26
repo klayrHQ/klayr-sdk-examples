@@ -2,16 +2,28 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install the packages in packages.json:
+
+```bash
+npm run install
+# or
+yarn install
+```
+
+### 2. Get a project ID from WalletConnect:
+
+Go to https://cloud.walletconnect.com/ and create a project if you don't already have one, or log in and go to your existing project, then go to the dashboard to copy your project ID
+
+### 3. Create a local .env file:
+
+Create `.env.local` in the root of the project. Copy over the content from `.env.example` and replace the placeholders with your project ID and a Service URL.
+
+### 4. run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
