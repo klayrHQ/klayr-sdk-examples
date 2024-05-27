@@ -1,5 +1,5 @@
 "use client"
-import { Box, Button, IconButton, Modal, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Modal, Tab, Tabs, Typography } from '@mui/material';
 import { Mint, Burn, Transfer, BatchTransfer } from '@/components/tokens/actions';
 import { SyntheticEvent, useState } from 'react';
 import { Settings } from '@mui/icons-material';
@@ -9,17 +9,6 @@ function a11yProps(index: number) {
 		id: `simple-tab-${index}`,
 		'aria-controls': `simple-tabpanel-${index}`,
 	};
-}
-
-export interface tokenActionsProps {
-	tokenID: string
-	tokenName?: string
-}
-
-export interface TxsProps {
-	amount?: string
-	tokenID: string
-	recipients?: {recipient: string, amount: string}[]
 }
 
 export const TokenActionsModal = ({tokenID, tokenName}: { tokenID: string, tokenName: string }) => {

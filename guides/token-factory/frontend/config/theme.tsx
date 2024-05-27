@@ -26,6 +26,12 @@ declare module '@mui/material/styles' {
 	}
 }
 
+declare module '@mui/material/Button' {
+	interface ButtonPropsVariantOverrides {
+		input: true;
+	}
+  }
+
 const heights = {
 	inputHeight: '50px',
 };

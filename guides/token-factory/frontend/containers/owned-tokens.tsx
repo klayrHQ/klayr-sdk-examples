@@ -1,11 +1,13 @@
 "use client"
 import {
 	Box,
+	Stack,
 	Table,
 	TableBody,
 	TableCell,
 	TableHead,
 	TableRow,
+	Typography,
 } from '@mui/material';
 import { PageLayout } from '@/components/layout/pageLayout';
 import { TokenActionsModal } from '@/components/tokens/tokenActionsModal';
@@ -13,6 +15,7 @@ import { ColumnsType, IToken, RowsType } from '@/types/types';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 import { useEffect, useState } from 'react';
 import { getTokens } from '@/utils/api';
+import { ConnectWalletButton } from '@/components/walletConnect/connectWalletButton';
 
 export const OwnedTokens = () => {
 	const { account } = useWalletConnect()
@@ -83,8 +86,13 @@ export const OwnedTokens = () => {
 								</TableRow>
 							)) :
 								<TableRow>
-									<TableCell variant={"body"} align={"center"} colspan={6}>
-										No tokens found...
+									<TableCell variant={"body"} align={"center"} colSpan={6}>
+										<Stack className={"gap-4"}>
+											<Typography>No tokens found...</Typography>
+											{
+												!account?.address && <ConnectWalletButton buttonClassName={"mx-auto"} />
+											}
+										</Stack>
 									</TableCell>
 								</TableRow>
 						}

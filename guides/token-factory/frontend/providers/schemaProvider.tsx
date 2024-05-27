@@ -47,7 +47,7 @@ export const SchemasProvider = ({ children }: {
 	const getSchema = (baseTransaction: boolean, moduleCommand?: string) => {
 		if (!schemas) return undefined;
 
-		return baseTransaction ? schemas.transaction.schema : schemas.commands.find((command) => command.moduleCommand === moduleCommand).schema;
+		return baseTransaction ? schemas.transaction.schema : schemas?.commands?.find((command) => command?.moduleCommand === moduleCommand)?.schema;
 	}
 
 	return (

@@ -1,23 +1,24 @@
-import { Box, Button, Grid, IconButton, Input, InputLabel, Stack, Typography } from '@mui/material';
-import { tokenActionsProps, TxsProps } from '@/components/tokens/tokenActionsModal';
+"use client"
+import { Box, Button, IconButton, Input, InputLabel, Stack, Typography } from '@mui/material';
+import { ITokenActionsProps, ITransactionFormProps } from '@/types/types';
 import { Add, Remove } from '@mui/icons-material';
-import { SubmitErrorHandler, SubmitHandler, useForm, useFieldArray } from 'react-hook-form';
+import { SubmitHandler, useForm, useFieldArray } from 'react-hook-form';
 import { Key, useEffect, useState } from 'react';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 import { useSchemas } from '@/providers/schemaProvider';
 import { TransactionStatus } from '@/types/transactions';
-import { createTransactionObject, getErrorText, returnIfString } from '@/utils/functions';
-import { api } from '@/utils/api';
+import { getErrorText, onError, returnIfString } from '@/utils/functions';
 import { TransactionModal } from '@/components/walletConnect/transactionModal';
+import { createTransactionObject, onConfirmApproval } from '@/utils/transactionFunctions';
 
-export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
+export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 	const { register, handleSubmit, control, formState: { errors } } = useForm({
 		defaultValues: {
 			tokenID,
 			recipients: [
 				{
 					amount: '',
-					address: '',
+					recipient: '',
 				},
 			],
 		},
@@ -28,7 +29,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 	const [transactionModalType, setTransactionModalType] = useState<"approve" | "status">("status");
 	const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>(TransactionStatus.PENDING);
 
-	const onSubmit: SubmitHandler<TxsProps> = (data) => {
+	const onSubmit: SubmitHandler<ITransactionFormProps> = (data) => {
 		if(account) {
 			const { chainID, publicKey } = account;
 			const schema = getSchema(false, "tokenFactory:batchTransfer")
@@ -41,7 +42,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 					setOpenTransactionModal(true);
 				})
 				.catch(error => {
-					console.log(error)
+					//console.log(error)
 				});
 		}
 	}
@@ -52,29 +53,6 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 			if (!openTransactionModal) setOpenTransactionModal(true);
 		}
 	}, [rpcResult]);
-
-	//submit signed transaction
-	const onConfirmApproval = () => {
-		if (rpcResult?.result) {
-			console.log(rpcResult)
-			api.post("transactions", { transaction: rpcResult.result })
-				.then(r => {
-					if(r.error) {
-						setTransactionStatus(TransactionStatus.FAILURE);
-						setTransactionModalType("status");
-					}
-					else {
-						setTransactionStatus(TransactionStatus.SUCCESS);
-						setTransactionModalType('status');
-					}
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		}
-	};
-
-	const onError: SubmitErrorHandler<TxsProps> = (errors) => console.log(errors);
 
 	const { fields, append, remove } = useFieldArray({
 		name: 'recipients',
@@ -88,7 +66,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 				<Stack className={'gap-6'}>
 					{
 						fields.map((field: { id: Key | null | undefined; }, index: number) => (
-							<Box key={field.id} className={'flex gap-4'} container>
+							<Box key={field.id} className={'flex gap-4'}>
 								<Box className={'flex gap-4 grow'}>
 									<InputLabel className={'w-full'}>
 										<Typography>Amount:</Typography>
@@ -98,7 +76,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 											placeholder={'Amount to transfer'}
 											{...register(`recipients.${index}.amount`, {required: true, pattern: /^[0-9]+$/i})}
 										/>
-										{errors.recipients?.[index].amount && getErrorText(returnIfString(errors.recipients?.[index].amount.type), "number")}
+										{errors?.recipients?.[index]?.amount && getErrorText(returnIfString(errors?.recipients?.[index]?.amount?.type), "number")}
 									</InputLabel>
 									<InputLabel className={'w-full'}>
 										<Typography>Address:</Typography>
@@ -106,9 +84,9 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 											className={'w-full'}
 											type={'text'}
 											placeholder={'kly address'}
-											{...register(`recipients.${index}.address`, {required: true})}
+											{...register(`recipients.${index}.recipient`, {required: true})}
 										/>
-										{errors.recipients?.[index].address && getErrorText(returnIfString(errors.recipients?.[index].address.type))}
+										{errors?.recipients?.[index]?.recipient && getErrorText(returnIfString(errors?.recipients?.[index]?.recipient?.type))}
 									</InputLabel>
 								</Box>
 								<Stack className={'justify-between h-[60px] mt-auto'}>
@@ -118,7 +96,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 											<Remove className={'text-[16px]'} />
 										</IconButton>
 									}
-									<IconButton className={"mt-auto"} onClick={() => append({amount: "", address: ""})}>
+									<IconButton className={"mt-auto"} onClick={() => append({amount: "", recipient: ""})}>
 										<Add className={'text-[16px]'} />
 									</IconButton>
 								</Stack>
@@ -135,7 +113,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 				type={"batchTransfer"}
 				open={openTransactionModal}
 				onClose={() => setOpenTransactionModal(false)}
-				onApprove={onConfirmApproval}
+				onApprove={() => onConfirmApproval(rpcResult, setTransactionStatus, setTransactionModalType,)}
 				status={transactionStatus}
 			/>
 		</Stack>

@@ -100,24 +100,23 @@ export const WalletConnectProvider = ({ children }: {
 
 		if (signClient) {
 			// @ts-ignore
-			signClient.on("session_event", (event) => {
-				console.log("event", event);
+			/*signClient.on("session_event", (event) => {
+				// console.log("event", event);
 				// Handle session events, such as "chainChanged", "accountsChanged", etc.
-			});
+			});*/
 
 			// @ts-ignore
-			signClient.on("session_update", ({ topic, params, }) => {
+			/*signClient.on("session_update", ({ topic, params, }) => {
 				const { namespaces, } = params;
 				const _session = signClient.session.get(topic);
 				// Overwrite the `namespaces` of the existing session with the incoming one.
 				const updatedSession = { ..._session, namespaces, };
 				// Integrate the updated session state into your dapp state.
-				console.log("update", topic, params, updatedSession);
+				// console.log("update", topic, params, updatedSession);
 				// onSessionUpdate(updatedSession)
-			});
+			});*/
 
 			signClient.on("session_delete", () => {
-				console.log("Wallet initiated session delete");
 				setSession(undefined);
 			});
 		}
@@ -131,7 +130,6 @@ export const WalletConnectProvider = ({ children }: {
 				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
-				console.log(address);
 				setAccount({chainID: currentChain, address, publicKey});
 			})();
 		}
@@ -162,7 +160,6 @@ export const WalletConnectProvider = ({ children }: {
 	}
 
 	async function connect() {
-		console.log(schemas)
 		try {
 			const {uri, approval,} = await getUri();
 			if (uri && approval) {
@@ -180,8 +177,6 @@ export const WalletConnectProvider = ({ children }: {
 	}
 
 	async function disconnect() {
-		console.log("sign client", signClient);
-		console.log("topic", topic);
 		if (!signClient) return;
 		try {
 			if (topic) {
@@ -195,11 +190,9 @@ export const WalletConnectProvider = ({ children }: {
 				setSession(undefined);
 				setTopic(undefined);
 				setAccount(undefined);
-				console.log("Wallet disconnected");
 			}
 		} catch (e) {
-			console.error(e);
-			console.log("error")
+			// console.error(e);
 		}
 	}
 
@@ -275,7 +268,6 @@ export const WalletConnectProvider = ({ children }: {
 			const payload = binary.toString('hex');
 
 			try {
-				console.log('client: ', signClient);
 				const result = await signClient!.request({
 					chainId,
 					topic: session!.topic,
@@ -287,9 +279,7 @@ export const WalletConnectProvider = ({ children }: {
 							recipientChainID: recipientChainID,
 						},
 					},
-				});
-
-				console.log('before valid true');
+				})as string;
 
 				const valid = true;
 
@@ -306,7 +296,6 @@ export const WalletConnectProvider = ({ children }: {
 					result: _signedTransaction,
 				};
 			} catch (error: any) {
-				console.log('error', error);
 				throw new Error(error);
 			}
 		},

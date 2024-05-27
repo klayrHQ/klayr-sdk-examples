@@ -1,22 +1,23 @@
+"use client"
 import { Button, Grid, Input, InputLabel, Stack, Typography } from '@mui/material';
-import { tokenActionsProps, TxsProps } from '@/components/tokens/tokenActionsModal';
-import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { ITokenActionsProps, ITransactionFormProps } from '@/types/types';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 import { useSchemas } from '@/providers/schemaProvider';
 import { useEffect, useState } from 'react';
 import { TransactionStatus } from '@/types/transactions';
-import { createTransactionObject, getErrorText, returnIfString } from '@/utils/functions';
-import { api } from '@/utils/api';
+import { getErrorText, onError, returnIfString } from '@/utils/functions';
 import { TransactionModal } from '@/components/walletConnect/transactionModal';
+import { createTransactionObject, onConfirmApproval } from '@/utils/transactionFunctions';
 
-export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
+export const Transfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 	const { register, handleSubmit, formState: { errors } } = useForm({
 		defaultValues: {
 			tokenID,
 			recipients: [
 				{
 					amount: "",
-					address: "",
+					recipient: "",
 				},
 			],
 		}
@@ -27,7 +28,7 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 	const [transactionModalType, setTransactionModalType] = useState<"approve" | "status">("status");
 	const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>(TransactionStatus.PENDING);
 
-	const onSubmit: SubmitHandler<TxsProps> = (data) => {
+	const onSubmit: SubmitHandler<ITransactionFormProps> = (data) => {
 		if(account) {
 			const { chainID, publicKey } = account;
 			const schema = getSchema(false, "tokenFactory:batchTransfer")
@@ -40,7 +41,7 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 					setOpenTransactionModal(true);
 				})
 				.catch(error => {
-					console.log(error)
+					//console.log(error)
 				});
 		}
 	}
@@ -51,29 +52,6 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 			if (!openTransactionModal) setOpenTransactionModal(true);
 		}
 	}, [rpcResult]);
-
-	//submit signed transaction
-	const onConfirmApproval = () => {
-		if (rpcResult?.result) {
-			console.log(rpcResult)
-			api.post("transactions", { transaction: rpcResult.result })
-				.then(r => {
-					if(r.error) {
-						setTransactionStatus(TransactionStatus.FAILURE);
-						setTransactionModalType("status");
-					}
-					else {
-						setTransactionStatus(TransactionStatus.SUCCESS);
-						setTransactionModalType('status');
-					}
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		}
-	};
-
-	const onError: SubmitErrorHandler<TxsProps> = (errors) => console.log(errors);
 
 	return (
 		<Stack className={"gap-8 min-h-full"}>
@@ -89,7 +67,7 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 								placeholder={'Amount to transfer'}
 								{...register("recipients.0.amount", {required: true, pattern: /^[0-9]+$/i})}
 							/>
-							{errors.recipients?.[0].amount && getErrorText(returnIfString(errors.recipients?.[0].amount.type), "number")}
+							{errors?.recipients?.[0]?.amount && getErrorText(returnIfString(errors.recipients?.[0].amount.type), "number")}
 						</InputLabel>
 					</Grid>
 					<Grid item>
@@ -99,9 +77,9 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 								className={'w-full'}
 								type={'text'}
 								placeholder={'kly address'}
-								{...register("recipients.0.address", {required: true})}
+								{...register("recipients.0.recipient", {required: true})}
 							/>
-							{errors.recipients?.[0].address && getErrorText(returnIfString(errors.recipients?.[0].address.type))}
+							{errors?.recipients?.[0]?.recipient && getErrorText(returnIfString(errors.recipients?.[0].recipient.type))}
 						</InputLabel>
 					</Grid>
 					<Grid item className={'flex items-end'}>
@@ -116,7 +94,7 @@ export const Transfer = ({ tokenID, tokenName }: tokenActionsProps) => {
 				type={"batchTransfer"}
 				open={openTransactionModal}
 				onClose={() => setOpenTransactionModal(false)}
-				onApprove={onConfirmApproval}
+				onApprove={() => onConfirmApproval(rpcResult, setTransactionStatus, setTransactionModalType)}
 				status={transactionStatus}
 			/>
 		</Stack>

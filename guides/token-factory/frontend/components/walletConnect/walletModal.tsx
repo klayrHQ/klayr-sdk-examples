@@ -2,14 +2,15 @@
 import { Button, Modal, ModalProps, Popover, PopoverProps, Slide, Stack, Typography } from '@mui/material';
 import { useWalletConnect } from '@/providers/walletConnectProvider';
 
-export const WalletModal = ({open, onClose}: ModalProps) => {
+export const WalletModal = ({open, onClose}: {open: ModalProps["open"], onClose: ModalProps["onClose"]}) => {
 	const { account, disconnect } = useWalletConnect()
 
 	return (
 		<Modal
-			closeAfterTranstition
+			closeAfterTransition
 			open={open}
 			onClose={onClose}
+			component={"div"}
 		>
 			<Slide direction={"left"} in={open}>
 				<Stack
