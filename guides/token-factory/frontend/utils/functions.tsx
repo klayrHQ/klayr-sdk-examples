@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import { SubmitErrorHandler } from 'react-hook-form';
-import { ITransactionFormProps } from '@/components/tokens/tokenActionsModal';
+import { ITransactionFormProps } from '@/types/types';
 
 export const returnIfString = (value: unknown) => {
 	if (typeof value !== "string") return undefined;

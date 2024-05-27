@@ -17,7 +17,7 @@ export const Transfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 			recipients: [
 				{
 					amount: "",
-					address: "",
+					recipient: "",
 				},
 			],
 		}
@@ -67,7 +67,7 @@ export const Transfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 								placeholder={'Amount to transfer'}
 								{...register("recipients.0.amount", {required: true, pattern: /^[0-9]+$/i})}
 							/>
-							{errors.recipients?.[0].amount && getErrorText(returnIfString(errors.recipients?.[0].amount.type), "number")}
+							{errors?.recipients?.[0]?.amount && getErrorText(returnIfString(errors.recipients?.[0].amount.type), "number")}
 						</InputLabel>
 					</Grid>
 					<Grid item>
@@ -77,9 +77,9 @@ export const Transfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 								className={'w-full'}
 								type={'text'}
 								placeholder={'kly address'}
-								{...register("recipients.0.address", {required: true})}
+								{...register("recipients.0.recipient", {required: true})}
 							/>
-							{errors.recipients?.[0].address && getErrorText(returnIfString(errors.recipients?.[0].address.type))}
+							{errors?.recipients?.[0]?.recipient && getErrorText(returnIfString(errors.recipients?.[0].recipient.type))}
 						</InputLabel>
 					</Grid>
 					<Grid item className={'flex items-end'}>

@@ -1,6 +1,6 @@
 import { CommandType, TransactionStatus } from '@/types/transactions';
 import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { Close } from '@mui/icons-material';
 
 interface TransactionModalProps {
@@ -14,6 +14,10 @@ interface TransactionModalProps {
 
 export const TransactionModal = ({open, onClose, type, status, onApprove, modalType}: TransactionModalProps) => {
     const [stateText, setStateText] = useState<string>('');
+
+    const handleClose = (event: React.MouseEvent) => {
+        onClose;
+    };
 
     useEffect(() => {
         switch(type) {
@@ -67,13 +71,13 @@ export const TransactionModal = ({open, onClose, type, status, onApprove, modalT
                         <Stack className={"justify-center items-center"}>
                             <Typography variant='h2'>{stateText}</Typography>
                             {
-                                status === TransactionStatus.PENDING && <Typography variant='span'>Sign transaction in your wallet</Typography>
+                                status === TransactionStatus.PENDING && <Typography>Sign transaction in your wallet</Typography>
                             }
                             {
-                                status === TransactionStatus.FAILURE && <Typography variant='span'>You can close this window and try again</Typography>
+                                status === TransactionStatus.FAILURE && <Typography>You can close this window and try again</Typography>
                             }
                             {
-                              status === TransactionStatus.SUCCESS && <Typography variant='span'>You can close this window</Typography>
+                              status === TransactionStatus.SUCCESS && <Typography>You can close this window</Typography>
                             }
                         </Stack>
                         : <Stack className={"gap-8"}>
@@ -81,7 +85,7 @@ export const TransactionModal = ({open, onClose, type, status, onApprove, modalT
                               <Button onClick={onApprove}><Typography>Approve</Typography></Button>
                           </Stack>
                 }
-                <IconButton className={"absolute right-2 top-2"} onClick={onClose}>
+                <IconButton className={"absolute right-2 top-2"} onClick={handleClose}>
                     <Close />
                 </IconButton>
             </Box>

@@ -279,7 +279,7 @@ export const WalletConnectProvider = ({ children }: {
 							recipientChainID: recipientChainID,
 						},
 					},
-				});
+				})as string;
 
 				const valid = true;
 

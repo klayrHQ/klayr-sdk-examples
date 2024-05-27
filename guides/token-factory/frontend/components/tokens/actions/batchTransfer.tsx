@@ -18,7 +18,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 			recipients: [
 				{
 					amount: '',
-					address: '',
+					recipient: '',
 				},
 			],
 		},
@@ -66,7 +66,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 				<Stack className={'gap-6'}>
 					{
 						fields.map((field: { id: Key | null | undefined; }, index: number) => (
-							<Box key={field.id} className={'flex gap-4'} container>
+							<Box key={field.id} className={'flex gap-4'}>
 								<Box className={'flex gap-4 grow'}>
 									<InputLabel className={'w-full'}>
 										<Typography>Amount:</Typography>
@@ -76,7 +76,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 											placeholder={'Amount to transfer'}
 											{...register(`recipients.${index}.amount`, {required: true, pattern: /^[0-9]+$/i})}
 										/>
-										{errors.recipients?.[index].amount && getErrorText(returnIfString(errors.recipients?.[index].amount.type), "number")}
+										{errors?.recipients?.[index]?.amount && getErrorText(returnIfString(errors?.recipients?.[index]?.amount?.type), "number")}
 									</InputLabel>
 									<InputLabel className={'w-full'}>
 										<Typography>Address:</Typography>
@@ -84,9 +84,9 @@ export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 											className={'w-full'}
 											type={'text'}
 											placeholder={'kly address'}
-											{...register(`recipients.${index}.address`, {required: true})}
+											{...register(`recipients.${index}.recipient`, {required: true})}
 										/>
-										{errors.recipients?.[index].address && getErrorText(returnIfString(errors.recipients?.[index].address.type))}
+										{errors?.recipients?.[index]?.recipient && getErrorText(returnIfString(errors?.recipients?.[index]?.recipient?.type))}
 									</InputLabel>
 								</Box>
 								<Stack className={'justify-between h-[60px] mt-auto'}>
@@ -96,7 +96,7 @@ export const BatchTransfer = ({ tokenID, tokenName }: ITokenActionsProps) => {
 											<Remove className={'text-[16px]'} />
 										</IconButton>
 									}
-									<IconButton className={"mt-auto"} onClick={() => append({amount: "", address: ""})}>
+									<IconButton className={"mt-auto"} onClick={() => append({amount: "", recipient: ""})}>
 										<Add className={'text-[16px]'} />
 									</IconButton>
 								</Stack>

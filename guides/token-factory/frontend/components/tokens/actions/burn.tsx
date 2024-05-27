@@ -11,7 +11,12 @@ import { TransactionModal } from '@/components/walletConnect/transactionModal';
 import { createTransactionObject, onConfirmApproval } from '@/utils/transactionFunctions';
 
 export const Burn = ({ tokenID, tokenName }: ITokenActionsProps) => {
-	const { register, handleSubmit, formState: { errors } } = useForm({defaultValues: {tokenID}});
+	const { register, handleSubmit, formState: { errors } } = useForm({
+		defaultValues: {
+			tokenID,
+			amount: ""
+		}
+	});
 	const { account, signTransaction, rpcResult } = useWalletConnect();
 	const { getSchema } = useSchemas();
 	const [openTransactionModal, setOpenTransactionModal] = useState<boolean>(false);

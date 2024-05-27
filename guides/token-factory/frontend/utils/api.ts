@@ -23,13 +23,9 @@ const post = async (call: string, data: any) => {
 
 const getFromCore = async (data?: any) => {
 	const response = await fetch(
-		`https://token-factory.klayr.dev:8443/rpc`,
+		`${process.env.NEXT_PUBLIC_TOKEN_FACTORY_CORE_URL}/rpc`,
 		{
 			method: "POST",
-			mode: "cors",
-			headers: {
-				"Content-Type": "application/json",
-			},
 			body: JSON.stringify(data),
 		}
 	);
@@ -79,7 +75,7 @@ export const getTokens = async (address?: string) => {
 				method: "tokenFactoryInfo_getTokenList",
 				params: { address }
 			});
-			return response.data as IToken[]
+			return response.result as IToken[]
 		}
 
 		const response = await getFromCore( {
@@ -88,8 +84,7 @@ export const getTokens = async (address?: string) => {
 			method: "tokenFactoryInfo_getTokenList",
 			params: {}
 		});
-
-		return response.data as IToken[]
+		return response.result as IToken[]
 	} catch (error) {
 		console.log(error)
 	}

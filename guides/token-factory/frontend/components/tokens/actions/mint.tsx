@@ -11,7 +11,12 @@ import { getErrorText, onError, returnIfString } from '@/utils/functions';
 import { createTransactionObject, onConfirmApproval } from '@/utils/transactionFunctions';
 
 export const Mint = ({ tokenID, tokenName }: ITokenActionsProps) => {
-	const { register, handleSubmit, formState: { errors } } = useForm({defaultValues: {tokenID}});
+	const { register, handleSubmit, formState: { errors } } = useForm({
+		defaultValues: {
+			tokenID,
+			amount: ""
+		}
+	});
 	const { account, signTransaction, rpcResult } = useWalletConnect();
 	const { getSchema } = useSchemas();
 	const [openTransactionModal, setOpenTransactionModal] = useState<boolean>(false);
@@ -57,7 +62,7 @@ export const Mint = ({ tokenID, tokenName }: ITokenActionsProps) => {
 								placeholder={'Amount to mint'}
 								{...register("amount", {required: true, pattern: /^[0-9]+$/i})}
 							/>
-							{errors.amount && getErrorText(returnIfString(errors.amount.type), "number")}
+							{errors.amount && getErrorText(returnIfString(errors.amount?.type), "number")}
 						</InputLabel>
 					</Grid>
 					<Grid item className={'flex items-end'}>
