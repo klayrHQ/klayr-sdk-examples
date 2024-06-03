@@ -43,3 +43,4 @@ config.local.json
 
 # Build Directory
 dist
+k8s/secrets
