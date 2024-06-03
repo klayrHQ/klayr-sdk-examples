@@ -71,7 +71,7 @@ export class TokenID {
 
 		return Buffer.concat([
 			// default genesis chainID
-			Buffer.from('12345678'),
+			Buffer.from('01234567'),
 			tokenIDBuffer,
 		]);
 	}

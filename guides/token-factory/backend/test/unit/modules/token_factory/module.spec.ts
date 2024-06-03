@@ -4,7 +4,7 @@ import { TokenFactoryModule } from '@app/modules/token_factory/module';
 
 describe('TokenFactoryModule', () => {
 	const genesisConfig: any = {
-		chainID: '12345678',
+		chainID: '01234567',
 	};
 	const defaultConfig = {
 		maxNameLength: 30,

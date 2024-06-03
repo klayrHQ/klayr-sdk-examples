@@ -17,7 +17,7 @@ describe('CreateTokenCommand', () => {
 		maxNameLength: 30,
 		maxSymbolLength: 6,
 		maxTotalSupply: BigInt(1e6),
-		chainID: Buffer.from('12345678'),
+		chainID: Buffer.from('01234567'),
 		createTokenFee: BigInt(100_000),
 	};
 	const defaultToken = {

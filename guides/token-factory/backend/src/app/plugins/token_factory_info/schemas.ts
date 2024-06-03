@@ -14,7 +14,7 @@ export const configSchema = {
 	required: ['syncInterval', 'chainID'],
 	default: {
 		syncInterval: 20000, // milliseconds
-		chainID: '12345678',
+		chainID: '01234567',
 	},
 };
 

@@ -9,3 +9,5 @@ COPY . .
 RUN npm run build
 
 CMD [ "./bin/run", "start", "--config", "config/custom_deploy_config.json", "--overwrite-config" ]
+
+  

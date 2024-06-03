@@ -17,7 +17,7 @@ describe('MintCommand', () => {
 	const initConfig = {
 		minAmountToMint: BigInt(1000),
 		maxAmountToMint: BigInt(1e6) * BigInt(1e8),
-		chainID: Buffer.from('12345678'),
+		chainID: Buffer.from('01234567'),
 		createTokenFee: BigInt(100_000),
 	};
 	const tokenID = new TokenID(1).toBuffer();
