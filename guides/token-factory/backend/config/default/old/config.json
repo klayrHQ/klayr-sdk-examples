@@ -1,6 +1,6 @@
 {
 	"system": {
-		"dataPath": "/Users/nickrossenberg/.klayr/test2",
+		"dataPath": "~/.klayr/token-factory",
 		"keepEventsForHeights": 300,
 		"logLevel": "info"
 	},

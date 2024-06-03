@@ -17,7 +17,7 @@ spec:
         - name: token-factory
           ports:
             - containerPort: 5000
-          image: ghcr.io/klayrhq/klayr-sdk-examples:v0.0.4-token-factory.11
+          image: ghcr.io/klayrhq/klayr-sdk-examples:v0.0.4-token-factory.13
           imagePullPolicy: Always
           # volumeMounts:
           #   - name: storage
