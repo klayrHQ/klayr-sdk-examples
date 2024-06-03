@@ -4,16 +4,22 @@ import { WalletConnectModal } from '@walletconnect/modal';
 import WCClient, {SignClient} from '@walletconnect/sign-client';
 import Logo from '@/assets/images/logo.png';
 import { SessionTypes } from '@walletconnect/types';
-import { getLisk32AddressFromPublicKey } from '@/utils/chainFunctions';
-import { chains, currentChain, projectID } from '@/utils/constants';
+import { getKlayr32AddressFromPublicKey } from '@/utils/chainFunctions';
+import { chains, currentChain, projectID, recipientChainID } from '@/utils/constants';
+import { useSchemas } from '@/providers/schemaProvider';
+import { codec } from '@klayr/codec';
+import { IAccount } from '@/types/transactions';
+
+type TRpcRequestCallback = (chainId: string, address: string, schema: any, rawTx: any) => Promise<void>;
 
 interface WalletConnectProps {
 	session: any
 	connect: () => void
 	disconnect: () => void
-	address: string | undefined
-	publicKey: string | undefined
-	sendTransaction: () => void
+	account: IAccount | undefined
+	//signTransaction: (payload, schema) => void
+	signTransaction: TRpcRequestCallback
+	rpcResult: IFormattedRpcResponse | null
 }
 
 type TransactionResult = {
@@ -27,20 +33,31 @@ type TransactionResult = {
 	error?: { code: number; message: string };
 };
 
+interface IFormattedRpcResponse {
+	method?: string;
+	address?: string;
+	valid: boolean;
+	result: string;
+}
+
 export const WalletConnect = createContext<WalletConnectProps>(
 	{} as WalletConnectProps,
 );
 
-export const useWalletConnect = () => useContext(WalletConnect)
+export const useWalletConnect = () => useContext(WalletConnect);
 
 export const WalletConnectProvider = ({ children }: {
 	children: ReactNode;
 }) => {
+	const { schemas, getSchema } = useSchemas()
 	const [session, setSession] = useState<any>()
 	const [signClient, setSignClient] = useState<WCClient>();
 	const [topic, setTopic] = useState<string | undefined>();
-	const [address, setAddress] = useState<string | undefined>();
-	const [publicKey, setPublicKey] = useState<string | undefined>();
+	const [account, setAccount] = useState<IAccount>()
+	const [pending, setPending] = useState(false);
+	const [result, setResult] = useState<IFormattedRpcResponse | null>(null);
+
+	const baseTransactionSchema = getSchema(true);
 
 	const modal = new WalletConnectModal({
 		projectId: projectID,
@@ -82,23 +99,24 @@ export const WalletConnectProvider = ({ children }: {
 		}
 
 		if (signClient) {
-			signClient.on("session_event", (event) => {
-				console.log("event", event);
+			// @ts-ignore
+			/*signClient.on("session_event", (event) => {
+				// console.log("event", event);
 				// Handle session events, such as "chainChanged", "accountsChanged", etc.
-			});
+			});*/
 
-			signClient.on("session_update", ({ topic, params, }) => {
+			// @ts-ignore
+			/*signClient.on("session_update", ({ topic, params, }) => {
 				const { namespaces, } = params;
 				const _session = signClient.session.get(topic);
 				// Overwrite the `namespaces` of the existing session with the incoming one.
 				const updatedSession = { ..._session, namespaces, };
 				// Integrate the updated session state into your dapp state.
-				console.log("update", topic, params, updatedSession);
+				// console.log("update", topic, params, updatedSession);
 				// onSessionUpdate(updatedSession)
-			});
+			});*/
 
 			signClient.on("session_delete", () => {
-				console.log("Wallet initiated session delete");
 				setSession(undefined);
 			});
 		}
@@ -108,12 +126,11 @@ export const WalletConnectProvider = ({ children }: {
 		if (session) {
 			(async () => {
 				setTopic(session.topic);
-				const publicKey = session.namespaces.lisk.accounts[0].split(":")[2];
-				const address = await getLisk32AddressFromPublicKey(
+				const publicKey = session.namespaces.klayr.accounts[0].split(":")[2];
+				const address = await getKlayr32AddressFromPublicKey(
 					Buffer.from(publicKey, "hex"),
 				);
-				setAddress(address);
-				setPublicKey(publicKey);
+				setAccount({chainID: currentChain, address, publicKey});
 			})();
 		}
 	}, [session]);
@@ -126,8 +143,8 @@ export const WalletConnectProvider = ({ children }: {
 		return signClient.connect({
 			// pairingTopic: topic,
 			requiredNamespaces: {
-				lisk: {
-					methods: ["send_transaction", "sign_transaction", "sign_message"],
+				klayr: {
+					methods: ["sign_transaction"],
 					chains: chains,
 					events: [
 						"session_proposal",
@@ -172,15 +189,119 @@ export const WalletConnectProvider = ({ children }: {
 				});
 				setSession(undefined);
 				setTopic(undefined);
-				/*setAddresses(undefined);*/
-				console.log("Wallet disconnected");
+				setAccount(undefined);
 			}
 		} catch (e) {
-			console.error(e);
+			// console.error(e);
 		}
 	}
 
-	async function sendTransaction() {
+	const encodeTransaction = async (tx: any, paramsSchema: any) => {
+		let encodedParams;
+		if (!Buffer.isBuffer(tx.params)) {
+			encodedParams = paramsSchema ? codec.encode(paramsSchema, tx.params) : Buffer.alloc(0);
+		} else {
+			encodedParams = tx.params;
+		}
+
+		// @ts-ignore
+		const encodedTransaction = codec.encode(baseTransactionSchema, {
+			...tx,
+			params: encodedParams,
+		});
+
+		return encodedTransaction;
+	};
+
+	const fromTransactionJSON = async (rawTx: any, paramsSchema: any) => {
+		// @ts-ignore
+		const tx = codec.fromJSON(baseTransactionSchema, {
+			...rawTx,
+			params: '',
+		});
+
+		let params;
+		if (typeof rawTx.params === 'string') {
+			params = paramsSchema ? codec.decode(paramsSchema, Buffer.from(rawTx.params, 'hex')) : {};
+		} else {
+			params = paramsSchema ? codec.fromJSON(paramsSchema, rawTx.params) : {};
+		}
+
+		return {
+			...tx,
+			id: rawTx.id ? Buffer.from(rawTx.id, 'hex') : Buffer.alloc(0),
+			params,
+		};
+	};
+
+	const _createJsonRpcRequestHandler =
+		(rpcRequest: (chainId: string, address: string, schema: any, rawTx: any) => Promise<IFormattedRpcResponse>) =>
+			async (chainId: string, address: string, schema: any, rawTx: any) => {
+				if (typeof signClient === 'undefined') {
+					throw new Error('WalletConnect is not initialized');
+				}
+				if (typeof session === 'undefined') {
+					throw new Error('Session is not connected');
+				}
+
+				try {
+					setPending(true);
+					const result = await rpcRequest(chainId, address, schema, rawTx);
+					setResult(result);
+				} catch (err: any) {
+					console.error('RPC request failed: ', err);
+					setResult({
+						address,
+						valid: false,
+						result: err?.message ?? err,
+					});
+					throw new Error(err);
+				} finally {
+					setPending(false);
+				}
+			};
+
+	const signTransaction = _createJsonRpcRequestHandler(
+		async (chainId: string, address: string, schema: any, rawTx: any): Promise<IFormattedRpcResponse> => {
+			const tx = await fromTransactionJSON(rawTx, schema);
+			const binary = await encodeTransaction(tx, schema);
+			const payload = binary.toString('hex');
+
+			try {
+				const result = await signClient!.request({
+					chainId,
+					topic: session!.topic,
+					request: {
+						method: "sign_transaction",
+						params: {
+							payload,
+							schema,
+							recipientChainID: recipientChainID,
+						},
+					},
+				})as string;
+
+				const valid = true;
+
+				rawTx.signatures = [...JSON.parse(result).signatures];
+
+				const _tx = await fromTransactionJSON(rawTx, schema);
+				const _binary = await encodeTransaction(_tx, schema);
+				const _signedTransaction = _binary.toString('hex');
+
+				return {
+					method: "sign_transaction",
+					address,
+					valid,
+					result: _signedTransaction,
+				};
+			} catch (error: any) {
+				throw new Error(error);
+			}
+		},
+	)
+
+	/*async function signTransaction(schema, payload) {
 		try {
 			if (!signClient || !session || !publicKey) {
 				console.error("Prerequisites not met");
@@ -190,9 +311,11 @@ export const WalletConnectProvider = ({ children }: {
 				topic: session.topic,
 				chainId: currentChain,
 				request: {
-					method: "send_transaction",
+					method: "sign_transaction",
 					params: {
 						address: publicKey,
+						payload,
+						schema: schema || getSchema(true),
 					},
 				},
 			}) as string;
@@ -209,7 +332,7 @@ export const WalletConnectProvider = ({ children }: {
 		} catch (e) {
 			console.error(e, "ERROR");
 		}
-	}
+	}*/
 
 	return (
 		<WalletConnect.Provider
@@ -217,9 +340,9 @@ export const WalletConnectProvider = ({ children }: {
 				session,
 				connect,
 				disconnect,
-				address,
-				publicKey,
-				sendTransaction,
+				account,
+				rpcResult: result,
+				signTransaction,
 			}}
 		>
 			{children}

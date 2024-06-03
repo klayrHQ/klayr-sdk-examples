@@ -1,22 +1,25 @@
 "use client"
 import { useWalletConnect } from '@/providers/walletConnectProvider';
-import { Button, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { PageLayout } from '@/components/layout/pageLayout';
 
 export const ClientHome = () => {
-	const {connect, disconnect, session, address, publicKey} = useWalletConnect()
+	const {connect, disconnect, session, account} = useWalletConnect()
 
 	return (
 		<PageLayout title={"Token Factory"}>
 			{
 				session ?
 					<>
-						<Typography className={'m-auto'}>{JSON.stringify(address)}</Typography>
+						<Stack className={"gap-4"}>
+							<Typography className={'m-auto'} variant={'h2'}>Welcome</Typography>
+							<Typography className={'m-auto'}>{account?.address}</Typography>
+						</Stack>
 						<Button
 							onClick={() => disconnect()}
 							sx={{ width: 'max-content', marginInline: 'auto', marginTop: '10px' }}
 						>
-							Disconnect Wallet
+							<Typography>Disconnect Wallet</Typography>
 						</Button>
 					</>
 					:
@@ -26,7 +29,7 @@ export const ClientHome = () => {
 							onClick={() => connect()}
 							sx={{ width: 'max-content', marginInline: 'auto', marginTop: '10px' }}
 						>
-							Connect Wallet
+							<Typography>Connect Wallet</Typography>
 						</Button>
 					</>
 			}
