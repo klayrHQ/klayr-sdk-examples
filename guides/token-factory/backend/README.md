@@ -27,7 +27,7 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 
 ```
 ./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
-./bin/run endpoint:invoke token_getBalance '{"tokenID": "1234567800000000", "address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "0123456700000000", "address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
 ```
 
 ### Commands
@@ -35,7 +35,7 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 ```
 ./bin/run endpoint:invoke token_getBalances '{"address":"kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --pretty
 
-./bin/run endpoint:invoke token_getBalance '{"tokenID": "1234567800000000", "address":"klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz"}' --pretty
+./bin/run endpoint:invoke token_getBalance '{"tokenID": "0123456700000000", "address":"klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz"}' --pretty
 ```
 
 ### Create token
@@ -47,19 +47,19 @@ npm run build && ./bin/run start --config config/custom_config.json --overwrite-
 ### Mint
 
 ```
- ./bin/run transaction:create tokenFactory mint 10000000 --params='{"tokenID": "1234567800000001", "amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
+ ./bin/run transaction:create tokenFactory mint 10000000 --params='{"tokenID": "0123456700000001", "amount": "100000000", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
 ```
 
 ### Burn
 
 ```
-./bin/run transaction:create tokenFactory burn 10000000 --params='{"tokenID": "1234567800000001", "amount": "9999", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
+./bin/run transaction:create tokenFactory burn 10000000 --params='{"tokenID": "0123456700000001", "amount": "9999", "recipient": "kly4mba244me87reyg9fegcy2cesdfw6gq9r8we5x"}' --json --pretty
 ```
 
 ### Batch Transfer
 
 ```
-./bin/run transaction:create tokenFactory batchTransfer 10000000 --params='{"tokenID": "1234567800000000", "recipients": [{"recipient": "klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8", "amount": "9999"}, {"recipient": "klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz", "amount": "9999"}]}' --json --pretty
+./bin/run transaction:create tokenFactory batchTransfer 10000000 --params='{"tokenID": "0123456700000000", "recipients": [{"recipient": "klys9u6yy466q2mpbj92cmbp64eg7gvpuz7v4efm8", "amount": "9999"}, {"recipient": "klyjzyvbewx5huzs8pyw4gqeb59ekmn3fg9qhoqqz", "amount": "9999"}]}' --json --pretty
 ```
 
 ### Batch Transfer test script

@@ -1,7 +1,7 @@
 import { cryptography } from 'klayr-sdk';
 
 function generateParams() {
-	const tokenID = '1234567800000000';
+	const tokenID = '0123456700000000';
 	const numberOfTransfers = 20;
 	const maxAmount = 100;
 

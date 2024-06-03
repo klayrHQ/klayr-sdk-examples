@@ -17,7 +17,7 @@ import { CommandExecuteContext, Transaction, VerifyStatus, chain, codec, db } fr
 describe('BurnCommand', () => {
 	const initConfig = {
 		minAmountToBurn: BigInt(1000),
-		chainID: Buffer.from('12345678'),
+		chainID: Buffer.from('01234567'),
 	};
 	const tokenID = new TokenID(1).toBuffer();
 

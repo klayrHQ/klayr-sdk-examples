@@ -29,7 +29,7 @@
 		"blockTime": 10,
 		"bftBatchSize": 103,
 		"maxTransactionsSize": 15360,
-		"chainID": "12345678"
+		"chainID": "01234567"
 	},
 	"generator": {
 		"keys": {
@@ -44,7 +44,7 @@
 	"plugins": {
 		"token_factory": {
 			"syncInterval": 10000,
-			"chainID": "12345678"
+			"chainID": "01234567"
 		},
 		"dashboard": {
 			"port": 5000,
