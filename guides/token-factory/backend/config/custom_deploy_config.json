@@ -55,7 +55,7 @@
 		"faucet": {
 			"tokenID": "0123456700000000",
 			"applicationUrl": "wss://token-factory.klayr.dev/rpc-ws",
-			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=a0b91e022c791cc9a157536c8af79a2d3dd4b1cc0604a36e6042db2978795fe649836ccf3d92b7ce8c119005d7b3ce44a4004ef8d2744fb75dca8f91b11d418374beb0d1019331d6962cd9444f410275bb7009ab183b0032d99130a70f1013da1fc973569b2c01a9e891b0014e0d727f42713e5f52446f6059d7a53290e8ac5d&mac=c0d21b0fea79e589599f7fba768c3d7d833a0b9c52de4670ee9106ab867fabf7&salt=f0c0b45de9926f86&iv=dd952cc598feb846167e54e117292066&tag=ef8211e2d124b084297205a41f0dc101&iterations=1&parallelism=4&memorySize=2097023",
+			"encryptedPrivateKey": "kdf=argon2id&cipher=aes-128-gcm&version=1&ciphertext=093377ee33f4642151a92c4a24f0616c05cb3fb935e37ce10b599207f1ff58156ce292457943a25ccd7d2a35ab8a86f644108a565258ccebeb244b77d3b3854c973784fe0167049c8a22f63fc0de9190639baa2a28ac2e3f90aca5e90927cc8f223031ff45c387ad3cd0ac2ffb26685bff5365b52dbb97ef8945c75f7e8e0c84&mac=ac065828d481cb18589c2b3e93806684eba839807d10529c8b24a73548ea9fda&salt=a53696d937159520&iv=329f4a4e4194b4e1e88ba499ea413a17&tag=895ac6198a2a0839141955b2da1b706f&iterations=1&parallelism=4&memorySize=2097023",
 			"captchaSecretkey": "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
 			"captchaSitekey": "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
 			"host": "0.0.0.0",
@@ -63,3 +63,4 @@
 		}
 	}
 }
+
