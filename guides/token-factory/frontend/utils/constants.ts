@@ -7,6 +7,6 @@ export const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a14
 
 //WalletConnect
 export const projectID = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string;
-export const currentChain = "klayr:12345678";
-export const recipientChainID = "12345678";
-export const chains = ["klayr:12345678"];
+export const currentChain = "klayr:01234567";
+export const recipientChainID = "01234567";
+export const chains = ["klayr:01234567"];
