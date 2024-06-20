@@ -1,5 +1,5 @@
 const transactionSchema = {
-  $id: '/lisk/transaction',
+  $id: '/klayr/transaction',
   type: 'object',
   required: ['module', 'command', 'nonce', 'fee', 'senderPublicKey', 'params'],
   properties: {
@@ -44,7 +44,7 @@ const transactionSchema = {
 };
 
 const transferParamsSchema = {
-  $id: '/lisk/transferParams',
+  $id: '/klayr/transferParams',
   title: 'Transfer transaction params',
   type: 'object',
   required: ['tokenID', 'amount', 'recipientAddress', 'data'],
@@ -62,7 +62,7 @@ const transferParamsSchema = {
     recipientAddress: {
       dataType: 'bytes',
       fieldNumber: 3,
-      format: 'lisk32',
+      format: 'klayr32',
     },
     data: {
       dataType: 'string',
