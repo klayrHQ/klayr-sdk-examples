@@ -1,11 +1,11 @@
-# @klayrhq/klayr-framework-dashboard-plugin
+# @liskhq/lisk-framework-dashboard-plugin
 
-@klayrhq/klayr-framework-dashboard-plugin is a plugin for interacting with a newly developed blockchain application.
+@liskhq/lisk-framework-dashboard-plugin is a plugin for interacting with a newly developed blockchain application.
 
 ## Installation
 
 ```sh
-$ npm install --save @klayrhq/klayr-framework-dashboard-plugin
+$ npm install --save @liskhq/lisk-framework-dashboard-plugin
 ```
 
 ## Config Options
@@ -34,5 +34,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[klayr core github]: https://github.com/KlayrHQ/klayr
-[klayr documentation site]: https://klayr.io/documentation/klayr-elements
+[lisk core github]: https://github.com/LiskHQ/lisk
+[lisk documentation site]: https://lisk.io/documentation/lisk-elements

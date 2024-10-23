@@ -81,7 +81,7 @@ rl.question("Do you want to sign the transaction? 'yes'", function (confirmed) {
             }
             process.exit(0);
         } else {
-            // Convert the JSON object read on the 7th step back to the Klayr accepted format, for the signing process.
+            // Convert the JSON object read on the 7th step back to the Lisk accepted format, for the signing process.
             signedTX['nonce'] = BigInt(signedTX.nonce);
             signedTX['fee'] = BigInt(signedTX.fee);
             signedTX['senderPublicKey'] = Buffer.from(signedTX.senderPublicKey, 'hex');

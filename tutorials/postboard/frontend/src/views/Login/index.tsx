@@ -26,7 +26,7 @@ const Login = () => {
             <CloseSvg />
           </div>
           <div className="text-center">
-            <h4>Login to Klayr Postboard</h4>
+            <h4>Login to Lisk Postboard</h4>
             <p>Enter your secret recovery phrase to sign in to your account.</p>
           </div>
           <PassphraseInput length={24} maxInputsLength={24} closeModal={closeModal} />

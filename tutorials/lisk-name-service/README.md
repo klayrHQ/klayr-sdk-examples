@@ -1,10 +1,10 @@
-# Klayr Name Service - PoC
+# Lisk Name Service - PoC
 
-This is a NFT Blockchain application created using `Version 5.1.0` of `klayr-sdk`.
+This is a NFT Blockchain application created using `Version 5.1.0` of `lisk-sdk`.
 
-This demonstrates On-Chain and Off-Chain architecture of `klayr-sdk`. We will be building an PoC name Klayr Name Service inspired from the ethereum name service to cover the following requirements.
+This demonstrates On-Chain and Off-Chain architecture of `lisk-sdk`. We will be building an PoC name Lisk Name Service inspired from the ethereum name service to cover the following requirements.
 
-- Able to register .kly domains.
+- Able to register .lsk domains.
 - Manage and update domain records.
 - Able to resolve a domain to an account address.
 - Able to reverse lookup an address for its domain.
