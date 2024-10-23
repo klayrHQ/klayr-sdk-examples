@@ -13,11 +13,11 @@ import logo from "../logo.png";
 const FixedMenuLayout = () => (
 
     <div>
-        <Menu fixed='top' inverted style={{ backgroundColor: '#050516' }}>
+        <Menu fixed='top' inverted style={{ backgroundColor: '#0C152E' }}>
             <Container>
                 <Menu.Item as={Link} to="/" >
                     <Image src={logo} size='mini' style={{ marginRight: '1.5em', }} />
-                    Hello Klayr Application
+                    Hello Lisk Application
                 </Menu.Item>
                 <Dropdown item simple text='Account'>
                     <Dropdown.Menu>

@@ -1,12 +1,12 @@
 {
 	"name": "postboard",
 	"version": "0.2.0",
-	"description": "Klayr-SDK Application",
+	"description": "Lisk-SDK Application",
 	"author": "mona",
 	"license": "ISC",
 	"keywords": [
 		"blockchain",
-		"klayr",
+		"lisk",
 		"nodejs",
 		"javascript",
 		"typescript"
@@ -78,7 +78,7 @@
 				"description": "Commands relating to postboard passphrases."
 			},
 			"sdk": {
-				"description": "Commands relating to Klayr SDK development."
+				"description": "Commands relating to Lisk SDK development."
 			},
 			"transaction": {
 				"description": "Commands relating to postboard transactions."

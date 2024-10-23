@@ -1,6 +1,6 @@
 # PostBoard with SDK v6.0.0
 
-This project was bootstrapped with [Klayr SDK](https://github.com/KlayrHQ/klayr-sdk)
+This project was bootstrapped with [Lisk SDK](https://github.com/LiskHQ/lisk-sdk)
 
 ### Start a node
 
@@ -19,7 +19,7 @@ $ ./bin/run transaction:create post createPost 5000000000 --params='{"message":"
 ### Follow an Account
 
 ```
-$ ./bin/run transaction:create post follow 5000000000 --params='{"account":"klyzbqjmwmd32sx8ya56saa4gk7tkco953btm24t8"}'
+$ ./bin/run transaction:create post follow 5000000000 --params='{"account":"lskzbqjmwmd32sx8ya56saa4gk7tkco953btm24t8"}'
 ```
 
 ### Like a Post
@@ -51,15 +51,15 @@ $ ./bin/run endpoint:invoke post_getPost "{\"id\": \"d62265b6b247c22934633aefa46
 ### getLatestPosts
 
 ```
-$ ./bin/run endpoint:invoke post_getLatestPosts "{\"address\": \"klysdfqvkbqpc8eczj2s3dzkxnap5pguaxdw2227r\"}"
+$ ./bin/run endpoint:invoke post_getLatestPosts "{\"address\": \"lsksdfqvkbqpc8eczj2s3dzkxnap5pguaxdw2227r\"}"
 ```
 
 ### getAccount
 
 ```
-$ ./bin/run endpoint:invoke post_getAccount "{\"address\": \"klyzbqjmwmd32sx8ya56saa4gk7tkco953btm24t8\"}"
+$ ./bin/run endpoint:invoke post_getAccount "{\"address\": \"lskzbqjmwmd32sx8ya56saa4gk7tkco953btm24t8\"}"
 ```
 
 ## Learn More
 
-You can learn more in the [documentation](https://klayr.io/documentation/klayr-sdk/index.html).
+You can learn more in the [documentation](https://lisk.io/documentation/lisk-sdk/index.html).

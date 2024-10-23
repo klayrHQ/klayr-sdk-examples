@@ -70,7 +70,7 @@ const RegisterNameDialog: React.FC<DialogProps & { name: string }> = props => {
 
 	return (
 		<Dialog {...rest} open={localOpen}>
-			<DialogTitle id="simple-dialog-title">Register klayr name: {props.name}</DialogTitle>
+			<DialogTitle id="simple-dialog-title">Register lisk name: {props.name}</DialogTitle>
 			<DialogContent>
 				<div className={classes.root}>
 					<TextField

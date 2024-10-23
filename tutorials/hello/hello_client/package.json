@@ -1,10 +1,10 @@
 {
 	"name": "hello_client",
 	"version": "0.1.0",
-	"description": "Klayr-SDK Application",
+	"description": "Lisk-SDK Application",
 	"author": "iamtalha",
 	"license": "ISC",
-	"keywords": ["blockchain", "klayr", "nodejs", "javascript", "typescript"],
+	"keywords": ["blockchain", "lisk", "nodejs", "javascript", "typescript"],
 	"homepage": "",
 	"repository": {},
 	"engines": {
@@ -71,7 +71,7 @@
 				"description": "Commands relating to hello_client endpoint."
 			},
 			"sdk": {
-				"description": "Commands relating to Klayr SDK development."
+				"description": "Commands relating to Lisk SDK development."
 			},
 			"transaction": {
 				"description": "Commands relating to hello_client transactions."

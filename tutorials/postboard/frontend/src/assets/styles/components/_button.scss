@@ -3,16 +3,16 @@
   border-radius: 25px;
   &.btn-primary {
     min-width: 150px;
-    background-color: $azule;
-    border-color: $azule;
+    background-color: $ultramarine_blue;
+    border-color: $ultramarine_blue;
     &.outline {
       background-color: $background;
-      color: $azule;
-      border-color: 1px solid $azule;
+      color: $ultramarine_blue;
+      border-color: 1px solid $ultramarine_blue;
       &:hover {
         color: $background;
-        background-color: $azule;
-        border-color: $azule;
+        background-color: $ultramarine_blue;
+        border-color: $ultramarine_blue;
       }
     }
   }
