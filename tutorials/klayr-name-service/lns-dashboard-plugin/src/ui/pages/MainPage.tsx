@@ -34,7 +34,7 @@ const MainPage: React.FC = () => {
 			<Container component="main" maxWidth="md">
 				<div className={classes.paper}>
 					<Typography component="h1" variant="h2">
-						Lisk Name Service
+						Klayr Name Service
 					</Typography>
 
 					<Box mt={8} width={'100%'}>

@@ -1,21 +1,21 @@
 {
 	"name": "lns-dashboard-plugin",
 	"version": "0.1.0",
-	"description": "A plugin for interacting with Lisk name service.",
-	"author": "Lisk Foundation <admin@lisk.io>, lightcurve GmbH <admin@lightcurve.io>",
+	"description": "A plugin for interacting with Klayr name service.",
+	"author": "Klayr <admin@lisk.io>, lightcurve GmbH <admin@lightcurve.io>",
 	"license": "Apache-2.0",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"blockchain",
 		"dashboard"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-sdk/tree/master/framework-plugins/lisk-framework-dashboard-plugin#readme",
+	"homepage": "https://github.com/KlayrHQ/klayr-sdk/tree/master/framework-plugins/klayr-framework-dashboard-plugin#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/LiskHQ/lisk-sdk.git"
+		"url": "git+https://github.com/KlayrHQ/klayr-sdk.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-sdk/issues"
+		"url": "https://github.com/KlayrHQ/klayr-sdk/issues"
 	},
 	"engines": {
 		"node": ">=16.14.1 <=16",

@@ -1,4 +1,4 @@
-# Building Social Security System using Lisk SDK
+# Building Social Security System using Klayr SDK
 
 ## Description
 

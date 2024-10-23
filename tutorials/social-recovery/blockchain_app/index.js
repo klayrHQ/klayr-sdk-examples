@@ -1,4 +1,4 @@
-// 1.Import lisk sdk to create the blockchain application
+// 1.Import klayr sdk to create the blockchain application
 const {
 	Application,
 	configDevnet,

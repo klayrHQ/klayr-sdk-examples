@@ -1,8 +1,8 @@
 # Steps to execute the script
 
-- Register a multi-signature account (You can use [this](https://github.com/LiskHQ/lisk-sdk-examples/tree/development/guides/register-multi-sig-accounts) script).
+- Register a multi-signature account (You can use [this](https://github.com/KlayrHQ/klayr-sdk-examples/tree/development/guides/register-multi-sig-accounts) script).
 
-- Install the `lisk-sdk` package by executing the following:
+- Install the `klayr-sdk` package by executing the following:
 
     ```
     npm install

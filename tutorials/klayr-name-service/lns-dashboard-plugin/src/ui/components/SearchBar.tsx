@@ -48,7 +48,7 @@ export const SearchBar: React.FC<SearchBarProps> = props => {
 			<InputBase
 				className={`${classes.input} ${props.large ? classes['Input-lg'] : ''}`}
 				value={term}
-				placeholder="Search Lisk Names"
+				placeholder="Search Klayr Names"
 				onChange={event => setTerm(event.target.value)}
 			/>
 			<IconButton type="submit" className={classes.iconButton}>

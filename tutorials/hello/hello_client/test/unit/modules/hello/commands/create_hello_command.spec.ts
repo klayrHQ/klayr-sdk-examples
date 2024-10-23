@@ -68,7 +68,7 @@ describe('CreateHelloCommand', () => {
 		});
 
 		it('should pass verify successfully and return status VerifyStatus.OK', async () => {
-			const legalParam = codec.encode(createHelloSchema, { 'message': "Hello Lisk v6 " })
+			const legalParam = codec.encode(createHelloSchema, { 'message': "Hello Klayr v6 " })
 			const transaction = new Transaction(getSampleTransaction(legalParam));
 
 			const context = testing

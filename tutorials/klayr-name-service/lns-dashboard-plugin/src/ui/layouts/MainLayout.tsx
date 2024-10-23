@@ -67,7 +67,7 @@ const MainLayout: React.FC<{ searchTerm?: string; disableSearch?: boolean }> = p
 				<Toolbar className={classes.toolbar}>
 					<Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
 						<Link to={'/'} component={RouterLink}>
-							Lisk Name Service
+							Klayr Name Service
 						</Link>
 					</Typography>
 

@@ -1,6 +1,6 @@
 # Steps to execute the script
 
-- Install the `lisk-sdk` package by executing the following:
+- Install the `klayr-sdk` package by executing the following:
 
     ```
     npm install

@@ -1,7 +1,7 @@
 .wrapper {
   margin: 0;
   position: relative;
-  
+
   .inputs {
     width: 100%;
     display: flex;
@@ -26,11 +26,11 @@
       margin: 5px;
       color: #000;
     }
-  
+
     &:focus-within {
-      border-color: $ultramarine_blue;
+      border-color: $azule;
     }
-  
+
     & > .inputContainer {
       width: calc(100% / 6);
       display: flex;
@@ -41,12 +41,12 @@
       box-sizing: border-box;
       color: var(--color-ghost);
       margin: 15px 0 15px;
-  
+
       &:focus-within {
-        color: $ultramarine_blue;
+        color: $azule;
       }
-  
-      
+
+
       & input {
         border: none;
         text-align: left;
@@ -54,15 +54,15 @@
         height: 20px !important;
         box-sizing: border-box;
         background-color: $background;
-  
+
         &:focus {
-          color: $ultramarine_blue;
-  
+          color: $azule;
+
           &::placeholder {
             border-bottom: none;
           }
         }
-  
+
         &::placeholder {
           font-family: sans-serif;
           color: $ghost;
@@ -71,12 +71,12 @@
         }
       }
     }
-  
+
     & > .inputContainer:nth-last-child(n + 7) {
       margin-bottom: 0;
     }
   }
-  
+
   .footerContent {
     align-items: center;
     display: flex;
@@ -86,7 +86,7 @@
     position: absolute;
     z-index: 1;
   }
-  
+
   .errorMessage {
     width: auto;
   }
@@ -94,19 +94,19 @@
   .inputNumber {
     color: #BEC1CD;
   }
-  
+
   .showPassphrase {
     cursor: pointer;
     float: right;
-  
+
     & > input {
       display: none;
     }
-  
+
     & .label {
       margin-left: 8px;
     }
-  
+
     & > img {
       width: 19px;
       height: 17px;
@@ -120,7 +120,7 @@
     .inputs {
       & > .inputContainer {
         width: calc(100% / 4);
-      } 
+      }
     }
   }
 }

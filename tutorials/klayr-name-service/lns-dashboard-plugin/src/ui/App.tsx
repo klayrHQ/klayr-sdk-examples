@@ -39,7 +39,7 @@ const App: React.FC = () => {
 				clientRef.current = c;
 				setAppState({ ...appState, ready: true });
 			} catch (error) {
-				console.error('Can not connect to Lisk Name Service Node', error);
+				console.error('Can not connect to Klayr Name Service Node', error);
 			}
 		};
 

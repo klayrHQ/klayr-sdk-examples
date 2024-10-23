@@ -1,7 +1,7 @@
 {
 	"name": "lns",
 	"version": "0.1.0",
-	"description": "Lisk-SDK Application",
+	"description": "Klayr-SDK Application",
 	"author": "nazar",
 	"license": "ISC",
 	"keywords": [
@@ -72,16 +72,16 @@
 				"description": "Create hash onions to be used by the forger."
 			},
 			"node": {
-				"description": "Commands relating to lisk-name-service node."
+				"description": "Commands relating to klayr-name-service node."
 			},
 			"passphrase": {
-				"description": "Commands relating to lisk-name-service passphrases."
+				"description": "Commands relating to klayr-name-service passphrases."
 			},
 			"sdk": {
-				"description": "Commands relating to Lisk SDK development."
+				"description": "Commands relating to Klayr SDK development."
 			},
 			"transaction": {
-				"description": "Commands relating to lisk-name-service transactions."
+				"description": "Commands relating to klayr-name-service transactions."
 			}
 		}
 	},
