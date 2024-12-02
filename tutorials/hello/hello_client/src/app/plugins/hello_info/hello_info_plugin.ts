@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import { BasePlugin, db as liskDB, codec } from 'lisk-sdk';
+import { Plugins, db as klayrDB, codec } from 'klayr-sdk';
 import {
 	getDBInstance,
 	getLastCounter,
@@ -9,25 +8,26 @@ import {
 	setLastEventHeight,
 } from './db';
 import { configSchema } from './schemas';
-import { newHelloEventSchema } from '../../modules/hello/events/new_hello';
 import { HelloInfoPluginConfig, Height, Counter } from './types';
+import { newHelloEventSchema } from '../../modules/hello/events/new_hello';
 import { Endpoint } from './endpoint';
 
-export class HelloInfoPlugin extends BasePlugin<HelloInfoPluginConfig> {
+export class HelloInfoPlugin extends Plugins.BasePlugin<HelloInfoPluginConfig> {
 	public configSchema = configSchema;
+	private _pluginDB!: klayrDB.Database;
+
 	public endpoint = new Endpoint();
-	private _pluginDB!: liskDB.Database;
 
 	public get nodeModulePath(): string {
 		return __filename;
 	}
 
-	// loads DB instances and initiates endpoint.
 	public async load(): Promise<void> {
+		// loads DB instance
 		this._pluginDB = await getDBInstance(this.dataPath);
+
 		this.endpoint.init(this._pluginDB);
 
-		// Syncs plugin's database after an interval.
 		setInterval(() => {
 			this._syncChainEvents();
 		}, this.config.syncInterval);
@@ -38,7 +38,32 @@ export class HelloInfoPlugin extends BasePlugin<HelloInfoPluginConfig> {
 		this._pluginDB.close();
 	}
 
-	// Syncs on-chain event's data with plugin's database.
+	private async _getLastCounter(): Promise<Counter> {
+		try {
+			const counter = await getLastCounter(this._pluginDB);
+			return counter;
+		} catch (error) {
+			if (!(error instanceof klayrDB.NotFoundError)) {
+				throw error;
+			}
+			await setLastCounter(this._pluginDB, 0);
+			return { counter: 0 };
+		}
+	}
+
+	private async _getLastHeight(): Promise<Height> {
+		try {
+			const height = await getLastEventHeight(this._pluginDB);
+			return height;
+		} catch (error) {
+			if (!(error instanceof klayrDB.NotFoundError)) {
+				throw error;
+			}
+			await setLastEventHeight(this._pluginDB, 0);
+			return { height: 0 };
+		}
+	}
+
 	private async _syncChainEvents(): Promise<void> {
 		// 1. Get the latest block height from the blockchain
 		const res = await this.apiClient.invoke<{ header: { height: number } }>(
@@ -71,33 +96,6 @@ export class HelloInfoPlugin extends BasePlugin<HelloInfoPluginConfig> {
 		await setLastEventHeight(this._pluginDB, height);
 	}
 
-	private async _getLastCounter(): Promise<Counter> {
-		try {
-			const counter = await getLastCounter(this._pluginDB);
-			return counter;
-		} catch (error) {
-			if (!(error instanceof liskDB.NotFoundError)) {
-				throw error;
-			}
-			await setLastCounter(this._pluginDB, 0);
-			return { counter: 0 };
-		}
-	}
-
-	private async _getLastHeight(): Promise<Height> {
-		try {
-			const height = await getLastEventHeight(this._pluginDB);
-			return height;
-		} catch (error) {
-			if (!(error instanceof liskDB.NotFoundError)) {
-				throw error;
-			}
-			await setLastEventHeight(this._pluginDB, 0);
-			return { height: 0 };
-		}
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private async _saveEventInfoToDB(
 		parsedData: { senderAddress: Buffer; message: string },
 		chainHeight: number,

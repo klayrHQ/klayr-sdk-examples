@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { codec, db as liskDB, cryptography } from 'lisk-sdk';
+import { codec, db as klayrDB, cryptography } from 'klayr-sdk';
 import * as os from 'os';
 import { join } from 'path';
 import { ensureDir } from 'fs-extra';
@@ -9,13 +9,13 @@ import { offChainEventSchema, counterSchema, heightSchema } from './schemas';
 import { Event, Counter, Height } from './types';
 import { DB_KEY_EVENT_INFO, DB_LAST_COUNTER_INFO, DB_LAST_HEIGHT_INFO } from './constants';
 
-const { Database } = liskDB;
-type KVStore = liskDB.Database;
+const { Database } = klayrDB;
+type KVStore = klayrDB.Database;
 
 // Returns DB's instance.
 export const getDBInstance = async (
 	dataPath: string,
-	dbName = 'lisk-framework-helloInfo-plugin.db',
+	dbName = 'klayr-framework-helloInfo-plugin.db',
 ): Promise<KVStore> => {
 	const dirPath = join(dataPath.replace('~', os.homedir()), 'database', dbName);
 	await ensureDir(dirPath);
@@ -52,13 +52,13 @@ export const getEventHelloInfo = async (db: KVStore): Promise<(Event & { id: Buf
 // Stores event data in the database.
 export const setEventHelloInfo = async (
 	db: KVStore,
-	_lskAddress: Buffer,
+	_klyAddress: Buffer,
 	_message: string,
 	_eventHeight: number,
 	lastCounter: number,
 ): Promise<void> => {
 	const encodedAddressInfo = codec.encode(offChainEventSchema, {
-		senderAddress: _lskAddress,
+		senderAddress: _klyAddress,
 		message: _message,
 		height: _eventHeight,
 	});

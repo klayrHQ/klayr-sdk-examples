@@ -1,7 +1,3 @@
-export interface HelloInfoPluginConfig {
-	syncInterval: number;
-}
-
 export interface Event {
 	senderAddress: Buffer;
 	message: string;
@@ -14,4 +10,8 @@ export interface Counter {
 
 export interface Height {
 	height: number;
+}
+
+export interface HelloInfoPluginConfig {
+	syncInterval: number;
 }

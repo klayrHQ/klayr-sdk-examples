@@ -1,17 +1,3 @@
-export const configSchema = {
-	$id: '/plugins/helloInfo/config',
-	type: 'object',
-	properties: {
-		syncInterval: {
-			type: 'integer',
-		},
-	},
-	required: ['syncInterval'],
-	default: {
-		syncInterval: 120000, // milliseconds
-	},
-};
-
 export const offChainEventSchema = {
 	$id: '/helloInfo/newHello',
 	type: 'object',
@@ -53,5 +39,19 @@ export const heightSchema = {
 			dataType: 'uint32',
 			fieldNumber: 1,
 		},
+	},
+};
+
+export const configSchema = {
+	$id: '/plugins/helloInfo/config',
+	type: 'object',
+	properties: {
+		syncInterval: {
+			type: 'integer',
+		},
+	},
+	required: ['syncInterval'],
+	default: {
+		syncInterval: 120000, // milliseconds
 	},
 };
