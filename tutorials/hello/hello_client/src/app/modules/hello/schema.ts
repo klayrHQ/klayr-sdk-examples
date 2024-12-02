@@ -1,22 +1,3 @@
-export interface CreateHelloParams {
-	message: string;
-}
-
-export const createHelloSchema = {
-	$id: 'hello/createHello-params',
-	title: 'CreateHelloCommand transaction parameter for the Hello module',
-	type: 'object',
-	required: ['message'],
-	properties: {
-		message: {
-			dataType: 'string',
-			fieldNumber: 1,
-			minLength: 3,
-			maxLength: 256,
-		},
-	},
-};
-
 export const configSchema = {
 	$id: '/hello/config',
 	type: 'object',
@@ -38,11 +19,22 @@ export const configSchema = {
 			},
 		},
 	},
-	required: [
-		'maxMessageLength',
-		'minMessageLength',
-		'blacklist'
-	],
+	required: ['maxMessageLength', 'minMessageLength', 'blacklist'],
+};
+
+export const createHelloSchema = {
+	$id: 'hello/createHello-params',
+	title: 'CreateHelloCommand transaction parameter for the Hello module',
+	type: 'object',
+	required: ['message'],
+	properties: {
+		message: {
+			dataType: 'string',
+			fieldNumber: 1,
+			minLength: 3,
+			maxLength: 256,
+		},
+	},
 };
 
 export const getHelloCounterResponseSchema = {
@@ -52,7 +44,7 @@ export const getHelloCounterResponseSchema = {
 	properties: {
 		counter: {
 			type: 'number',
-			format: 'uint32'
+			format: 'uint32',
 		},
 	},
 };
@@ -64,7 +56,7 @@ export const getHelloResponseSchema = {
 	properties: {
 		message: {
 			type: 'string',
-			format: 'utf8'
+			format: 'utf8',
 		},
 	},
 };
